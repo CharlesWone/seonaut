@@ -34,12 +34,20 @@ type UIConfig struct {
 	Theme    string `mapstructure:"theme"`
 }
 
+// DingTalkConfig stores the DingTalk webhook configuration.
+type DingTalkConfig struct {
+	Enabled    bool   `mapstructure:"enabled"`
+	WebhookURL string `mapstructure:"webhook_url"`
+	Secret     string `mapstructure:"secret"`
+}
+
 // Config stores the configuration for the application.
 type Config struct {
 	Crawler    *CrawlerConfig    `mapstructure:"crawler"`
 	HTTPServer *HTTPServerConfig `mapstructure:"server"`
 	DB         *DBConfig         `mapstructure:"database"`
 	UIConfig   *UIConfig         `mapstructure:"UI"`
+	DingTalk   *DingTalkConfig   `mapstructure:"dingtalk"`
 }
 
 // NewConfig loads the configuration from the specified file and path.

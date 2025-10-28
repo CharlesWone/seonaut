@@ -32,6 +32,7 @@ type Container struct {
 	CookieSession      *CookieSession
 	ArchiveService     *ArchiveService
 	ReplayService      *ReplayService
+	DingTalkService    *DingTalkService
 
 	db                   *sql.DB
 	issueRepository      *repository.IssueRepository
@@ -59,6 +60,7 @@ func NewContainer(configFile string) *Container {
 	c.InitProjectService()
 	c.InitProjectViewService()
 	c.InitExportService()
+	c.InitDingTalkService()
 	c.InitCrawlerService()
 	c.InitRenderer()
 	c.InitCookieSession()
@@ -194,11 +196,12 @@ func (c *Container) InitExportService() {
 // Create Crawler service.
 func (c *Container) InitCrawlerService() {
 	crawlerServices := CrawlerServicesContainer{
-		Broker:         c.PubSubBroker,
-		ReportManager:  c.ReportManager,
-		CrawlerHandler: NewCrawlerHandler(c.pageReportRepository, c.PubSubBroker, c.ReportManager),
-		ArchiveService: c.ArchiveService,
-		Config:         c.Config.Crawler,
+		Broker:          c.PubSubBroker,
+		ReportManager:   c.ReportManager,
+		CrawlerHandler:  NewCrawlerHandler(c.pageReportRepository, c.PubSubBroker, c.ReportManager),
+		ArchiveService:  c.ArchiveService,
+		DingTalkService: c.DingTalkService,
+		Config:          c.Config.Crawler,
 	}
 	repository := &struct {
 		*repository.CrawlRepository
@@ -250,4 +253,9 @@ func (c *Container) InitArchiveService() {
 // Init the WACZ archive replay service.
 func (c *Container) InitReplayService() {
 	c.ReplayService = NewReplayService()
+}
+
+// Init the DingTalk notification service.
+func (c *Container) InitDingTalkService() {
+	c.DingTalkService = NewDingTalkService(c.Config.DingTalk)
 }

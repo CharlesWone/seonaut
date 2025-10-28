@@ -32,34 +32,37 @@ type CrawlerServiceRepository interface {
 }
 
 type CrawlerServicesContainer struct {
-	Broker         *Broker
-	ReportManager  *ReportManager
-	CrawlerHandler *CrawlerHandler
-	ArchiveService *ArchiveService
-	Config         *config.CrawlerConfig
+	Broker          *Broker
+	ReportManager   *ReportManager
+	CrawlerHandler  *CrawlerHandler
+	ArchiveService  *ArchiveService
+	DingTalkService *DingTalkService
+	Config          *config.CrawlerConfig
 }
 
 type CrawlerService struct {
-	repository     CrawlerServiceRepository
-	config         *config.CrawlerConfig
-	broker         *Broker
-	reportManager  *ReportManager
-	crawlerHandler *CrawlerHandler
-	ArchiveService *ArchiveService
-	crawlers       map[int64]*crawler.Crawler
-	lock           *sync.RWMutex
+	repository      CrawlerServiceRepository
+	config          *config.CrawlerConfig
+	broker          *Broker
+	reportManager   *ReportManager
+	crawlerHandler  *CrawlerHandler
+	ArchiveService  *ArchiveService
+	DingTalkService *DingTalkService
+	crawlers        map[int64]*crawler.Crawler
+	lock            *sync.RWMutex
 }
 
 func NewCrawlerService(r CrawlerServiceRepository, s CrawlerServicesContainer) *CrawlerService {
 	return &CrawlerService{
-		repository:     r,
-		broker:         s.Broker,
-		config:         s.Config,
-		reportManager:  s.ReportManager,
-		crawlerHandler: s.CrawlerHandler,
-		ArchiveService: s.ArchiveService,
-		crawlers:       make(map[int64]*crawler.Crawler),
-		lock:           &sync.RWMutex{},
+		repository:      r,
+		broker:          s.Broker,
+		config:          s.Config,
+		reportManager:   s.ReportManager,
+		crawlerHandler:  s.CrawlerHandler,
+		ArchiveService:  s.ArchiveService,
+		DingTalkService: s.DingTalkService,
+		crawlers:        make(map[int64]*crawler.Crawler),
+		lock:            &sync.RWMutex{},
 	}
 }
 
@@ -129,6 +132,14 @@ func (s *CrawlerService) StartCrawler(p models.Project, b models.BasicAuth) erro
 
 		s.repository.UpdateCrawl(crawl)
 		s.broker.Publish(fmt.Sprintf("crawl-%d", p.Id), &models.Message{Name: "CrawlEnd", Data: crawl.TotalURLs})
+
+		// Send DingTalk notification if enabled
+		if s.DingTalkService != nil {
+			if err := s.DingTalkService.SendCrawlReport(crawl, &p); err != nil {
+				log.Printf("Failed to send DingTalk notification: %v", err)
+			}
+		}
+
 		log.Printf("Crawled %d urls in %s", crawl.TotalURLs, p.URL)
 	}()
 
