@@ -24,3 +24,20 @@ type StatusCodeByDepth struct {
 	StatusCode500 int
 }
 
+type TitleStats struct {
+	TotalPages     int
+	EmptyTitle     int
+	ShortTitle     int
+	LongTitle      int
+	MultipleTitles int
+	DuplicateTitle int
+}
+
+type DescriptionStats struct {
+	TotalPages           int
+	EmptyDescription     int
+	ShortDescription     int
+	LongDescription      int
+	MultipleDescriptions int
+	DuplicateDescription int
+}

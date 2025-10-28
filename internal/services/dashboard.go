@@ -18,6 +18,8 @@ type (
 		CountScheme(int64) *models.SchemeCount
 		CountByNonCanonical(int64) int
 		GetStatusCodeByDepth(crawlId int64) []models.StatusCodeByDepth
+		GetTitleStats(crawlId int64) *models.TitleStats
+		GetDescriptionStats(crawlId int64) *models.DescriptionStats
 	}
 
 	DashboardService struct {
@@ -63,6 +65,16 @@ func (s *DashboardService) GetCanonicalCount(crawlId int64) *models.CanonicalCou
 // pagereports by depth and status code.
 func (s *DashboardService) GetStatusCodeByDepth(crawlId int64) []models.StatusCodeByDepth {
 	return s.repository.GetStatusCodeByDepth(crawlId)
+}
+
+// GetTitleStats returns title statistics for a crawl
+func (s *DashboardService) GetTitleStats(crawlId int64) *models.TitleStats {
+	return s.repository.GetTitleStats(crawlId)
+}
+
+// GetDescriptionStats returns description statistics for a crawl
+func (s *DashboardService) GetDescriptionStats(crawlId int64) *models.DescriptionStats {
+	return s.repository.GetDescriptionStats(crawlId)
 }
 
 // Returns a Chart containing the keys and values from the CountList.

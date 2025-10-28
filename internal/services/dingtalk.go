@@ -18,8 +18,9 @@ import (
 
 // DingTalkService handles sending notifications to DingTalk webhook
 type DingTalkService struct {
-	config *config.DingTalkConfig
-	client *http.Client
+	config           *config.DingTalkConfig
+	client           *http.Client
+	dashboardService *DashboardService
 }
 
 // DingTalkMessage represents the message structure for DingTalk webhook
@@ -41,12 +42,11 @@ type DingTalkAt struct {
 }
 
 // NewDingTalkService creates a new DingTalk service instance
-func NewDingTalkService(config *config.DingTalkConfig) *DingTalkService {
+func NewDingTalkService(config *config.DingTalkConfig, dashboardService *DashboardService) *DingTalkService {
 	return &DingTalkService{
-		config: config,
-		client: &http.Client{
-			Timeout: 10 * time.Second,
-		},
+		config:           config,
+		client:           &http.Client{Timeout: 10 * time.Second},
+		dashboardService: dashboardService,
 	}
 }
 
@@ -87,30 +87,59 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 		statusEmoji = "🟢"
 	}
 
-	text := fmt.Sprintf(`## %s SEO审计报告完成
+	// Get additional statistics from dashboard service
+	imageAltCount := s.dashboardService.GetImageAltCount(crawl.Id)
+	schemeCount := s.dashboardService.GetSchemeCount(crawl.Id)
+	mediaTypeCount := s.dashboardService.GetMediaCount(crawl.Id)
+	statusCodeCount := s.dashboardService.GetStatusCount(crawl.Id)
+	statusCodeByDepth := s.dashboardService.GetStatusCodeByDepth(crawl.Id)
+	titleStats := s.dashboardService.GetTitleStats(crawl.Id)
+	descriptionStats := s.dashboardService.GetDescriptionStats(crawl.Id)
 
-**网站：** %s
-**爬取时间：** %s
-**爬取耗时：** %s
+	text := fmt.Sprintf(`
+### %s SEO审计报告完成
+- **网站：** %s
+- **审计时间：** %s
+- **审计耗时：** %s
 
 ### 📊 爬取统计
 - **总URL数：** %d
 - **被robots.txt阻止：** %d
 - **Noindex页面：** %d
 
-### ⚠️ 问题统计
-- **🔴 严重问题：** %d
-- **🟡 警告问题：** %d  
-- **🟠 提示问题：** %d
-- **总问题数：** %d
-
 ### 🔗 链接统计
-- **内部Follow链接：** %d
-- **内部NoFollow链接：** %d
-- **外部Follow链接：** %d
-- **外部NoFollow链接：** %d
-- **赞助链接：** %d
-- **UGC链接：** %d
+- **内部链接：** %d
+- **外部链接：** %d
+
+### 🖼️ 图片Alt属性统计
+- **有Alt属性：** %d
+- **无Alt属性：** %d
+
+### 🔒 HTTP/HTTPS统计
+- **HTTP页面：** %d
+- **HTTPS页面：** %d
+
+### 📄 媒体类型统计%s
+
+### 📊 状态码统计%s
+
+### 📈 页面深度分布%s
+
+### 📝 标题统计
+- **总页面数：** %d
+- **空标题：** %d
+- **短标题(<20字符)：** %d
+- **长标题(>60字符)：** %d
+- **多标题标签：** %d
+- **重复标题：** %d
+
+### 📄 描述统计
+- **总页面数：** %d
+- **空描述：** %d
+- **短描述(<80字符)：** %d
+- **长描述(>160字符)：** %d
+- **多描述标签：** %d
+- **重复描述：** %d
 
 ### 🤖 技术信息
 - **Robots.txt存在：** %s
@@ -126,16 +155,33 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 		crawl.TotalURLs,
 		crawl.BlockedByRobotstxt,
 		crawl.Noindex,
-		crawl.CriticalIssues,
-		crawl.AlertIssues,
-		crawl.WarningIssues,
-		crawl.TotalIssues,
-		crawl.InternalFollowLinks,
-		crawl.InternalNoFollowLinks,
-		crawl.ExternalFollowLinks,
-		crawl.ExternalNoFollowLinks,
-		crawl.SponsoredLinks,
-		crawl.UGCLinks,
+		// crawl.CriticalIssues,
+		// crawl.AlertIssues,
+		// crawl.WarningIssues,
+		// crawl.TotalIssues,
+		crawl.InternalFollowLinks+crawl.InternalNoFollowLinks,
+		crawl.ExternalFollowLinks+crawl.ExternalNoFollowLinks,
+		// crawl.SponsoredLinks,
+		// crawl.UGCLinks,
+		imageAltCount.Alt,
+		imageAltCount.NonAlt,
+		schemeCount.HTTP,
+		schemeCount.HTTPS,
+		s.formatMediaTypeStats(mediaTypeCount),
+		s.formatStatusCodeStats(statusCodeCount),
+		s.formatStatusCodeByDepthStats(statusCodeByDepth),
+		titleStats.TotalPages,
+		titleStats.EmptyTitle,
+		titleStats.ShortTitle,
+		titleStats.LongTitle,
+		titleStats.MultipleTitles,
+		titleStats.DuplicateTitle,
+		descriptionStats.TotalPages,
+		descriptionStats.EmptyDescription,
+		descriptionStats.ShortDescription,
+		descriptionStats.LongDescription,
+		descriptionStats.MultipleDescriptions,
+		descriptionStats.DuplicateDescription,
 		formatBool(crawl.RobotstxtExists),
 		formatBool(crawl.SitemapExists),
 		formatBool(crawl.SitemapIsBlocked),
@@ -199,6 +245,88 @@ func formatDuration(d time.Duration) string {
 	} else {
 		return fmt.Sprintf("%.1f小时", d.Hours())
 	}
+}
+
+// formatMediaTypeStats formats media type statistics
+func (s *DingTalkService) formatMediaTypeStats(chart *models.Chart) string {
+	if chart == nil || len(*chart) == 0 {
+		return "\n- 无数据"
+	}
+
+	var result string
+	for _, item := range *chart {
+		result += fmt.Sprintf("\n- **%s：** %d", item.Key, item.Value)
+	}
+	return result
+}
+
+// formatStatusCodeStats formats status code statistics
+func (s *DingTalkService) formatStatusCodeStats(chart *models.Chart) string {
+	if chart == nil || len(*chart) == 0 {
+		return "\n- 无数据"
+	}
+
+	var result string
+	for _, item := range *chart {
+		result += fmt.Sprintf("\n- **%s：** %d", item.Key, item.Value)
+	}
+	return result
+}
+
+// formatStatusCodeByDepthStats formats status code by depth statistics
+func (s *DingTalkService) formatStatusCodeByDepthStats(statusCodes []models.StatusCodeByDepth) string {
+	if len(statusCodes) == 0 {
+		return "\n- 无数据"
+	}
+
+	// Calculate totals
+	var totalPages int
+	var depth1_2, depth3_4, depth5_6, depth7_8 int
+
+	for _, sc := range statusCodes {
+		depthTotal := sc.StatusCode100 + sc.StatusCode200 + sc.StatusCode300 + sc.StatusCode400 + sc.StatusCode500
+		if depthTotal > 0 {
+			totalPages += depthTotal
+
+			// Group by depth ranges
+			switch {
+			case sc.Depth <= 2:
+				depth1_2 += depthTotal
+			case sc.Depth <= 4:
+				depth3_4 += depthTotal
+			case sc.Depth <= 6:
+				depth5_6 += depthTotal
+			case sc.Depth <= 8:
+				depth7_8 += depthTotal
+			}
+		}
+	}
+
+	if totalPages == 0 {
+		return "\n- 无数据"
+	}
+
+	// Calculate percentages
+	depth1_2Percent := float64(depth1_2) / float64(totalPages) * 100
+	depth3_4Percent := float64(depth3_4) / float64(totalPages) * 100
+	depth5_6Percent := float64(depth5_6) / float64(totalPages) * 100
+	depth7_8Percent := float64(depth7_8) / float64(totalPages) * 100
+
+	result := fmt.Sprintf(`
+- **总页面数：** %d
+- **深度1-2：** %d页 (%.1f%%)
+- **深度3-4：** %d页 (%.1f%%) 
+- **深度5-6：** %d页 (%.1f%%)
+- **深度7-8：** %d页 (%.1f%%)
+`,
+		totalPages,
+		depth1_2, depth1_2Percent,
+		depth3_4, depth3_4Percent,
+		depth5_6, depth5_6Percent,
+		depth7_8, depth7_8Percent,
+	)
+
+	return result
 }
 
 // formatBool formats boolean to Chinese string

@@ -223,3 +223,141 @@ func (ds *DashboardRepository) GetStatusCodeByDepth(cid int64) []models.StatusCo
 
 	return s
 }
+
+// GetTitleStats returns title statistics for a crawl
+func (ds *DashboardRepository) GetTitleStats(cid int64) *models.TitleStats {
+	query := `
+		SELECT
+			COUNT(*) as total_pages,
+			SUM(CASE WHEN title = '' OR title IS NULL THEN 1 ELSE 0 END) as empty_title,
+			SUM(CASE WHEN LENGTH(title) > 0 AND LENGTH(title) < 20 THEN 1 ELSE 0 END) as short_title,
+			SUM(CASE WHEN LENGTH(title) > 60 THEN 1 ELSE 0 END) as long_title,
+			SUM(CASE WHEN title_count > 1 THEN 1 ELSE 0 END) as multiple_titles
+		FROM (
+			SELECT 
+				pr.*,
+				(SELECT COUNT(*) FROM pagereports pr2 
+				 WHERE pr2.crawl_id = pr.crawl_id 
+				 AND pr2.title = pr.title 
+				 AND pr2.media_type = 'text/html' 
+				 AND pr2.status_code >= 200 
+				 AND pr2.status_code < 300 
+				 AND (pr2.canonical = '' OR pr2.canonical = pr2.url) 
+				 AND pr2.crawled = 1) as title_count
+			FROM pagereports pr
+			WHERE pr.crawl_id = ? 
+			AND pr.media_type = 'text/html' 
+			AND pr.status_code >= 200 
+			AND pr.status_code < 300 
+			AND (pr.canonical = '' OR pr.canonical = pr.url) 
+			AND pr.crawled = 1
+		) as pr_with_counts
+	`
+
+	stats := &models.TitleStats{}
+	row := ds.DB.QueryRow(query, cid)
+
+	var duplicateTitle int
+	err := row.Scan(&stats.TotalPages, &stats.EmptyTitle, &stats.ShortTitle, &stats.LongTitle, &stats.MultipleTitles)
+	if err != nil {
+		log.Printf("GetTitleStats: %v\n", err)
+		return stats
+	}
+
+	// Get duplicate title count separately
+	duplicateQuery := `
+		SELECT COUNT(*) as duplicate_count
+		FROM (
+			SELECT title, COUNT(*) as cnt
+			FROM pagereports
+			WHERE crawl_id = ? 
+			AND media_type = 'text/html' 
+			AND status_code >= 200 
+			AND status_code < 300 
+			AND (canonical = '' OR canonical = url) 
+			AND crawled = 1
+			AND title != ''
+			GROUP BY title
+			HAVING cnt > 1
+		) as duplicates
+	`
+
+	row = ds.DB.QueryRow(duplicateQuery, cid)
+	err = row.Scan(&duplicateTitle)
+	if err != nil {
+		log.Printf("GetTitleStats duplicate count: %v\n", err)
+	} else {
+		stats.DuplicateTitle = duplicateTitle
+	}
+
+	return stats
+}
+
+// GetDescriptionStats returns description statistics for a crawl
+func (ds *DashboardRepository) GetDescriptionStats(cid int64) *models.DescriptionStats {
+	query := `
+		SELECT
+			COUNT(*) as total_pages,
+			SUM(CASE WHEN description = '' OR description IS NULL THEN 1 ELSE 0 END) as empty_description,
+			SUM(CASE WHEN LENGTH(description) > 0 AND LENGTH(description) < 80 THEN 1 ELSE 0 END) as short_description,
+			SUM(CASE WHEN LENGTH(description) > 160 THEN 1 ELSE 0 END) as long_description,
+			SUM(CASE WHEN description_count > 1 THEN 1 ELSE 0 END) as multiple_descriptions
+		FROM (
+			SELECT 
+				pr.*,
+				(SELECT COUNT(*) FROM pagereports pr2 
+				 WHERE pr2.crawl_id = pr.crawl_id 
+				 AND pr2.description = pr.description 
+				 AND pr2.media_type = 'text/html' 
+				 AND pr2.status_code >= 200 
+				 AND pr2.status_code < 300 
+				 AND (pr2.canonical = '' OR pr2.canonical = pr2.url) 
+				 AND pr2.crawled = 1) as description_count
+			FROM pagereports pr
+			WHERE pr.crawl_id = ? 
+			AND pr.media_type = 'text/html' 
+			AND pr.status_code >= 200 
+			AND pr.status_code < 300 
+			AND (pr.canonical = '' OR pr.canonical = pr.url) 
+			AND pr.crawled = 1
+		) as pr_with_counts
+	`
+
+	stats := &models.DescriptionStats{}
+	row := ds.DB.QueryRow(query, cid)
+
+	var duplicateDescription int
+	err := row.Scan(&stats.TotalPages, &stats.EmptyDescription, &stats.ShortDescription, &stats.LongDescription, &stats.MultipleDescriptions)
+	if err != nil {
+		log.Printf("GetDescriptionStats: %v\n", err)
+		return stats
+	}
+
+	// Get duplicate description count separately
+	duplicateQuery := `
+		SELECT COUNT(*) as duplicate_count
+		FROM (
+			SELECT description, COUNT(*) as cnt
+			FROM pagereports
+			WHERE crawl_id = ? 
+			AND media_type = 'text/html' 
+			AND status_code >= 200 
+			AND status_code < 300 
+			AND (canonical = '' OR canonical = url) 
+			AND crawled = 1
+			AND description != ''
+			GROUP BY description
+			HAVING cnt > 1
+		) as duplicates
+	`
+
+	row = ds.DB.QueryRow(duplicateQuery, cid)
+	err = row.Scan(&duplicateDescription)
+	if err != nil {
+		log.Printf("GetDescriptionStats duplicate count: %v\n", err)
+	} else {
+		stats.DuplicateDescription = duplicateDescription
+	}
+
+	return stats
+}

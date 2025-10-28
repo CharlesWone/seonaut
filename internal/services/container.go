@@ -257,5 +257,5 @@ func (c *Container) InitReplayService() {
 
 // Init the DingTalk notification service.
 func (c *Container) InitDingTalkService() {
-	c.DingTalkService = NewDingTalkService(c.Config.DingTalk)
+	c.DingTalkService = NewDingTalkService(c.Config.DingTalk, c.DashboardService)
 }
