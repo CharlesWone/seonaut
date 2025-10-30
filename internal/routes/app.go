@@ -23,7 +23,12 @@ type PageView struct {
 func NewServer(container *services.Container) {
 	// Handle static files
 	fileServer := http.FileServer(http.Dir("./web/static"))
-	http.Handle("GET /resources/", http.StripPrefix("/resources", fileServer))
+	cssFileServer := http.FileServer(http.Dir("./web/css"))
+	fontsFileServer := http.FileServer(http.Dir("./web/fonts"))
+	//http.Handle("GET /resources/", http.StripPrefix("/resources", fileServer))
+	http.Handle("GET /resources/", http.StripPrefix("/resources", cssFileServer))
+	http.Handle("GET /fonts/", http.StripPrefix("/fonts", fontsFileServer))
+	http.Handle("GET /resources/echarts.min.js", http.StripPrefix("/resources", fileServer))
 	http.Handle("GET /robots.txt", fileServer)
 	http.Handle("GET /favicon.ico", fileServer)
 

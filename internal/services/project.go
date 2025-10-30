@@ -13,7 +13,7 @@ type (
 		DeleteArchive(*models.Project)
 	}
 	ProjectServiceRepository interface {
-		SaveProject(*models.Project, int)
+		SaveProject(*models.Project, int) int64
 		DeleteProject(*models.Project)
 		DisableProject(*models.Project)
 		UpdateProject(p *models.Project) error
@@ -21,6 +21,8 @@ type (
 		FindProjectsByUser(userId int) []models.Project
 
 		DeleteProjectCrawls(*models.Project)
+		GetProjectWithCron() []models.Project
+		GetAllProject() []models.Project
 	}
 
 	ProjectService struct {
@@ -47,17 +49,17 @@ func NewProjectService(r ProjectServiceRepository, a ArchiveRemover) *ProjectSer
 // SaveProject stores a new project.
 // It trims the spaces in the project's URL field and checks the scheme to
 // make sure it is http or https.
-func (s *ProjectService) SaveProject(p *models.Project, userId int) error {
+func (s *ProjectService) SaveProject(p *models.Project, userId int) (error, int64) {
 	p.URL = strings.TrimSpace(p.URL)
 
 	err := s.validateProject(p)
 	if err != nil {
-		return err
+		return err, 0
 	}
 
-	s.repository.SaveProject(p, userId)
+	id := s.repository.SaveProject(p, userId)
 
-	return nil
+	return nil, id
 }
 
 // Return a project specified by id and user.
@@ -136,4 +138,12 @@ func (s *ProjectService) validateProject(p *models.Project) error {
 	}
 
 	return nil
+}
+
+func (s *ProjectService) GetProjectWithCron() []models.Project {
+	return s.repository.GetProjectWithCron()
+}
+
+func (s *ProjectService) GetAllProject() []models.Project {
+	return s.repository.GetAllProject()
 }

@@ -104,6 +104,12 @@ CUSTOM_USERAGENT_CHECKBOX: User-Agent سفارشی
 CUSTOM_USERAGENT_HELP: یک User-Agent سفارشی برای خزنده SEOnaut هنگام دریافت URL‌ها تنظیم کنید.
 ENTER_USERAGENT_LABEL: "رشته User-Agent سفارشی خود را وارد کنید:"
 USERAGENT_NOT_VALID: User-Agent معتبر نیست.
+ENABLE_SCHEDULING_CRAWLING_CHECKBOX: فعال‌سازی خزش زمان‌بندی‌شده
+ENABLE_SCHEDULING_CRAWLING_HELP: خزش را بر اساس عبارت کران برنامه‌ریزی کنید.
+ENTER_CRON_EXPRESSION_LABEL: "عبارت کران خود را وارد کنید:"
+DINGTALK_CHECKBOX:     اعلان به DingTalk
+DINGTALK_CHECKBOX_HELP: پس از اتمام خزش، گزارش را به گروه DingTalk ارسال کنید.
+DINGTALK_CHECKBOX_LABEL: "آدرس وب‌هوک DingTalk خود را وارد کنید:"
 
 # =============================================
 # CONTEXT: Edit project page. Contains the edit project form.

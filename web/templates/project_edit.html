@@ -190,6 +190,50 @@
 			</div>
 		</div>
 
+		<!-- Cron表达式 -->
+		<div class="box soft">
+			<div class="col col-main">
+				<div class="content">
+					<div class="toggle-container">
+						<label class="toggle">
+							<input type="checkbox" value="1" name="enable_cron" id="enable_cron" {{ if .EnableCron }}checked{{ end }}>
+							<span class="slider"></span>
+						</label>
+						<span class="label">{{ trans "ENABLE_SCHEDULING_CRAWLING_CHECKBOX" }}</span>
+					</div>
+					<div class="toggle-help">
+						<p>{{ trans "ENABLE_SCHEDULING_CRAWLING_HELP" }}</p>
+						<div id="cron_input" style="display: none;">
+							<label for="cron_expr">{{ trans "ENTER_CRON_EXPRESSION_LABEL" }}</label>
+							<input type="text" name="cron_expr" id="cron_expr" value="{{ .Project.CronExpr }}" placeholder="* * * * * *" maxlength="60">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 自定义钉钉推送链接 -->
+		<div class="box soft">
+			<div class="col col-main">
+				<div class="content">
+					<div class="toggle-container">
+						<label class="toggle">
+							<input type="checkbox" value="1" name="custom_dingtalk_webhook_url" id="custom_dingtalk_webhook_url" {{ if .CustomDingtalkWebhookUrl }}checked{{ end }}>
+							<span class="slider"></span>
+						</label>
+						<span class="label">{{ trans "DINGTALK_CHECKBOX" }}</span>
+					</div>
+					<div class="toggle-help">
+						<p>{{ trans "DINGTALK_CHECKBOX_HELP" }}</p>
+						<div id="dingtalk_input" style="display: none;">
+							<label for="dingtalk_webhook_url">{{ trans "DINGTALK_CHECKBOX_LABEL" }}</label>
+							<input type="url" name="dingtalk_webhook_url" id="dingtalk_webhook_url" value="{{ .Project.DingtalkWebhookUrl }}" placeholder="https://oapi.dingtalk.com/robot/send?access_token=..." maxlength="255">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<div class="box box-highlight">
 			<div class="col col-main">
 				<div class="content-s">
@@ -230,6 +274,20 @@
 	userAgent.addEventListener('change', function(e) {
 		toggleUserAgentInput(e.currentTarget.checked);
 	});
+
+	// cron表达式
+	let cronToggle = document.getElementById('enable_cron');
+	let cronInput = document.getElementById('cron_input');
+	let toggleCronInput = checked => cronInput.style.display = checked ? 'block' : 'none';
+	toggleCronInput(cronToggle.checked);
+	cronToggle.addEventListener('change', e => toggleCronInput(e.currentTarget.checked));
+
+	// 自定义钉钉推送链接
+	let dingtalkToggle = document.getElementById('custom_dingtalk_webhook_url');
+	let dingtalkInput = document.getElementById('dingtalk_input');
+	let toggleDingtalkInput = checked => dingtalkInput.style.display = checked ? 'block' : 'none';
+	toggleDingtalkInput(dingtalkToggle.checked);
+	dingtalkToggle.addEventListener('change', e => toggleDingtalkInput(e.currentTarget.checked));
 </script>
 
 {{ end }}

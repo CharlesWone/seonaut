@@ -52,7 +52,8 @@ func NewDingTalkService(config *config.DingTalkConfig, dashboardService *Dashboa
 
 // SendCrawlReport sends crawl completion report to DingTalk
 func (s *DingTalkService) SendCrawlReport(crawl *models.Crawl, project *models.Project) error {
-	if !s.config.Enabled || s.config.WebhookURL == "" {
+	// 校验项目的推送地址
+	if !s.config.Enabled || project.DingtalkWebhookUrl == "" {
 		return nil
 	}
 
@@ -69,7 +70,7 @@ func (s *DingTalkService) SendCrawlReport(crawl *models.Crawl, project *models.P
 		},
 	}
 
-	return s.sendMessage(message)
+	return s.sendMessage(message, project.DingtalkWebhookUrl)
 }
 
 // formatCrawlReport formats the crawl data into Markdown
@@ -192,13 +193,15 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 }
 
 // sendMessage sends the message to DingTalk webhook
-func (s *DingTalkService) sendMessage(message DingTalkMessage) error {
+func (s *DingTalkService) sendMessage(message DingTalkMessage, webhookUrl string) error {
 	jsonData, err := json.Marshal(message)
 	if err != nil {
 		return fmt.Errorf("failed to marshal message: %w", err)
 	}
 
-	req, err := http.NewRequest("POST", s.config.WebhookURL, bytes.NewBuffer(jsonData))
+	// 使用项目的webhook地址
+	req, err := http.NewRequest("POST", webhookUrl, bytes.NewBuffer(jsonData))
+
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
@@ -214,6 +217,8 @@ func (s *DingTalkService) sendMessage(message DingTalkMessage) error {
 		req.Header.Set("sign", signature)
 	}
 
+	// 设置超时时间
+	s.client.Timeout = 60 * time.Second
 	resp, err := s.client.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to send request: %w", err)
