@@ -255,8 +255,9 @@ func (h *crawlHandler) wsHandler(w http.ResponseWriter, r *http.Request) {
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
 		CheckOrigin: func(r *http.Request) bool {
-			origin := r.Header.Get("Origin")
-			return origin == h.Config.HTTPServer.URL
+			//origin := r.Header.Get("Origin")
+			//return origin == h.Config.HTTPServer.URL
+			return true
 		},
 	}
 
