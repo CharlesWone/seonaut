@@ -151,7 +151,8 @@
 
 		addMsg("{{ trans "CONNECTING_TO_SERVER" }}")
 
-		const protocol = {{ if .Data.Secure }}"wss://" {{ else }}"ws://"{{ end }}
+		// const protocol = {{ if .Data.Secure }}"wss://" {{ else }}"ws://"{{ end }}
+		const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
 		let conn = new WebSocket(protocol + document.location.host + "/crawl/ws?pid={{ .Data.Project.Id }}")
 
 		conn.onclose = evt => {
