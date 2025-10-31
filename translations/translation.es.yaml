@@ -104,6 +104,12 @@ CUSTOM_USERAGENT_CHECKBOX: User-Agent personalizado
 CUSTOM_USERAGENT_HELP: Establece un User-Agent personalizado para el rastreador de SEOnaut al recuperar URLs.
 ENTER_USERAGENT_LABEL: "Introduce tu cadena de User-Agent personalizada:"
 USERAGENT_NOT_VALID: El User-Agent no es válido.
+ENABLE_SCHEDULING_CRAWLING_CHECKBOX: Habilitar rastreo programado
+ENABLE_SCHEDULING_CRAWLING_HELP: Programa el rastreo según una expresión cron.
+ENTER_CRON_EXPRESSION_LABEL: "Introduce tu expresión cron:"
+DINGTALK_CHECKBOX: Notificación a DingTalk
+DINGTALK_CHECKBOX_HELP: Envía el informe al grupo de DingTalk cuando finalice el rastreo.
+DINGTALK_CHECKBOX_LABEL: "Introduce tu URL del Webhook de DingTalk:"
 
 # =============================================
 # CONTEXT: Edit project page. Contains the edit project form.

@@ -12,7 +12,7 @@ type ProjectRepository struct {
 }
 
 // SaveProject inserts a new project into the database.
-func (ds *ProjectRepository) SaveProject(project *models.Project, uid int) {
+func (ds *ProjectRepository) SaveProject(project *models.Project, uid int) int64 {
 	query := `
 		INSERT INTO projects (
 			url,
@@ -25,14 +25,16 @@ func (ds *ProjectRepository) SaveProject(project *models.Project, uid int) {
 			user_id,
 			check_external_links,
 			archive,
-			user_agent
+			user_agent,
+			cron_expr,
+			dingtalk_webhook_url
 		)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`
 
 	stmt, _ := ds.DB.Prepare(query)
 	defer stmt.Close()
-	_, err := stmt.Exec(
+	res, err := stmt.Exec(
 		project.URL,
 		project.IgnoreRobotsTxt,
 		project.FollowNofollow,
@@ -44,10 +46,18 @@ func (ds *ProjectRepository) SaveProject(project *models.Project, uid int) {
 		project.CheckExternalLinks,
 		project.Archive,
 		project.UserAgent,
+		project.CronExpr,
+		project.DingtalkWebhookUrl,
 	)
 	if err != nil {
 		log.Printf("saveProject: %v\n", err)
 	}
+
+	id, err := res.LastInsertId()
+	if err != nil {
+		log.Printf("failed to get last insert id: %v\n", err)
+	}
+	return id
 }
 
 // FindProjectsByUser returns a slice with all the projects of the specified user.
@@ -67,7 +77,9 @@ func (ds *ProjectRepository) FindProjectsByUser(uid int) []models.Project {
 			created,
 			check_external_links,
 			archive,
-			user_agent
+			user_agent,
+			cron_expr,
+			dingtalk_webhook_url
 		FROM projects
 		WHERE user_id = ?
 		ORDER BY url ASC`
@@ -94,6 +106,8 @@ func (ds *ProjectRepository) FindProjectsByUser(uid int) []models.Project {
 			&p.CheckExternalLinks,
 			&p.Archive,
 			&p.UserAgent,
+			&p.CronExpr,
+			&p.DingtalkWebhookUrl,
 		)
 		if err != nil {
 			log.Println(err)
@@ -122,7 +136,9 @@ func (ds *ProjectRepository) FindProjectById(id int, uid int) (models.Project, e
 			created,
 			check_external_links,
 			archive,
-			user_agent
+			user_agent,
+			cron_expr,
+			dingtalk_webhook_url
 		FROM projects
 		WHERE id = ? AND user_id = ?`
 
@@ -143,6 +159,8 @@ func (ds *ProjectRepository) FindProjectById(id int, uid int) (models.Project, e
 		&p.CheckExternalLinks,
 		&p.Archive,
 		&p.UserAgent,
+		&p.CronExpr,
+		&p.DingtalkWebhookUrl,
 	)
 	if err != nil {
 		log.Println(err)
@@ -183,7 +201,9 @@ func (ds *ProjectRepository) UpdateProject(p *models.Project) error {
 			basic_auth = ?,
 			check_external_links = ?,
 			archive = ?,
-			user_agent = ?
+			user_agent = ?,
+			cron_expr = ?,
+			dingtalk_webhook_url = ?
 		WHERE id = ?
 	`
 	_, err := ds.DB.Exec(
@@ -197,8 +217,123 @@ func (ds *ProjectRepository) UpdateProject(p *models.Project) error {
 		p.CheckExternalLinks,
 		p.Archive,
 		p.UserAgent,
+		p.CronExpr,
+		p.DingtalkWebhookUrl,
 		p.Id,
 	)
 
 	return err
+}
+
+func (ds *ProjectRepository) GetProjectWithCron() []models.Project {
+	var projects []models.Project
+	query := `
+		SELECT
+			id,
+			url,
+			ignore_robotstxt,
+			follow_nofollow,
+			include_noindex,
+			crawl_sitemap,
+			allow_subdomains,
+			basic_auth,
+			deleting,
+			created,
+			check_external_links,
+			archive,
+			user_agent,
+			cron_expr,
+			dingtalk_webhook_url
+		FROM projects
+		WHERE cron_expr != ''
+		`
+
+	rows, err := ds.DB.Query(query)
+	if err != nil {
+		log.Println(err)
+		return projects
+	}
+
+	for rows.Next() {
+		p := models.Project{}
+		err := rows.Scan(
+			&p.Id,
+			&p.URL,
+			&p.IgnoreRobotsTxt,
+			&p.FollowNofollow,
+			&p.IncludeNoindex,
+			&p.CrawlSitemap,
+			&p.AllowSubdomains,
+			&p.BasicAuth,
+			&p.Deleting,
+			&p.Created,
+			&p.CheckExternalLinks,
+			&p.Archive,
+			&p.UserAgent,
+			&p.CronExpr,
+			&p.DingtalkWebhookUrl,
+		)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		projects = append(projects, p)
+	}
+	return projects
+}
+
+func (ds *ProjectRepository) GetAllProject() []models.Project {
+	var projects []models.Project
+	query := `
+		SELECT
+			id,
+			url,
+			ignore_robotstxt,
+			follow_nofollow,
+			include_noindex,
+			crawl_sitemap,
+			allow_subdomains,
+			basic_auth,
+			deleting,
+			created,
+			check_external_links,
+			archive,
+			user_agent,
+			cron_expr,
+			dingtalk_webhook_url
+		FROM projects
+		`
+
+	rows, err := ds.DB.Query(query)
+	if err != nil {
+		log.Println(err)
+		return projects
+	}
+
+	for rows.Next() {
+		p := models.Project{}
+		err := rows.Scan(
+			&p.Id,
+			&p.URL,
+			&p.IgnoreRobotsTxt,
+			&p.FollowNofollow,
+			&p.IncludeNoindex,
+			&p.CrawlSitemap,
+			&p.AllowSubdomains,
+			&p.BasicAuth,
+			&p.Deleting,
+			&p.Created,
+			&p.CheckExternalLinks,
+			&p.Archive,
+			&p.UserAgent,
+			&p.CronExpr,
+			&p.DingtalkWebhookUrl,
+		)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		projects = append(projects, p)
+	}
+	return projects
 }

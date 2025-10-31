@@ -42,6 +42,7 @@ type Container struct {
 	exportRepository     *repository.ExportRepository
 	crawlRepository      *repository.CrawlRepository
 	dashboardRepository  *repository.DashboardRepository
+	CronManagerService   *CronManagerService
 }
 
 func NewContainer(configFile string) *Container {
@@ -66,6 +67,8 @@ func NewContainer(configFile string) *Container {
 	c.InitCookieSession()
 	c.InitReplayService()
 
+	// 最后启动 cron（依赖其他服务）
+	c.InitCronManagerService()
 	return c
 }
 
@@ -258,4 +261,9 @@ func (c *Container) InitReplayService() {
 // Init the DingTalk notification service.
 func (c *Container) InitDingTalkService() {
 	c.DingTalkService = NewDingTalkService(c.Config.DingTalk, c.DashboardService)
+}
+
+// Init the cron manager.
+func (c *Container) InitCronManagerService() {
+	c.CronManagerService = NewCronManagerService(c.ProjectService, c.CrawlerService)
 }

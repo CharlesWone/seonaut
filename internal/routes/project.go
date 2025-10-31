@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/stjudewashere/seonaut/internal/models"
 	"github.com/stjudewashere/seonaut/internal/services"
@@ -143,6 +144,23 @@ func (h *projectHandler) addPostHandler(w http.ResponseWriter, r *http.Request) 
 		userAgent = r.FormValue("custom_user_agent_text")
 	}
 
+	// 解析cron表达式
+	enableCron, err := strconv.ParseBool(r.FormValue("enable_cron"))
+	if err != nil {
+		enableCron = false
+	}
+	cronExpr := ""
+	if enableCron {
+		cronExpr = strings.TrimSpace(r.FormValue("cron_expr"))
+	}
+
+	// 解析钉钉webhook地址
+	customDingtalkWebhookUrl, err := strconv.ParseBool(r.FormValue("custom_dingtalk_webhook_url"))
+	dingtalkWebhookUrl := h.Config.DingTalk.WebhookURL
+	if customDingtalkWebhookUrl {
+		dingtalkWebhookUrl = strings.TrimSpace(r.FormValue("dingtalk_webhook_url"))
+	}
+
 	project := &models.Project{
 		URL:                r.FormValue("url"),
 		IgnoreRobotsTxt:    ignoreRobotsTxt,
@@ -154,9 +172,11 @@ func (h *projectHandler) addPostHandler(w http.ResponseWriter, r *http.Request) 
 		CheckExternalLinks: checkExternalLinks,
 		Archive:            archive,
 		UserAgent:          userAgent,
+		CronExpr:           cronExpr,
+		DingtalkWebhookUrl: dingtalkWebhookUrl,
 	}
 
-	err = h.ProjectService.SaveProject(project, user.Id)
+	err, id := h.ProjectService.SaveProject(project, user.Id)
 	if err != nil {
 		pageView := &PageView{
 			Lang:      user.Lang,
@@ -176,6 +196,9 @@ func (h *projectHandler) addPostHandler(w http.ResponseWriter, r *http.Request) 
 		h.Renderer.RenderTemplate(w, "project_add", pageView, user.Lang)
 		return
 	}
+	// 增加定时任务
+	project.Id = id
+	h.CronManagerService.AddJob(*project)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
@@ -202,6 +225,8 @@ func (h *projectHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.ProjectService.DeleteProject(&p)
+	// 删除定时任务
+	h.CronManagerService.DeleteJob(p)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
@@ -230,13 +255,17 @@ func (h *projectHandler) editGetHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	data := &struct {
-		Project         models.Project
-		Error           bool
-		UserAgentError  bool
-		CustomUserAgent bool
+		Project                  models.Project
+		Error                    bool
+		UserAgentError           bool
+		CustomUserAgent          bool
+		EnableCron               bool
+		CustomDingtalkWebhookUrl bool
 	}{
-		Project:         p,
-		CustomUserAgent: h.Config.Crawler.Agent != p.UserAgent,
+		Project:                  p,
+		CustomUserAgent:          h.Config.Crawler.Agent != p.UserAgent,
+		EnableCron:               p.CronExpr != "",
+		CustomDingtalkWebhookUrl: p.DingtalkWebhookUrl != h.Config.DingTalk.WebhookURL,
 	}
 
 	pageView := &PageView{
@@ -330,6 +359,25 @@ func (h *projectHandler) editPostHandler(w http.ResponseWriter, r *http.Request)
 		p.UserAgent = h.Config.Crawler.Agent
 	}
 
+	// 解析cron表达式
+	enableCron, err := strconv.ParseBool(r.FormValue("enable_cron"))
+	if err != nil {
+		enableCron = false
+	}
+	if enableCron {
+		p.CronExpr = strings.TrimSpace(r.FormValue("cron_expr"))
+	} else {
+		p.CronExpr = ""
+	}
+
+	// 解析钉钉webhook地址
+	customDingtalkWebhookUrl, err := strconv.ParseBool(r.FormValue("custom_dingtalk_webhook_url"))
+	if customDingtalkWebhookUrl {
+		p.DingtalkWebhookUrl = strings.TrimSpace(r.FormValue("dingtalk_webhook_url"))
+	} else {
+		p.DingtalkWebhookUrl = h.Config.DingTalk.WebhookURL
+	}
+
 	err = h.ProjectService.UpdateProject(&p)
 	if err != nil {
 		pageView := &PageView{
@@ -353,6 +401,8 @@ func (h *projectHandler) editPostHandler(w http.ResponseWriter, r *http.Request)
 		h.Renderer.RenderTemplate(w, "project_edit", pageView, user.Lang)
 		return
 	}
+	// 更新定时任务
+	h.CronManagerService.UpdateProject(p)
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

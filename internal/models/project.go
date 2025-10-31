@@ -19,4 +19,6 @@ type Project struct {
 	CheckExternalLinks bool
 	Archive            bool
 	UserAgent          string
+	CronExpr           string
+	DingtalkWebhookUrl string
 }
