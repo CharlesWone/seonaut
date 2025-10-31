@@ -1,0 +1,1 @@
+ALTER TABLE `projects` ADD COLUMN `dingtalk_webhook_url` varchar(255)  NOT NULL DEFAULT '';

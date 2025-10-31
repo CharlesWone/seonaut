@@ -1,0 +1,1 @@
+ALTER TABLE `projects` ADD COLUMN `cron_expr` varchar(50)  NOT NULL DEFAULT '';
