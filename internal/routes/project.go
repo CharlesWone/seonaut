@@ -158,7 +158,7 @@ func (h *projectHandler) addPostHandler(w http.ResponseWriter, r *http.Request) 
 
 	// 解析钉钉webhook地址
 	customDingtalkWebhookUrl, err := strconv.ParseBool(r.FormValue("custom_dingtalk_webhook_url"))
-	dingtalkWebhookUrl := h.Config.DingTalk.WebhookURL
+	dingtalkWebhookUrl := ""
 	if customDingtalkWebhookUrl {
 		dingtalkWebhookUrl = strings.TrimSpace(r.FormValue("dingtalk_webhook_url"))
 	}
@@ -272,7 +272,7 @@ func (h *projectHandler) editGetHandler(w http.ResponseWriter, r *http.Request) 
 		Project:                  p,
 		CustomUserAgent:          h.Config.Crawler.Agent != p.UserAgent,
 		EnableCron:               p.CronExpr != "",
-		CustomDingtalkWebhookUrl: p.DingtalkWebhookUrl != h.Config.DingTalk.WebhookURL,
+		CustomDingtalkWebhookUrl: p.DingtalkWebhookUrl != "",
 	}
 
 	pageView := &PageView{
@@ -382,7 +382,7 @@ func (h *projectHandler) editPostHandler(w http.ResponseWriter, r *http.Request)
 	if customDingtalkWebhookUrl {
 		p.DingtalkWebhookUrl = strings.TrimSpace(r.FormValue("dingtalk_webhook_url"))
 	} else {
-		p.DingtalkWebhookUrl = h.Config.DingTalk.WebhookURL
+		p.DingtalkWebhookUrl = ""
 	}
 
 	err = h.ProjectService.UpdateProject(&p, enableCron)
