@@ -107,6 +107,7 @@ USERAGENT_NOT_VALID: The User-Agent is not valid.
 ENABLE_SCHEDULING_CRAWLING_CHECKBOX: Enable scheduled crawling
 ENABLE_SCHEDULING_CRAWLING_HELP: Schedule crawling based on cron expression.
 ENTER_CRON_EXPRESSION_LABEL: "Enter your cron expression:"
+CRON_EXPRESSION_NOT_VALID: The cron expression is not valid.
 DINGTALK_CHECKBOX: DingTalk push webhook url
 DINGTALK_CHECKBOX_HELP: Send the report to the DingTalk group after the crawling is complete.
 DINGTALK_CHECKBOX_LABEL: "Enter your DingTalk Webhook URL:"

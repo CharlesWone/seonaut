@@ -107,6 +107,7 @@ USERAGENT_NOT_VALID: El User-Agent no es válido.
 ENABLE_SCHEDULING_CRAWLING_CHECKBOX: Habilitar rastreo programado
 ENABLE_SCHEDULING_CRAWLING_HELP: Programa el rastreo según una expresión cron.
 ENTER_CRON_EXPRESSION_LABEL: "Introduce tu expresión cron:"
+CRON_EXPRESSION_NOT_VALID: La expresión cron no es válida.
 DINGTALK_CHECKBOX: Notificación a DingTalk
 DINGTALK_CHECKBOX_HELP: Envía el informe al grupo de DingTalk cuando finalice el rastreo.
 DINGTALK_CHECKBOX_LABEL: "Introduce tu URL del Webhook de DingTalk:"

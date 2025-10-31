@@ -71,6 +71,8 @@ func (h *projectHandler) addGetHandler(w http.ResponseWriter, r *http.Request) {
 			URLError       bool
 			UserAgentError bool
 			UserAgent      string
+			CronExprError  bool
+			CronExpr       string
 		}{UserAgent: h.Config.Crawler.Agent},
 	}
 
@@ -176,7 +178,7 @@ func (h *projectHandler) addPostHandler(w http.ResponseWriter, r *http.Request) 
 		DingtalkWebhookUrl: dingtalkWebhookUrl,
 	}
 
-	err, id := h.ProjectService.SaveProject(project, user.Id)
+	err, id := h.ProjectService.SaveProject(project, user.Id, enableCron)
 	if err != nil {
 		pageView := &PageView{
 			Lang:      user.Lang,
@@ -187,10 +189,14 @@ func (h *projectHandler) addPostHandler(w http.ResponseWriter, r *http.Request) 
 				URLError       bool
 				UserAgentError bool
 				UserAgent      string
+				CronExprError  bool
+				CronExpr       string
 			}{
 				URLError:       errors.Is(err, services.ErrProtocolNotSupported),
 				UserAgentError: errors.Is(err, services.ErrUserAgent),
 				UserAgent:      h.Config.Crawler.Agent,
+				CronExprError:  errors.Is(err, services.ErrCronExpr),
+				CronExpr:       cronExpr,
 			},
 		}
 		h.Renderer.RenderTemplate(w, "project_add", pageView, user.Lang)
@@ -260,6 +266,7 @@ func (h *projectHandler) editGetHandler(w http.ResponseWriter, r *http.Request) 
 		UserAgentError           bool
 		CustomUserAgent          bool
 		EnableCron               bool
+		CronExprError            bool
 		CustomDingtalkWebhookUrl bool
 	}{
 		Project:                  p,
@@ -378,7 +385,7 @@ func (h *projectHandler) editPostHandler(w http.ResponseWriter, r *http.Request)
 		p.DingtalkWebhookUrl = h.Config.DingTalk.WebhookURL
 	}
 
-	err = h.ProjectService.UpdateProject(&p)
+	err = h.ProjectService.UpdateProject(&p, enableCron)
 	if err != nil {
 		pageView := &PageView{
 			Lang:      user.Lang,
@@ -386,15 +393,21 @@ func (h *projectHandler) editPostHandler(w http.ResponseWriter, r *http.Request)
 			User:      *user,
 			PageTitle: "EDIT_PROJECT_PAGE_TITLE",
 			Data: &struct {
-				Project         models.Project
-				Error           bool
-				UserAgentError  bool
-				CustomUserAgent bool
+				Project                  models.Project
+				Error                    bool
+				UserAgentError           bool
+				CustomUserAgent          bool
+				CronExprError            bool
+				EnableCron               bool
+				CustomDingtalkWebhookUrl bool
 			}{
-				Project:         p,
-				Error:           true,
-				UserAgentError:  errors.Is(err, services.ErrUserAgent),
-				CustomUserAgent: h.Config.Crawler.Agent != p.UserAgent,
+				Project:                  p,
+				Error:                    true,
+				UserAgentError:           errors.Is(err, services.ErrUserAgent),
+				CustomUserAgent:          h.Config.Crawler.Agent != p.UserAgent,
+				CronExprError:            errors.Is(err, services.ErrCronExpr),
+				EnableCron:               enableCron,
+				CustomDingtalkWebhookUrl: customDingtalkWebhookUrl,
 			},
 		}
 

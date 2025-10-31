@@ -25,7 +25,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<div class="box soft">
 			<div class="col col-main">
 				<div class="content">
@@ -40,7 +40,7 @@
 					<span class="toggle-help">
 						{{ trans "IGNORE_ROBOTS_HELP" }}
 					</span>
-					
+
 				</div>
 			</div>
 		</div>
@@ -57,7 +57,7 @@
 							<span class="label">{{ trans "FOLLOW_NOFOLLOW_CHECKBOX" }}</span>
 					</div>
 					<span class="toggle-help">{{ trans "FOLLOW_NOFOLLOW_HELP" }}</span>
-			
+
 			</div>
 		</div>
 	</div>
@@ -95,7 +95,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<div class="box soft">
 			<div class="col col-main">
 				<div class="content">
@@ -178,7 +178,7 @@
 							{{ if .Data.UserAgentError }}
 								<p class="error">{{ trans "USERAGENT_NOT_VALID" }}</p>
 							{{ end }}
-						</div>	
+						</div>
 					</div>
 				</div>
 			</div>
@@ -197,7 +197,7 @@
 					</div>
 					<div class="toggle-help">
 						<p>{{ trans "ENABLE_SCHEDULING_CRAWLING_HELP" }}</p>
-						<div id="cron_input" style="display: none;">
+						<div id="cron_input">
 							<label for="cron_expr">{{ trans "ENTER_CRON_EXPRESSION_LABEL" }}</label>
 							<input
 									type="text"
@@ -205,7 +205,11 @@
 									id="cron_expr"
 									placeholder="* * * * * *"
 									maxlength="60"
+									value="{{ .Data.CronExpr }}"
 							>
+							{{ if .Data.CronExprError }}
+							<p class="error">{{ trans "CRON_EXPRESSION_NOT_VALID" }}</p>
+							{{ end }}
 						</div>
 					</div>
 				</div>
@@ -232,7 +236,9 @@
 									name="dingtalk_webhook_url"
 									id="dingtalk_webhook_url"
 									placeholder="https://oapi.dingtalk.com/robot/send?access_token=..."
-									maxlength="255">
+									maxlength="255"
+							>
+							<p class="error" id="dingtalk_error" style="display: none;"></p>
 						</div>
 					</div>
 				</div>
@@ -268,14 +274,32 @@
 	// cron表达式
 	let cronToggle = document.getElementById('enable_cron');
 	let cronInput = document.getElementById('cron_input');
-	let toggleCronInput = checked => cronInput.style.display = checked ? 'block' : 'none';
+	let cronExpr = document.getElementById('cron_expr');
+	let toggleCronInput = (checked) => {
+		cronInput.style.display = checked ? 'block' : 'none';
+		if (checked) {
+			cronExpr.setAttribute('required', 'required');
+		} else {
+			cronExpr.removeAttribute('required');
+		}
+	};
+	// Initially hide the input if checkbox is not checked
+	{{ if .Data.CronExprError }}cronToggle.checked = true;{{ end }}
 	toggleCronInput(cronToggle.checked);
 	cronToggle.addEventListener('change', e => toggleCronInput(e.currentTarget.checked));
 
 	// 自定义钉钉推送链接
 	let dingtalkToggle = document.getElementById('custom_dingtalk_webhook_url');
 	let dingtalkInput = document.getElementById('dingtalk_input');
-	let toggleDingtalkInput = checked => dingtalkInput.style.display = checked ? 'block' : 'none';
+	let dingtalkWebhookUrl = document.getElementById('dingtalk_webhook_url');
+	let toggleDingtalkInput = (checked) => {
+		dingtalkInput.style.display = checked ? 'block' : 'none';
+		if (checked) {
+			dingtalkWebhookUrl.setAttribute('required', 'required');
+		} else {
+			dingtalkWebhookUrl.removeAttribute('required');
+		}
+	}
 	toggleDingtalkInput(dingtalkToggle.checked);
 	dingtalkToggle.addEventListener('change', e => toggleDingtalkInput(e.currentTarget.checked));
 </script>

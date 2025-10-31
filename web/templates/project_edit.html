@@ -206,6 +206,9 @@
 						<div id="cron_input" style="display: none;">
 							<label for="cron_expr">{{ trans "ENTER_CRON_EXPRESSION_LABEL" }}</label>
 							<input type="text" name="cron_expr" id="cron_expr" value="{{ .Project.CronExpr }}" placeholder="* * * * * *" maxlength="60">
+							{{ if .CronExprError }}
+							<p class="error">{{ trans "CRON_EXPRESSION_NOT_VALID" }}</p>
+							{{ end }}
 						</div>
 					</div>
 				</div>
@@ -227,7 +230,7 @@
 						<p>{{ trans "DINGTALK_CHECKBOX_HELP" }}</p>
 						<div id="dingtalk_input" style="display: none;">
 							<label for="dingtalk_webhook_url">{{ trans "DINGTALK_CHECKBOX_LABEL" }}</label>
-							<input type="url" name="dingtalk_webhook_url" id="dingtalk_webhook_url" value="{{ .Project.DingtalkWebhookUrl }}" placeholder="https://oapi.dingtalk.com/robot/send?access_token=..." maxlength="255">
+							<input type="url" name="dingtalk_webhook_url" id="dingtalk_webhook_url" value="{{ .Project.DingtalkWebhookUrl }}" placeholder="https://oapi.dingtalk.com/robot/send?access_token=..." maxlength="255" required>
 						</div>
 					</div>
 				</div>
@@ -278,14 +281,32 @@
 	// cron表达式
 	let cronToggle = document.getElementById('enable_cron');
 	let cronInput = document.getElementById('cron_input');
-	let toggleCronInput = checked => cronInput.style.display = checked ? 'block' : 'none';
+	let cronExpr = document.getElementById('cron_expr');
+	let toggleCronInput = (checked) => {
+		cronInput.style.display = checked ? 'block' : 'none';
+		if (checked) {
+			cronExpr.setAttribute('required', 'required');
+		} else {
+			cronExpr.removeAttribute('required');
+		}
+	};
+	// Initially hide the input if checkbox is not checked
+	{{ if .EnableCron }}cronToggle.checked = true;{{ end }}
 	toggleCronInput(cronToggle.checked);
 	cronToggle.addEventListener('change', e => toggleCronInput(e.currentTarget.checked));
 
 	// 自定义钉钉推送链接
 	let dingtalkToggle = document.getElementById('custom_dingtalk_webhook_url');
 	let dingtalkInput = document.getElementById('dingtalk_input');
-	let toggleDingtalkInput = checked => dingtalkInput.style.display = checked ? 'block' : 'none';
+	let dingtalkWebhookUrl = document.getElementById('dingtalk_webhook_url');
+	let toggleDingtalkInput = (checked) => {
+		dingtalkInput.style.display = checked ? 'block' : 'none';
+		if (checked) {
+			dingtalkWebhookUrl.setAttribute('required', 'required');
+		} else {
+			dingtalkWebhookUrl.removeAttribute('required');
+		}
+	}
 	toggleDingtalkInput(dingtalkToggle.checked);
 	dingtalkToggle.addEventListener('change', e => toggleDingtalkInput(e.currentTarget.checked));
 </script>

@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"github.com/robfig/cron/v3"
 	"net/url"
 	"strings"
 
@@ -37,6 +38,8 @@ var (
 
 	// Error returned when the project's user agent is empty.
 	ErrUserAgent = errors.New("user agent string must not be empty")
+
+	ErrCronExpr = errors.New("cron expression must not be empty")
 )
 
 func NewProjectService(r ProjectServiceRepository, a ArchiveRemover) *ProjectService {
@@ -49,10 +52,10 @@ func NewProjectService(r ProjectServiceRepository, a ArchiveRemover) *ProjectSer
 // SaveProject stores a new project.
 // It trims the spaces in the project's URL field and checks the scheme to
 // make sure it is http or https.
-func (s *ProjectService) SaveProject(p *models.Project, userId int) (error, int64) {
+func (s *ProjectService) SaveProject(p *models.Project, userId int, enableCron bool) (error, int64) {
 	p.URL = strings.TrimSpace(p.URL)
 
-	err := s.validateProject(p)
+	err := s.validateProject(p, enableCron)
 	if err != nil {
 		return err, 0
 	}
@@ -60,6 +63,23 @@ func (s *ProjectService) SaveProject(p *models.Project, userId int) (error, int6
 	id := s.repository.SaveProject(p, userId)
 
 	return nil, id
+}
+
+func (s *ProjectService) ValidateCron(expr string) error {
+	if expr == "" {
+		return ErrCronExpr
+	}
+	// 创建解析器（秒级 + 标准字段）
+	parser := cron.NewParser(
+		cron.Second |
+			cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow | cron.Descriptor,
+	)
+	// 尝试解析
+	_, err := parser.Parse(expr)
+	if err != nil {
+		return ErrCronExpr
+	}
+	return nil
 }
 
 // Return a project specified by id and user.
@@ -94,8 +114,8 @@ func (s *ProjectService) DeleteProject(p *models.Project) {
 
 // UpdateProject updates the project details. It first validates the project, then if the
 // project's archive option is false it deletes any existing archive.
-func (s *ProjectService) UpdateProject(p *models.Project) error {
-	err := s.validateProject(p)
+func (s *ProjectService) UpdateProject(p *models.Project, enableCron bool) error {
+	err := s.validateProject(p, enableCron)
 	if err != nil {
 		return err
 	}
@@ -122,7 +142,7 @@ func (s *ProjectService) DeleteAllUserProjects(user *models.User) {
 
 // validateProject checks the project's URL and User-Agent to make sure they are valid.
 // It is called when a project is saved or updated.
-func (s *ProjectService) validateProject(p *models.Project) error {
+func (s *ProjectService) validateProject(p *models.Project, enableCron bool) error {
 	parsedURL, err := url.Parse(p.URL)
 	if err != nil {
 		return err
@@ -135,6 +155,13 @@ func (s *ProjectService) validateProject(p *models.Project) error {
 	p.UserAgent = strings.TrimSpace(p.UserAgent)
 	if p.UserAgent == "" {
 		return ErrUserAgent
+	}
+
+	if enableCron {
+		e := s.ValidateCron(p.CronExpr)
+		if e != nil {
+			return e
+		}
 	}
 
 	return nil
