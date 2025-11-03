@@ -76,6 +76,7 @@ func (s *CronManagerService) AddJob(p models.Project) error {
 		}
 	})
 	if err != nil {
+		log.Printf("[Cron] 添加任务失败 [id=%d, url=%s, cron_expr=%s]：%v", p.Id, p.URL, p.CronExpr, err)
 		return err
 	}
 
