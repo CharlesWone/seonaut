@@ -361,3 +361,116 @@ func (ds *DashboardRepository) GetDescriptionStats(cid int64) *models.Descriptio
 
 	return stats
 }
+
+// GetInlinkStats returns statistics about pages with zero or low inlinks
+func (ds *DashboardRepository) GetInlinkStats(cid int64) *models.InlinkStats {
+	stats := &models.InlinkStats{}
+
+	// First, get total pages that should be indexed (HTML pages with 200-299 status code)
+	totalQuery := `
+		SELECT COUNT(*)
+		FROM pagereports
+		WHERE crawl_id = ? 
+		AND media_type = 'text/html' 
+		AND status_code >= 200 
+		AND status_code < 300 
+		AND (canonical = '' OR canonical = url) 
+		AND crawled = 1
+	`
+
+	row := ds.DB.QueryRow(totalQuery, cid)
+	err := row.Scan(&stats.TotalPages)
+	if err != nil {
+		log.Printf("GetInlinkStats total pages: %v\n", err)
+		return stats
+	}
+
+	if stats.TotalPages == 0 {
+		return stats
+	}
+
+	// Count pages with zero inlinks (isolated pages)
+	zeroInlinksQuery := `
+		SELECT COUNT(*)
+		FROM pagereports pr
+		WHERE pr.crawl_id = ? 
+		AND pr.media_type = 'text/html' 
+		AND pr.status_code >= 200 
+		AND pr.status_code < 300 
+		AND (pr.canonical = '' OR pr.canonical = pr.url) 
+		AND pr.crawled = 1
+		AND NOT EXISTS (
+			SELECT 1 
+			FROM links l
+			INNER JOIN pagereports pr2 ON pr2.id = l.pagereport_id
+			WHERE l.url_hash = pr.url_hash 
+			AND pr2.crawl_id = ? 
+			AND pr2.crawled = 1
+		)
+	`
+
+	row = ds.DB.QueryRow(zeroInlinksQuery, cid, cid)
+	err = row.Scan(&stats.ZeroInlinks)
+	if err != nil {
+		log.Printf("GetInlinkStats zero inlinks: %v\n", err)
+	}
+
+	// Count pages with <= 1 inlinks (low value entry pages)
+	lowValueInlinksQuery := `
+		SELECT COUNT(*)
+		FROM pagereports pr
+		WHERE pr.crawl_id = ? 
+		AND pr.media_type = 'text/html' 
+		AND pr.status_code >= 200 
+		AND pr.status_code < 300 
+		AND (pr.canonical = '' OR pr.canonical = pr.url) 
+		AND pr.crawled = 1
+		AND (
+			SELECT COUNT(*)
+			FROM links l
+			INNER JOIN pagereports pr2 ON pr2.id = l.pagereport_id
+			WHERE l.url_hash = pr.url_hash 
+			AND pr2.crawl_id = ? 
+			AND pr2.crawled = 1
+		) <= 1
+	`
+
+	row = ds.DB.QueryRow(lowValueInlinksQuery, cid, cid)
+	err = row.Scan(&stats.LowValueInlinks)
+	if err != nil {
+		log.Printf("GetInlinkStats low value inlinks: %v\n", err)
+	}
+
+	return stats
+}
+
+// GetMediaTypeDetails returns all media types with their counts (not limited by chartLimit)
+func (ds *DashboardRepository) GetMediaTypeDetails(cid int64) []models.MediaTypeDetail {
+	query := `
+		SELECT media_type, count(*)
+		FROM pagereports
+		WHERE crawl_id = ? AND crawled = 1
+		GROUP BY media_type
+		ORDER BY count(*) DESC
+	`
+
+	var details []models.MediaTypeDetail
+	rows, err := ds.DB.Query(query, cid)
+	if err != nil {
+		log.Printf("GetMediaTypeDetails: %v\n", err)
+		return details
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var detail models.MediaTypeDetail
+		err := rows.Scan(&detail.MediaType, &detail.Count)
+		if err != nil {
+			log.Printf("GetMediaTypeDetails scan: %v\n", err)
+			continue
+		}
+		details = append(details, detail)
+	}
+
+	return details
+}

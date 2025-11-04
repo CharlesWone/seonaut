@@ -41,3 +41,14 @@ type DescriptionStats struct {
 	MultipleDescriptions int
 	DuplicateDescription int
 }
+
+type InlinkStats struct {
+	TotalPages      int // 需要被收录的页面总数（HTML页面且状态码200-299）
+	ZeroInlinks     int // 入链数 = 0 的页面数量（孤岛页面）
+	LowValueInlinks int // 入链数 <= 1 的页面数量（低价值入口页面）
+}
+
+type MediaTypeDetail struct {
+	MediaType string
+	Count     int
+}

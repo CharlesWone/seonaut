@@ -92,6 +92,7 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 	imageAltCount := s.dashboardService.GetImageAltCount(crawl.Id)
 	schemeCount := s.dashboardService.GetSchemeCount(crawl.Id)
 	mediaTypeCount := s.dashboardService.GetMediaCount(crawl.Id)
+	allMediaTypes := s.dashboardService.GetMediaTypeDetails(crawl.Id)
 	statusCodeCount := s.dashboardService.GetStatusCount(crawl.Id)
 	statusCodeByDepth := s.dashboardService.GetStatusCodeByDepth(crawl.Id)
 	titleStats := s.dashboardService.GetTitleStats(crawl.Id)
@@ -110,16 +111,15 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 %s
 
 ### 🔗 链接统计
-- **内部链接：** %d
-- **外部链接：** %d
+%s
 
 ### 🖼️ 图片Alt属性统计
-- **有Alt属性：** %d
+%s
 %s
 
 ### 🔒 HTTP/HTTPS统计
 %s
-- **HTTPS页面：** %d
+%s
 
 ### 📄 媒体类型统计%s
 
@@ -128,7 +128,7 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 ### 📈 页面深度分布%s
 
 ### 📝 标题统计
-- **总页面数：** %d
+%s
 %s
 %s
 %s
@@ -136,7 +136,7 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 %s
 
 ### 📄 描述统计
-- **总页面数：** %d
+%s
 %s
 %s
 %s
@@ -157,22 +157,21 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 		crawl.TotalURLs,
 		formatIntMetric("被robots.txt阻止", crawl.BlockedByRobotstxt, crawl.BlockedByRobotstxt > 0),
 		formatIntMetric("Noindex页面", crawl.Noindex, crawl.Noindex > 0),
-		crawl.InternalFollowLinks+crawl.InternalNoFollowLinks,
-		crawl.ExternalFollowLinks+crawl.ExternalNoFollowLinks,
-		imageAltCount.Alt,
+		s.formatLinkStats(crawl),
+		fmt.Sprintf("- **有Alt属性：** %d", imageAltCount.Alt),
 		formatIntMetric("无Alt属性", imageAltCount.NonAlt, imageAltCount.NonAlt > 0),
 		formatIntMetric("HTTP页面", schemeCount.HTTP, schemeCount.HTTP > 0),
-		schemeCount.HTTPS,
-		s.formatMediaTypeStats(mediaTypeCount),
+		fmt.Sprintf("- **HTTPS页面：** %d", schemeCount.HTTPS),
+		s.formatMediaTypeStats(mediaTypeCount, allMediaTypes),
 		s.formatStatusCodeStats(statusCodeCount),
 		s.formatStatusCodeByDepthStats(statusCodeByDepth),
-		titleStats.TotalPages,
+		fmt.Sprintf("- **总页面数：** %d", titleStats.TotalPages),
 		formatIntMetric("空标题", titleStats.EmptyTitle, titleStats.EmptyTitle > 0),
 		formatIntMetric("短标题(<20字符)", titleStats.ShortTitle, titleStats.ShortTitle > 0),
 		formatIntMetric("长标题(>60字符)", titleStats.LongTitle, titleStats.LongTitle > 0),
 		formatIntMetric("多标题标签", titleStats.MultipleTitles, titleStats.MultipleTitles > 0),
 		formatIntMetric("重复标题", titleStats.DuplicateTitle, titleStats.DuplicateTitle > 0),
-		descriptionStats.TotalPages,
+		fmt.Sprintf("- **总页面数：** %d", descriptionStats.TotalPages),
 		formatIntMetric("空描述", descriptionStats.EmptyDescription, descriptionStats.EmptyDescription > 0),
 		formatIntMetric("短描述(<80字符)", descriptionStats.ShortDescription, descriptionStats.ShortDescription > 0),
 		formatIntMetric("长描述(>160字符)", descriptionStats.LongDescription, descriptionStats.LongDescription > 0),
@@ -185,8 +184,9 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 	)
 
 	// Add optimization suggestions
-	suggestions := s.generateOptimizationSuggestions(crawl, imageAltCount, schemeCount, statusCodeCount, titleStats, descriptionStats)
+	suggestions := s.generateOptimizationSuggestions(crawl, imageAltCount, schemeCount, statusCodeCount, titleStats, descriptionStats, allMediaTypes, statusCodeByDepth)
 	if suggestions != "" {
+		text += "\n\n --- \n\n"
 		text += "\n\n" + suggestions
 	}
 
@@ -253,15 +253,72 @@ func formatDuration(d time.Duration) string {
 	}
 }
 
-// formatMediaTypeStats formats media type statistics
-func (s *DingTalkService) formatMediaTypeStats(chart *models.Chart) string {
+// formatMediaTypeStats formats media type statistics with abnormal indicators
+func (s *DingTalkService) formatMediaTypeStats(chart *models.Chart, allMediaTypes []models.MediaTypeDetail) string {
 	if chart == nil || len(*chart) == 0 {
 		return "\n- 无数据"
 	}
 
+	// Calculate total count from all media types
+	var totalCount int
+	for _, mt := range allMediaTypes {
+		totalCount += mt.Count
+	}
+
+	if totalCount == 0 {
+		return "\n- 无数据"
+	}
+
+	// Build a map of media types from chart for quick lookup
+	chartMap := make(map[string]int)
+	for _, item := range *chart {
+		chartMap[item.Key] = item.Value
+	}
+
 	var result string
 	for _, item := range *chart {
-		result += fmt.Sprintf("\n- **%s：** %d", item.Key, item.Value)
+		percentage := float64(item.Value) / float64(totalCount) * 100
+		isAbnormal := false
+
+		// Check if this is "Other" type
+		if item.Key == "Other" {
+			// For Other type, check if percentage > 10%
+			if percentage > 10 {
+				isAbnormal = true
+			}
+		} else {
+			// Check for specific media types
+			if item.Key == "image/png" && percentage > 5 {
+				isAbnormal = true
+			} else if item.Key == "image/gif" && percentage > 5 {
+				isAbnormal = true
+			} else if item.Key != "text/html" && percentage > 10 {
+				// Other non-HTML types with > 10% are abnormal
+				isAbnormal = true
+			}
+		}
+
+		if isAbnormal {
+			result += fmt.Sprintf("\n- **%s：** <font color=\"red\">%d (%.1f%%)</font>", item.Key, item.Value, percentage)
+		} else {
+			result += fmt.Sprintf("\n- **%s：** %d (%.1f%%)", item.Key, item.Value, percentage)
+		}
+
+		// If this is "Other" type, show details
+		if item.Key == "Other" && len(allMediaTypes) > 4 {
+			// Get the media types that are in "Other" (after the first 4)
+			result += "\n  <font color=\"gray\">包含："
+			for i := 4; i < len(allMediaTypes) && i < 10; i++ {
+				if i > 4 {
+					result += "、"
+				}
+				result += allMediaTypes[i].MediaType
+			}
+			if len(allMediaTypes) > 10 {
+				result += "等"
+			}
+			result += "</font>"
+		}
 	}
 	return result
 }
@@ -331,19 +388,33 @@ func (s *DingTalkService) formatStatusCodeByDepthStats(statusCodes []models.Stat
 	depth5_6Percent := float64(depth5_6) / float64(totalPages) * 100
 	depth7_8Percent := float64(depth7_8) / float64(totalPages) * 100
 
+	// Determine if depth 5-8 is abnormal (> 20%) or depth 7-8 is abnormal (> 10%)
+	depth5_8Percent := depth5_6Percent + depth7_8Percent
+	depth5_8Abnormal := depth5_8Percent > 20
+	depth7_8Abnormal := depth7_8Percent > 10
+
 	result := fmt.Sprintf(`
 - **总页面数：** %d
 - **深度1-2：** %d页 (%.1f%%)
-- **深度3-4：** %d页 (%.1f%%) 
-- **深度5-6：** %d页 (%.1f%%)
-- **深度7-8：** %d页 (%.1f%%)
-`,
+- **深度3-4：** %d页 (%.1f%%)`,
 		totalPages,
 		depth1_2, depth1_2Percent,
 		depth3_4, depth3_4Percent,
-		depth5_6, depth5_6Percent,
-		depth7_8, depth7_8Percent,
 	)
+
+	// Format depth 5-6 with red if abnormal
+	if depth5_8Abnormal {
+		result += fmt.Sprintf("\n- **深度5-6：** <font color=\"red\">%d页 (%.1f%%)</font>", depth5_6, depth5_6Percent)
+	} else {
+		result += fmt.Sprintf("\n- **深度5-6：** %d页 (%.1f%%)", depth5_6, depth5_6Percent)
+	}
+
+	// Format depth 7-8 with red if abnormal
+	if depth7_8Abnormal {
+		result += fmt.Sprintf("\n- **深度7-8：** <font color=\"red\">%d页 (%.1f%%)</font>", depth7_8, depth7_8Percent)
+	} else {
+		result += fmt.Sprintf("\n- **深度7-8：** %d页 (%.1f%%)", depth7_8, depth7_8Percent)
+	}
 
 	return result
 }
@@ -375,6 +446,72 @@ func formatStringMetric(name string, value string, isAbnormal bool) string {
 	return formatMetric(name, value, isAbnormal)
 }
 
+// formatLinkStats formats link statistics with abnormal indicators
+func (s *DingTalkService) formatLinkStats(crawl *models.Crawl) string {
+	internalTotal := crawl.InternalFollowLinks + crawl.InternalNoFollowLinks
+	externalTotal := crawl.ExternalFollowLinks + crawl.ExternalNoFollowLinks
+
+	result := fmt.Sprintf("- **内部链接：** %d", internalTotal)
+
+	// Check internal nofollow ratio
+	if internalTotal > 0 {
+		internalNoFollowRatio := float64(crawl.InternalNoFollowLinks) / float64(internalTotal)
+		if internalNoFollowRatio > 0.3 {
+			result += fmt.Sprintf("\n- <font color=\"red\">**内部nofollow链接：** %d (%.1f%%)</font>", crawl.InternalNoFollowLinks, internalNoFollowRatio*100)
+		} else {
+			result += fmt.Sprintf("\n- **内部nofollow链接：** %d (%.1f%%)", crawl.InternalNoFollowLinks, internalNoFollowRatio*100)
+		}
+	}
+
+	result += fmt.Sprintf("\n- **外部链接：** %d", externalTotal)
+
+	// Check external follow ratio
+	if externalTotal > 0 {
+		externalFollowRatio := float64(crawl.ExternalFollowLinks) / float64(externalTotal)
+		if externalFollowRatio > 0.5 {
+			result += fmt.Sprintf("\n- <font color=\"red\">**外部follow链接：** %d (%.1f%%)</font>", crawl.ExternalFollowLinks, externalFollowRatio*100)
+		} else {
+			result += fmt.Sprintf("\n- **外部follow链接：** %d (%.1f%%)", crawl.ExternalFollowLinks, externalFollowRatio*100)
+		}
+	}
+
+	return result
+}
+
+// formatInlinkStats formats inlink statistics with abnormal indicators
+func (s *DingTalkService) formatInlinkStats(stats *models.InlinkStats) string {
+	if stats == nil || stats.TotalPages == 0 {
+		return ""
+	}
+
+	result := "\n### 🔗 内链结构统计\n"
+	result += fmt.Sprintf("- **总页面数：** %d", stats.TotalPages)
+
+	// Calculate percentages
+	zeroInlinksPercent := float64(stats.ZeroInlinks) / float64(stats.TotalPages) * 100
+	lowValueInlinksPercent := float64(stats.LowValueInlinks) / float64(stats.TotalPages) * 100
+
+	// Zero inlinks (isolated pages)
+	if zeroInlinksPercent > 10 {
+		result += fmt.Sprintf("\n- <font color=\"red\">**孤岛页面（入链数=0）：** %d (%.1f%%)</font>", stats.ZeroInlinks, zeroInlinksPercent)
+	} else if zeroInlinksPercent > 5 {
+		result += fmt.Sprintf("\n- <font color=\"red\">**孤岛页面（入链数=0）：** %d (%.1f%%)</font>", stats.ZeroInlinks, zeroInlinksPercent)
+	} else {
+		result += fmt.Sprintf("\n- **孤岛页面（入链数=0）：** %d (%.1f%%)", stats.ZeroInlinks, zeroInlinksPercent)
+	}
+
+	// Low value inlinks (<= 1)
+	if lowValueInlinksPercent > 30 {
+		result += fmt.Sprintf("\n- <font color=\"red\">**低价值入口页面（入链数<=1）：** %d (%.1f%%)</font>", stats.LowValueInlinks, lowValueInlinksPercent)
+	} else if lowValueInlinksPercent > 15 {
+		result += fmt.Sprintf("\n- <font color=\"red\">**低价值入口页面（入链数<=1）：** %d (%.1f%%)</font>", stats.LowValueInlinks, lowValueInlinksPercent)
+	} else {
+		result += fmt.Sprintf("\n- **低价值入口页面（入链数<=1）：** %d (%.1f%%)", stats.LowValueInlinks, lowValueInlinksPercent)
+	}
+
+	return result
+}
+
 // generateOptimizationSuggestions generates optimization suggestions based on abnormal indicators
 func (s *DingTalkService) generateOptimizationSuggestions(
 	crawl *models.Crawl,
@@ -383,6 +520,8 @@ func (s *DingTalkService) generateOptimizationSuggestions(
 	statusCodeCount *models.Chart,
 	titleStats *models.TitleStats,
 	descriptionStats *models.DescriptionStats,
+	allMediaTypes []models.MediaTypeDetail,
+	statusCodeByDepth []models.StatusCodeByDepth,
 ) string {
 	var suggestions []string
 
@@ -485,6 +624,96 @@ func (s *DingTalkService) generateOptimizationSuggestions(
 	}
 	if crawl.SitemapIsBlocked {
 		suggestions = append(suggestions, "- **Sitemap被阻止：** Sitemap被robots.txt阻止。建议修改robots.txt配置，允许搜索引擎访问sitemap。")
+	}
+
+	// Check for link ratio issues
+	internalTotal := crawl.InternalFollowLinks + crawl.InternalNoFollowLinks
+	externalTotal := crawl.ExternalFollowLinks + crawl.ExternalNoFollowLinks
+	if internalTotal > 0 {
+		internalNoFollowRatio := float64(crawl.InternalNoFollowLinks) / float64(internalTotal)
+		if internalNoFollowRatio > 0.3 {
+			suggestions = append(suggestions, fmt.Sprintf("- **内部nofollow链接：** 发现 %.1f%%%% 的内部链接使用了nofollow属性，超过30%%%%的阈值。这不利于内部权重传递，建议减少内部链接的nofollow使用。", internalNoFollowRatio*100))
+		}
+	}
+	if externalTotal > 0 {
+		externalFollowRatio := float64(crawl.ExternalFollowLinks) / float64(externalTotal)
+		if externalFollowRatio > 0.5 {
+			suggestions = append(suggestions, fmt.Sprintf("- **外部follow链接：** 发现 %.1f%%%% 的外部链接使用了follow属性，超过50%%%%的阈值。这可能导致SEO权重外流，建议为外部链接添加nofollow属性。", externalFollowRatio*100))
+		}
+	}
+
+	// Check for media type issues
+	if len(allMediaTypes) > 0 {
+		var totalMediaCount int
+		for _, mt := range allMediaTypes {
+			totalMediaCount += mt.Count
+		}
+
+		for _, mt := range allMediaTypes {
+			percentage := float64(mt.Count) / float64(totalMediaCount) * 100
+
+			if mt.MediaType == "image/png" && percentage > 5 {
+				if percentage > 10 {
+					suggestions = append(suggestions, fmt.Sprintf("- **PNG格式图片：** 发现 %d 个PNG格式页面（%.1f%%），属于高风险异常。照片应该使用JPEG或WebP格式，PNG会带来不必要的体积膨胀，影响页面加载速度。建议将PNG格式的照片转换为JPEG或WebP格式。", mt.Count, percentage))
+				} else {
+					suggestions = append(suggestions, fmt.Sprintf("- **PNG格式图片：** 发现 %d 个PNG格式页面（%.1f%%）。照片应该使用JPEG或WebP格式，PNG会带来不必要的体积膨胀。建议将PNG格式的照片转换为JPEG或WebP格式，以减小文件体积，提升页面加载速度。", mt.Count, percentage))
+				}
+			} else if mt.MediaType == "image/gif" && percentage > 5 {
+				suggestions = append(suggestions, fmt.Sprintf("- **GIF格式图片：** 发现 %d 个GIF格式页面（%.1f%%）。建议使用WebP或视频格式替代GIF，以获得更好的压缩效果和性能。", mt.Count, percentage))
+			} else if mt.MediaType != "text/html" && mt.MediaType != "image/jpeg" && mt.MediaType != "image/jpg" && mt.MediaType != "image/webp" && mt.MediaType != "image/png" && mt.MediaType != "image/gif" && percentage > 10 {
+				suggestions = append(suggestions, fmt.Sprintf("- **非HTML媒体类型：** 发现 %d 个%s类型页面（%.1f%%）。请检查这些页面是否应该被搜索引擎索引，如果不需要，建议在robots.txt中阻止或使用noindex标签。", mt.Count, mt.MediaType, percentage))
+			}
+		}
+
+		// Check for "Other" types (if there are more than 4 media types)
+		if len(allMediaTypes) > 4 {
+			var otherCount int
+			for i := 4; i < len(allMediaTypes); i++ {
+				otherCount += allMediaTypes[i].Count
+			}
+			otherPercentage := float64(otherCount) / float64(totalMediaCount) * 100
+			if otherPercentage > 10 {
+				otherTypes := ""
+				for i := 4; i < len(allMediaTypes) && i < 8; i++ {
+					if i > 4 {
+						otherTypes += "、"
+					}
+					otherTypes += allMediaTypes[i].MediaType
+				}
+				if len(allMediaTypes) > 8 {
+					otherTypes += "等"
+				}
+				suggestions = append(suggestions, fmt.Sprintf("- **其他媒体类型：** 发现 %d 个其他类型页面（%.1f%%），包含：%s。请检查这些媒体类型是否合理，必要时进行优化。", otherCount, otherPercentage, otherTypes))
+			}
+		}
+	}
+
+	// Check for page depth issues
+	if len(statusCodeByDepth) > 0 {
+		var totalPages int
+		var depth5_6, depth7_8 int
+		for _, sc := range statusCodeByDepth {
+			depthTotal := sc.StatusCode100 + sc.StatusCode200 + sc.StatusCode300 + sc.StatusCode400 + sc.StatusCode500
+			if depthTotal > 0 {
+				totalPages += depthTotal
+				if sc.Depth == 5 || sc.Depth == 6 {
+					depth5_6 += depthTotal
+				} else if sc.Depth == 7 || sc.Depth == 8 {
+					depth7_8 += depthTotal
+				}
+			}
+		}
+
+		if totalPages > 0 {
+			depth5_8Percent := float64(depth5_6+depth7_8) / float64(totalPages) * 100
+			depth7_8Percent := float64(depth7_8) / float64(totalPages) * 100
+
+			if depth7_8Percent > 10 {
+				suggestions = append(suggestions, fmt.Sprintf("- **页面深度过深：** 发现深度7-8层的页面占比为 %.1f%%%%，超过10%%%%的阈值。网站结构过深，不利于搜索引擎爬取和用户体验。建议优化网站结构，减少页面深度。", depth7_8Percent))
+			} else if depth5_8Percent > 20 {
+				suggestions = append(suggestions, fmt.Sprintf("- **页面深度：** 发现深度5-8层的页面占比为 %.1f%%%%，超过20%%%%的阈值。建议优化网站导航结构，尽量将重要页面控制在3-4层以内。", depth5_8Percent))
+			}
+		}
 	}
 
 	// If no suggestions, return empty string

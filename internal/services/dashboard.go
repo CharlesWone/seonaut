@@ -20,6 +20,8 @@ type (
 		GetStatusCodeByDepth(crawlId int64) []models.StatusCodeByDepth
 		GetTitleStats(crawlId int64) *models.TitleStats
 		GetDescriptionStats(crawlId int64) *models.DescriptionStats
+		GetInlinkStats(crawlId int64) *models.InlinkStats
+		GetMediaTypeDetails(crawlId int64) []models.MediaTypeDetail
 	}
 
 	DashboardService struct {
@@ -75,6 +77,16 @@ func (s *DashboardService) GetTitleStats(crawlId int64) *models.TitleStats {
 // GetDescriptionStats returns description statistics for a crawl
 func (s *DashboardService) GetDescriptionStats(crawlId int64) *models.DescriptionStats {
 	return s.repository.GetDescriptionStats(crawlId)
+}
+
+// GetInlinkStats returns statistics about pages with zero or low inlinks
+func (s *DashboardService) GetInlinkStats(crawlId int64) *models.InlinkStats {
+	return s.repository.GetInlinkStats(crawlId)
+}
+
+// GetMediaTypeDetails returns all media types with their counts (not limited by chartLimit)
+func (s *DashboardService) GetMediaTypeDetails(crawlId int64) []models.MediaTypeDetail {
+	return s.repository.GetMediaTypeDetails(crawlId)
 }
 
 // Returns a Chart containing the keys and values from the CountList.
