@@ -299,7 +299,7 @@ func (s *DingTalkService) formatMediaTypeStats(chart *models.Chart, allMediaType
 		}
 
 		if isAbnormal {
-			result += fmt.Sprintf("\n- **%s：** <font color=\"red\">%d (%.1f%%)</font>", item.Key, item.Value, percentage)
+			result += fmt.Sprintf("\n- <font color=\"red\">**%s：** %d (%.1f%%)</font>", item.Key, item.Value, percentage)
 		} else {
 			result += fmt.Sprintf("\n- **%s：** %d (%.1f%%)", item.Key, item.Value, percentage)
 		}
