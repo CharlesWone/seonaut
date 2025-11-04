@@ -97,6 +97,7 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 	titleStats := s.dashboardService.GetTitleStats(crawl.Id)
 	descriptionStats := s.dashboardService.GetDescriptionStats(crawl.Id)
 
+	// Build report sections with abnormal indicators highlighted
 	text := fmt.Sprintf(`
 ### %s SEO审计报告完成
 - **网站：** %s
@@ -105,8 +106,8 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 
 ### 📊 爬取统计
 - **总URL数：** %d
-- **被robots.txt阻止：** %d
-- **Noindex页面：** %d
+%s
+%s
 
 ### 🔗 链接统计
 - **内部链接：** %d
@@ -114,10 +115,10 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 
 ### 🖼️ 图片Alt属性统计
 - **有Alt属性：** %d
-- **无Alt属性：** %d
+%s
 
 ### 🔒 HTTP/HTTPS统计
-- **HTTP页面：** %d
+%s
 - **HTTPS页面：** %d
 
 ### 📄 媒体类型统计%s
@@ -128,24 +129,24 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 
 ### 📝 标题统计
 - **总页面数：** %d
-- **空标题：** %d
-- **短标题(<20字符)：** %d
-- **长标题(>60字符)：** %d
-- **多标题标签：** %d
-- **重复标题：** %d
+%s
+%s
+%s
+%s
+%s
 
 ### 📄 描述统计
 - **总页面数：** %d
-- **空描述：** %d
-- **短描述(<80字符)：** %d
-- **长描述(>160字符)：** %d
-- **多描述标签：** %d
-- **重复描述：** %d
+%s
+%s
+%s
+%s
+%s
 
 ### 🤖 技术信息
-- **Robots.txt存在：** %s
+%s
 - **Sitemap存在：** %s
-- **Sitemap被阻止：** %s
+%s
 
 ---
 *报告生成时间：%s*`,
@@ -154,40 +155,40 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 		crawl.Start.Format("2006-01-02 15:04:05"),
 		formatDuration(duration),
 		crawl.TotalURLs,
-		crawl.BlockedByRobotstxt,
-		crawl.Noindex,
-		// crawl.CriticalIssues,
-		// crawl.AlertIssues,
-		// crawl.WarningIssues,
-		// crawl.TotalIssues,
+		formatIntMetric("被robots.txt阻止", crawl.BlockedByRobotstxt, crawl.BlockedByRobotstxt > 0),
+		formatIntMetric("Noindex页面", crawl.Noindex, crawl.Noindex > 0),
 		crawl.InternalFollowLinks+crawl.InternalNoFollowLinks,
 		crawl.ExternalFollowLinks+crawl.ExternalNoFollowLinks,
-		// crawl.SponsoredLinks,
-		// crawl.UGCLinks,
 		imageAltCount.Alt,
-		imageAltCount.NonAlt,
-		schemeCount.HTTP,
+		formatIntMetric("无Alt属性", imageAltCount.NonAlt, imageAltCount.NonAlt > 0),
+		formatIntMetric("HTTP页面", schemeCount.HTTP, schemeCount.HTTP > 0),
 		schemeCount.HTTPS,
 		s.formatMediaTypeStats(mediaTypeCount),
 		s.formatStatusCodeStats(statusCodeCount),
 		s.formatStatusCodeByDepthStats(statusCodeByDepth),
 		titleStats.TotalPages,
-		titleStats.EmptyTitle,
-		titleStats.ShortTitle,
-		titleStats.LongTitle,
-		titleStats.MultipleTitles,
-		titleStats.DuplicateTitle,
+		formatIntMetric("空标题", titleStats.EmptyTitle, titleStats.EmptyTitle > 0),
+		formatIntMetric("短标题(<20字符)", titleStats.ShortTitle, titleStats.ShortTitle > 0),
+		formatIntMetric("长标题(>60字符)", titleStats.LongTitle, titleStats.LongTitle > 0),
+		formatIntMetric("多标题标签", titleStats.MultipleTitles, titleStats.MultipleTitles > 0),
+		formatIntMetric("重复标题", titleStats.DuplicateTitle, titleStats.DuplicateTitle > 0),
 		descriptionStats.TotalPages,
-		descriptionStats.EmptyDescription,
-		descriptionStats.ShortDescription,
-		descriptionStats.LongDescription,
-		descriptionStats.MultipleDescriptions,
-		descriptionStats.DuplicateDescription,
-		formatBool(crawl.RobotstxtExists),
+		formatIntMetric("空描述", descriptionStats.EmptyDescription, descriptionStats.EmptyDescription > 0),
+		formatIntMetric("短描述(<80字符)", descriptionStats.ShortDescription, descriptionStats.ShortDescription > 0),
+		formatIntMetric("长描述(>160字符)", descriptionStats.LongDescription, descriptionStats.LongDescription > 0),
+		formatIntMetric("多描述标签", descriptionStats.MultipleDescriptions, descriptionStats.MultipleDescriptions > 0),
+		formatIntMetric("重复描述", descriptionStats.DuplicateDescription, descriptionStats.DuplicateDescription > 0),
+		formatStringMetric("Robots.txt存在", formatBool(crawl.RobotstxtExists), !crawl.RobotstxtExists),
 		formatBool(crawl.SitemapExists),
-		formatBool(crawl.SitemapIsBlocked),
+		formatStringMetric("Sitemap被阻止", formatBool(crawl.SitemapIsBlocked), crawl.SitemapIsBlocked),
 		time.Now().Format("2006-01-02 15:04:05"),
 	)
+
+	// Add optimization suggestions
+	suggestions := s.generateOptimizationSuggestions(crawl, imageAltCount, schemeCount, statusCodeCount, titleStats, descriptionStats)
+	if suggestions != "" {
+		text += "\n\n" + suggestions
+	}
 
 	return text
 }
@@ -273,7 +274,20 @@ func (s *DingTalkService) formatStatusCodeStats(chart *models.Chart) string {
 
 	var result string
 	for _, item := range *chart {
-		result += fmt.Sprintf("\n- **%s：** %d", item.Key, item.Value)
+		// Check if status code is 4xx or 5xx (error codes)
+		isAbnormal := false
+		if len(item.Key) >= 1 {
+			firstDigit := item.Key[0]
+			if firstDigit == '4' || firstDigit == '5' {
+				isAbnormal = true
+			}
+		}
+
+		if isAbnormal {
+			result += fmt.Sprintf("\n- **%s：** <font color=\"red\">%d</font>", item.Key, item.Value)
+		} else {
+			result += fmt.Sprintf("\n- **%s：** %d", item.Key, item.Value)
+		}
 	}
 	return result
 }
@@ -340,4 +354,149 @@ func formatBool(b bool) string {
 		return "是"
 	}
 	return "否"
+}
+
+// formatMetric formats a metric with optional red highlighting if abnormal
+func formatMetric(name string, value interface{}, isAbnormal bool) string {
+	valueStr := fmt.Sprintf("%v", value)
+	if isAbnormal {
+		return fmt.Sprintf("- <font color=\"red\">**%s：** %s</font>", name, valueStr)
+	}
+	return fmt.Sprintf("- **%s：** %s", name, valueStr)
+}
+
+// formatIntMetric formats an integer metric with optional red highlighting
+func formatIntMetric(name string, value int, isAbnormal bool) string {
+	return formatMetric(name, value, isAbnormal)
+}
+
+// formatStringMetric formats a string metric with optional red highlighting
+func formatStringMetric(name string, value string, isAbnormal bool) string {
+	return formatMetric(name, value, isAbnormal)
+}
+
+// generateOptimizationSuggestions generates optimization suggestions based on abnormal indicators
+func (s *DingTalkService) generateOptimizationSuggestions(
+	crawl *models.Crawl,
+	imageAltCount *models.AltCount,
+	schemeCount *models.SchemeCount,
+	statusCodeCount *models.Chart,
+	titleStats *models.TitleStats,
+	descriptionStats *models.DescriptionStats,
+) string {
+	var suggestions []string
+
+	// Check for robots.txt blocking
+	if crawl.BlockedByRobotstxt > 0 {
+		suggestions = append(suggestions, fmt.Sprintf("- **被robots.txt阻止：** 发现 %d 个URL被robots.txt阻止。请检查robots.txt配置，确保重要页面未被意外阻止。", crawl.BlockedByRobotstxt))
+	}
+
+	// Check for noindex pages
+	if crawl.Noindex > 0 {
+		suggestions = append(suggestions, fmt.Sprintf("- **Noindex页面：** 发现 %d 个页面设置了noindex标签。请确认这些页面是否需要被搜索引擎索引，如不需要请忽略。", crawl.Noindex))
+	}
+
+	// Check for images without alt text
+	if imageAltCount.NonAlt > 0 {
+		totalImages := imageAltCount.Alt + imageAltCount.NonAlt
+		if totalImages > 0 {
+			percentage := float64(imageAltCount.NonAlt) / float64(totalImages) * 100
+			suggestions = append(suggestions, fmt.Sprintf("- **图片Alt属性：** 发现 %d 张图片（%.1f%%）缺少Alt属性。建议为所有图片添加描述性的Alt文本，提升可访问性和SEO效果。", imageAltCount.NonAlt, percentage))
+		} else {
+			suggestions = append(suggestions, fmt.Sprintf("- **图片Alt属性：** 发现 %d 张图片缺少Alt属性。建议为所有图片添加描述性的Alt文本，提升可访问性和SEO效果。", imageAltCount.NonAlt))
+		}
+	}
+
+	// Check for HTTP pages
+	if schemeCount.HTTP > 0 {
+		totalPages := schemeCount.HTTP + schemeCount.HTTPS
+		if totalPages > 0 {
+			percentage := float64(schemeCount.HTTP) / float64(totalPages) * 100
+			suggestions = append(suggestions, fmt.Sprintf("- **HTTPS迁移：** 发现 %d 个页面（%.1f%%）仍使用HTTP协议。建议将全部页面迁移至HTTPS，提升安全性和SEO排名。", schemeCount.HTTP, percentage))
+		} else {
+			suggestions = append(suggestions, fmt.Sprintf("- **HTTPS迁移：** 发现 %d 个页面仍使用HTTP协议。建议将全部页面迁移至HTTPS，提升安全性和SEO排名。", schemeCount.HTTP))
+		}
+	}
+
+	// Check for error status codes
+	if statusCodeCount != nil {
+		var error4xx, error5xx int
+		for _, item := range *statusCodeCount {
+			if len(item.Key) >= 1 {
+				firstDigit := item.Key[0]
+				if firstDigit == '4' {
+					error4xx += item.Value
+				} else if firstDigit == '5' {
+					error5xx += item.Value
+				}
+			}
+		}
+		if error4xx > 0 {
+			suggestions = append(suggestions, fmt.Sprintf("- **4xx错误：** 发现 %d 个页面返回4xx客户端错误。请检查链接是否正确，修复或删除无效页面，避免影响用户体验和SEO。", error4xx))
+		}
+		if error5xx > 0 {
+			suggestions = append(suggestions, fmt.Sprintf("- **5xx错误：** 发现 %d 个页面返回5xx服务器错误。请立即检查服务器配置和代码，修复服务器端问题。", error5xx))
+		}
+	}
+
+	// Check for title issues
+	if titleStats.TotalPages > 0 {
+		if titleStats.EmptyTitle > 0 {
+			percentage := float64(titleStats.EmptyTitle) / float64(titleStats.TotalPages) * 100
+			suggestions = append(suggestions, fmt.Sprintf("- **空标题：** 发现 %d 个页面（%.1f%%）缺少标题标签。建议为所有页面添加唯一且描述性的标题，长度控制在20-60字符之间。", titleStats.EmptyTitle, percentage))
+		}
+		if titleStats.ShortTitle > 0 {
+			suggestions = append(suggestions, fmt.Sprintf("- **短标题：** 发现 %d 个页面标题过短（<20字符）。建议优化标题，使其更具体、更具描述性，以提升SEO效果。", titleStats.ShortTitle))
+		}
+		if titleStats.LongTitle > 0 {
+			suggestions = append(suggestions, fmt.Sprintf("- **长标题：** 发现 %d 个页面标题过长（>60字符）。建议将标题长度控制在60字符以内，避免在搜索结果中被截断。", titleStats.LongTitle))
+		}
+		if titleStats.MultipleTitles > 0 {
+			suggestions = append(suggestions, fmt.Sprintf("- **多标题标签：** 发现 %d 个页面存在多个标题标签。每个页面应只有一个标题标签，请删除多余的标题标签。", titleStats.MultipleTitles))
+		}
+		if titleStats.DuplicateTitle > 0 {
+			suggestions = append(suggestions, fmt.Sprintf("- **重复标题：** 发现 %d 个页面使用重复标题。建议为每个页面创建唯一标题，提升页面区分度和SEO效果。", titleStats.DuplicateTitle))
+		}
+	}
+
+	// Check for description issues
+	if descriptionStats.TotalPages > 0 {
+		if descriptionStats.EmptyDescription > 0 {
+			percentage := float64(descriptionStats.EmptyDescription) / float64(descriptionStats.TotalPages) * 100
+			suggestions = append(suggestions, fmt.Sprintf("- **空描述：** 发现 %d 个页面（%.1f%%）缺少meta描述。建议为所有页面添加吸引人的描述，长度控制在80-160字符之间。", descriptionStats.EmptyDescription, percentage))
+		}
+		if descriptionStats.ShortDescription > 0 {
+			suggestions = append(suggestions, fmt.Sprintf("- **短描述：** 发现 %d 个页面描述过短（<80字符）。建议优化描述内容，使其更详细、更具吸引力。", descriptionStats.ShortDescription))
+		}
+		if descriptionStats.LongDescription > 0 {
+			suggestions = append(suggestions, fmt.Sprintf("- **长描述：** 发现 %d 个页面描述过长（>160字符）。建议将描述长度控制在160字符以内，避免在搜索结果中被截断。", descriptionStats.LongDescription))
+		}
+		if descriptionStats.MultipleDescriptions > 0 {
+			suggestions = append(suggestions, fmt.Sprintf("- **多描述标签：** 发现 %d 个页面存在多个meta描述标签。每个页面应只有一个描述标签，请删除多余的描述标签。", descriptionStats.MultipleDescriptions))
+		}
+		if descriptionStats.DuplicateDescription > 0 {
+			suggestions = append(suggestions, fmt.Sprintf("- **重复描述：** 发现 %d 个页面使用重复描述。建议为每个页面创建唯一描述，提升页面吸引力。", descriptionStats.DuplicateDescription))
+		}
+	}
+
+	// Check for robots.txt and sitemap issues
+	if !crawl.RobotstxtExists {
+		suggestions = append(suggestions, "- **Robots.txt：** 网站未配置robots.txt文件。建议创建robots.txt文件，指导搜索引擎爬虫的访问行为。")
+	}
+	if crawl.SitemapIsBlocked {
+		suggestions = append(suggestions, "- **Sitemap被阻止：** Sitemap被robots.txt阻止。建议修改robots.txt配置，允许搜索引擎访问sitemap。")
+	}
+
+	// If no suggestions, return empty string
+	if len(suggestions) == 0 {
+		return ""
+	}
+
+	// Format suggestions section
+	result := "### 💡 优化建议\n\n"
+	for _, suggestion := range suggestions {
+		result += suggestion + "\n"
+	}
+
+	return result
 }
