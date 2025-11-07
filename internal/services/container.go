@@ -16,33 +16,40 @@ import (
 )
 
 type Container struct {
-	Config             *config.Config
-	PubSubBroker       *Broker
-	IssueService       *IssueService
-	ReportService      *ReportService
-	ReportManager      *ReportManager
-	UserService        *UserService
-	DashboardService   *DashboardService
-	ProjectService     *ProjectService
-	ProjectViewService *ProjectViewService
-	ExportService      *Exporter
-	CrawlerService     *CrawlerService
-	Translator         *Translator
-	Renderer           *Renderer
-	CookieSession      *CookieSession
-	ArchiveService     *ArchiveService
-	ReplayService      *ReplayService
-	DingTalkService    *DingTalkService
+	Config              *config.Config
+	PubSubBroker        *Broker
+	IssueService        *IssueService
+	ReportService       *ReportService
+	ReportManager       *ReportManager
+	UserService         *UserService
+	DashboardService    *DashboardService
+	ProjectService      *ProjectService
+	ProjectViewService  *ProjectViewService
+	ExportService       *Exporter
+	CrawlerService      *CrawlerService
+	Translator          *Translator
+	Renderer            *Renderer
+	CookieSession       *CookieSession
+	ArchiveService      *ArchiveService
+	ReplayService       *ReplayService
+	DingTalkService     *DingTalkService
+	ImageService        *ImageService
+	LinkService         *LinkService
+	ExternalLinkService *ExternalLinkService
 
-	db                   *sql.DB
-	issueRepository      *repository.IssueRepository
-	pageReportRepository *repository.PageReportRepository
-	userRepository       *repository.UserRepository
-	projectRepository    *repository.ProjectRepository
-	exportRepository     *repository.ExportRepository
-	crawlRepository      *repository.CrawlRepository
-	dashboardRepository  *repository.DashboardRepository
-	CronManagerService   *CronManagerService
+	db                     *sql.DB
+	issueRepository        *repository.IssueRepository
+	pageReportRepository   *repository.PageReportRepository
+	userRepository         *repository.UserRepository
+	projectRepository      *repository.ProjectRepository
+	exportRepository       *repository.ExportRepository
+	crawlRepository        *repository.CrawlRepository
+	dashboardRepository    *repository.DashboardRepository
+	imageRepository        *repository.ImageRepository
+	linkRepository         *repository.LinkRepository
+	externalLinkRepository *repository.ExternalLinkRepository
+	CronManagerService     *CronManagerService
+	CrawlReportService     *CrawlReportService
 }
 
 func NewContainer(configFile string) *Container {
@@ -66,9 +73,14 @@ func NewContainer(configFile string) *Container {
 	c.InitRenderer()
 	c.InitCookieSession()
 	c.InitReplayService()
+	c.InitImageService()
+	c.InitLinkService()
+	c.InitExternalLinkService()
 
 	// 最后启动 cron（依赖其他服务）
 	c.InitCronManagerService()
+
+	c.InitCrawlReportService()
 	return c
 }
 
@@ -113,6 +125,9 @@ func (c *Container) InitRepositories() {
 	c.exportRepository = &repository.ExportRepository{DB: c.db}
 	c.crawlRepository = &repository.CrawlRepository{DB: c.db}
 	c.dashboardRepository = &repository.DashboardRepository{DB: c.db}
+	c.imageRepository = &repository.ImageRepository{DB: c.db}
+	c.linkRepository = &repository.LinkRepository{DB: c.db}
+	c.externalLinkRepository = &repository.ExternalLinkRepository{DB: c.db}
 
 	// Clean up unfinished crawls.
 	c.crawlRepository.DeleteUnfinishedCrawls()
@@ -176,6 +191,18 @@ func (c *Container) InitProjectService() {
 	// Add a DeleteHook so it deletes all user projects and crawl
 	// data when a user is deleted.
 	c.UserService.AddDeleteHook(c.ProjectService.DeleteAllUserProjects)
+}
+
+func (c *Container) InitImageService() {
+	c.ImageService = NewImageService(c.imageRepository)
+}
+
+func (c *Container) InitLinkService() {
+	c.LinkService = NewLinkService(c.linkRepository)
+}
+
+func (c *Container) InitExternalLinkService() {
+	c.ExternalLinkService = NewExternalLinkService(c.externalLinkRepository)
 }
 
 // Create the ProjectView service.
@@ -266,4 +293,9 @@ func (c *Container) InitDingTalkService() {
 // Init the cron manager.
 func (c *Container) InitCronManagerService() {
 	c.CronManagerService = NewCronManagerService(c.ProjectService, c.CrawlerService)
+}
+
+// Init the crawl report service.
+func (c *Container) InitCrawlReportService() {
+	c.CrawlReportService = NewCrawlReportService(c.DashboardService, c.ImageService, c.LinkService, c.ExternalLinkService)
 }

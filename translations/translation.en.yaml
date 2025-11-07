@@ -176,6 +176,7 @@ PAGE_DETAILS_LINK: Page Details
 ANALYZE_DATA: Analyze Raw Data
 ANALYZE_DATA_MESSAGE: Export your data for further analysis and reporting.
 ANALYZE_DATA_LINK: Data Export
+CRAWL_REPORT_LINK: Crawl Report
 URL_CRAWLED: 1 URL crawled.       # Singular
 URLS_CRAWLED: "%1% URLs crawled." # Plural. %1% will be replaced with a number greater than 1
 CANONICAL: Canonical
@@ -269,6 +270,7 @@ EXPORT_ALL: Export all issues
 EXPORT_ALL_MESSAGE: Export all the issues with the affected URLs, issue type and priority.
 EXPORT_WACZ: Export WACZ Archive
 EXPORT_WACZ_MESSAGE: Export your project's crawled data as a WACZ file for archival or replaying.
+CRAWL_REPORT: Crawl Report
 
 # =============================================
 # CONTEXT: Resources pages. It includes the tabs for images, links, scripts, etc...
@@ -388,6 +390,7 @@ EXPLORER_PAGE_TITLE: URL Explorer
 DELETE_ACCOUNT_VIEW_PAGE_TITLE: Delete Account
 ARCHIVE_VIEW_PAGE_TITLE: Archive Source Code
 SUPPORT_SEONAUT_VIEW_PAGE_TITLE: SEOnaut Project
+CRAWL_REPORT_VIEW_PAGE_TITLE: Crawl Report
 
 # =============================================
 # CONTEXT: Issue types. Name and description of the issue types. Displayed in the issue index page.

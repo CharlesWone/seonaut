@@ -170,6 +170,55 @@ func (ds *ProjectRepository) FindProjectById(id int, uid int) (models.Project, e
 	return p, nil
 }
 
+func (ds *ProjectRepository) FindProjectByIdNoAuth(id int) (models.Project, error) {
+	query := `
+		SELECT
+			id,
+			url,
+			ignore_robotstxt,
+			follow_nofollow,
+			include_noindex,
+			crawl_sitemap,
+			allow_subdomains,
+			basic_auth,
+			deleting,
+			created,
+			check_external_links,
+			archive,
+			user_agent,
+			cron_expr,
+			dingtalk_webhook_url
+		FROM projects
+		WHERE id = ? `
+
+	row := ds.DB.QueryRow(query, id)
+
+	p := models.Project{}
+	err := row.Scan(
+		&p.Id,
+		&p.URL,
+		&p.IgnoreRobotsTxt,
+		&p.FollowNofollow,
+		&p.IncludeNoindex,
+		&p.CrawlSitemap,
+		&p.AllowSubdomains,
+		&p.BasicAuth,
+		&p.Deleting,
+		&p.Created,
+		&p.CheckExternalLinks,
+		&p.Archive,
+		&p.UserAgent,
+		&p.CronExpr,
+		&p.DingtalkWebhookUrl,
+	)
+	if err != nil {
+		log.Println(err)
+		return p, err
+	}
+
+	return p, nil
+}
+
 // DisableProject disables a project marking it as "deleting".
 func (ds *ProjectRepository) DisableProject(p *models.Project) {
 	query := `UPDATE projects SET deleting=1 WHERE id = ?`

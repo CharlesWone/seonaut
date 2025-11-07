@@ -57,6 +57,10 @@ func NewServer(container *services.Container) {
 	http.HandleFunc("GET /export/resources", container.CookieSession.Auth(exportHandler.resourcesHandler))
 	http.HandleFunc("GET /export/wazc", container.CookieSession.Auth(exportHandler.waczHandler))
 
+	// Crawl Report routes
+	crawlReportHandler := crawlReportHandler{container}
+	http.HandleFunc("GET /crawlReport", crawlReportHandler.indexHandler)
+
 	// Issues routes
 	issueHandler := issueHandler{container}
 	http.HandleFunc("GET /issues", container.CookieSession.Auth(issueHandler.indexHandler))

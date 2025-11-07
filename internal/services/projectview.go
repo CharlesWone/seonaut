@@ -10,6 +10,7 @@ type (
 	ProjectViewServiceRepository interface {
 		FindProjectsByUser(int) []models.Project
 		FindProjectById(id int, uid int) (models.Project, error)
+		FindProjectByIdNoAuth(id int) (models.Project, error)
 
 		GetLastCrawl(*models.Project) models.Crawl
 	}
@@ -27,6 +28,29 @@ func NewProjectViewService(r ProjectViewServiceRepository) *ProjectViewService {
 // and the project's last crawl.
 func (s *ProjectViewService) GetProjectView(id, uid int) (*models.ProjectView, error) {
 	project, err := s.repository.FindProjectById(id, uid)
+	if err != nil {
+		return nil, err
+	}
+
+	parsedURL, err := url.Parse(project.URL)
+	if err != nil {
+		return nil, err
+	}
+
+	project.Host = parsedURL.Host
+
+	c := s.repository.GetLastCrawl(&project)
+
+	v := &models.ProjectView{
+		Project: project,
+		Crawl:   c,
+	}
+
+	return v, nil
+}
+
+func (s *ProjectViewService) GetProjectViewNoAuth(id int) (*models.ProjectView, error) {
+	project, err := s.repository.FindProjectByIdNoAuth(id)
 	if err != nil {
 		return nil, err
 	}

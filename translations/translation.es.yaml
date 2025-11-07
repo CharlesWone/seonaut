@@ -176,6 +176,7 @@ PAGE_DETAILS_LINK: Detalles de la página
 ANALYZE_DATA: Analizar datos en bruto
 ANALYZE_DATA_MESSAGE: Exporta tus datos para un análisis y informe más detallados.
 ANALYZE_DATA_LINK: Exportación de datos
+CRAWL_REPORT_LINK: Informe de rastreo
 URL_CRAWLED: 1 URL rastreada.         # Singular
 URLS_CRAWLED: "%1% URLs rastreadas."  # Plural. %1% will be replaced with a number greater than 1
 CANONICAL: Canónica
@@ -269,6 +270,7 @@ EXPORT_ALL: Exportar todos los problemas
 EXPORT_ALL_MESSAGE: Exporta todos los problemas con las URLs afectadas, el tipo de problema y la prioridad.
 EXPORT_WACZ: Exportar archivo WACZ
 EXPORT_WACZ_MESSAGE: Exporta los datos rastreados de tu proyecto como un archivo WACZ para archivo o reproducción.
+CRAWL_REPORT: Informe de rastreo
 
 # =============================================
 # CONTEXT: Resources pages. It includes the tabs for images, links, scripts, etc...
@@ -388,6 +390,7 @@ EXPLORER_PAGE_TITLE: Explorador de URLs
 DELETE_ACCOUNT_VIEW_PAGE_TITLE: Eliminar cuenta
 ARCHIVE_VIEW_PAGE_TITLE: Código fuente archivado
 SUPPORT_SEONAUT_VIEW_PAGE_TITLE: Proyecto SEOnaut
+CRAWL_REPORT_VIEW_PAGE_TITLE: Informe de rastreo
 
 # =============================================
 # CONTEXT: Issue types. Name and description of the issue types. Displayed in the issue index page.

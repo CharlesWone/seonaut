@@ -22,6 +22,21 @@ type (
 		GetDescriptionStats(crawlId int64) *models.DescriptionStats
 		GetInlinkStats(crawlId int64) *models.InlinkStats
 		GetMediaTypeDetails(crawlId int64) []models.MediaTypeDetail
+		GetPageURLsByScheme(crawlId int64, scheme string) []string
+		GetPageURLsByStatusCodeRange(crawlId int64, left int64, right int64) []string
+		GetWithoutTitlePageURLs(crawlId int64) []string
+		GetPageURLsByTitleLength(crawlId int64, minLength int64, maxLength int64) []string
+		GetMultipleTitlesPageURLs(crawlId int64) []string
+		GetDuplicateTitle(crawlId int64) []string
+		GetDuplicateTitleURLsByTitle(crawlId int64, title string) []string
+		GetWithoutDescriptionPageURLs(crawlId int64) []string
+		GetPageURLsByDescriptionLength(crawlId int64, minLength int64, maxLength int64) []string
+		GetMultipleDescriptionPageURLs(crawlId int64) []string
+		GetDuplicateDescription(crawlId int64) []string
+		GetDuplicateDescriptionURLsByDescription(crawlId int64, description string) []string
+		GetURLsByMediaType(crawlId int64, mediaType string) []string
+		GetNonHTMLMediaURLs(crawlId int64) []string
+		GetURLsByDepthRange(crawlId int64, left int, right int) []string
 	}
 
 	DashboardService struct {
@@ -114,4 +129,68 @@ func newChart(c *models.CountList) *models.Chart {
 	}
 
 	return &chart
+}
+
+//func (s *DashboardService) GetWithoutAltImageURLs(crawlId int64) []string {
+//	return s.repository.GetWithoutAltImageURLs(crawlId)
+//}
+
+func (s *DashboardService) GetPageURLsByScheme(crawlId int64, scheme string) []string {
+	return s.repository.GetPageURLsByScheme(crawlId, scheme)
+}
+
+func (s *DashboardService) GetPageURLsByStatusCodeRange(crawlId int64, left int64, right int64) []string {
+	return s.repository.GetPageURLsByStatusCodeRange(crawlId, left, right)
+}
+
+func (s *DashboardService) GetWithoutTitlePageURLs(crawlId int64) []string {
+	return s.repository.GetWithoutTitlePageURLs(crawlId)
+}
+
+func (s *DashboardService) GetPageURLsByTitleLength(crawlId int64, minLength int64, maxLength int64) []string {
+	return s.repository.GetPageURLsByTitleLength(crawlId, minLength, maxLength)
+}
+
+func (s *DashboardService) GetMultipleTitlesPageURLs(crawlId int64) []string {
+	return s.repository.GetMultipleTitlesPageURLs(crawlId)
+}
+
+func (s *DashboardService) GetDuplicateTitle(crawlId int64) []string {
+	return s.repository.GetDuplicateTitle(crawlId)
+}
+
+func (s *DashboardService) GetDuplicateTitleURLsByTitle(crawlId int64, title string) []string {
+	return s.repository.GetDuplicateTitleURLsByTitle(crawlId, title)
+}
+
+func (s *DashboardService) GetWithoutDescriptionPageURLs(crawlId int64) []string {
+	return s.repository.GetWithoutDescriptionPageURLs(crawlId)
+}
+
+func (s *DashboardService) GetPageURLsByDescriptionLength(crawlId int64, minLength int64, maxLength int64) []string {
+	return s.repository.GetPageURLsByDescriptionLength(crawlId, minLength, maxLength)
+}
+
+func (s *DashboardService) GetMultipleDescriptionPageURLs(crawlId int64) []string {
+	return s.repository.GetMultipleDescriptionPageURLs(crawlId)
+}
+
+func (s *DashboardService) GetDuplicateDescription(crawlId int64) []string {
+	return s.repository.GetDuplicateDescription(crawlId)
+}
+
+func (s *DashboardService) GetDuplicateDescriptionURLsByDescription(crawlId int64, description string) []string {
+	return s.repository.GetDuplicateDescriptionURLsByDescription(crawlId, description)
+}
+
+func (s *DashboardService) GetURLsByMediaType(crawlId int64, mediaType string) []string {
+	return s.repository.GetURLsByMediaType(crawlId, mediaType)
+}
+
+func (s *DashboardService) GetNonHTMLMediaURLs(crawlId int64) []string {
+	return s.repository.GetNonHTMLMediaURLs(crawlId)
+}
+
+func (s *DashboardService) GetURLsByDepthRange(crawlId int64, left int, right int) []string {
+	return s.repository.GetURLsByDepthRange(crawlId, left, right)
 }

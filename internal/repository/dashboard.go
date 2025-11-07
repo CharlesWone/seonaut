@@ -474,3 +474,536 @@ func (ds *DashboardRepository) GetMediaTypeDetails(cid int64) []models.MediaType
 
 	return details
 }
+
+func (ds *DashboardRepository) GetPageURLsByScheme(crawlId int64, scheme string) []string {
+	query := `
+		SELECT url 
+		FROM pagereports
+		WHERE 
+		crawl_id = ?
+		AND scheme = ?
+	`
+
+	var result []string
+
+	rows, err := ds.DB.Query(query, crawlId, scheme)
+	if err != nil {
+		log.Printf("GetPageURLsByScheme: %v\n", err)
+		return result
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item string
+		err := rows.Scan(&item)
+		if err != nil {
+			log.Printf("GetPageURLsByScheme scan: %v\n", err)
+			continue
+		}
+		result = append(result, item)
+	}
+
+	return result
+}
+
+func (ds *DashboardRepository) GetPageURLsByStatusCodeRange(crawlId int64, left int64, right int64) []string {
+	query := `
+		SELECT url
+		FROM pagereports
+		WHERE crawl_id = ?
+		  AND crawled = 1
+		  AND status_code BETWEEN ? AND ?
+	`
+
+	var result []string
+
+	rows, err := ds.DB.Query(query, crawlId, left, right)
+	if err != nil {
+		log.Printf("GetPageURLsByStatus: %v\n", err)
+		return result
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item string
+		err := rows.Scan(&item)
+		if err != nil {
+			log.Printf("GetPageURLsByStatus scan: %v\n", err)
+			continue
+		}
+		result = append(result, item)
+	}
+
+	return result
+}
+
+func (ds *DashboardRepository) GetWithoutTitlePageURLs(crawlId int64) []string {
+	query := `
+		SELECT pr.url
+		FROM pagereports pr
+		WHERE pr.crawl_id = ?
+		  AND pr.media_type = 'text/html'
+		  AND pr.status_code >= 200
+		  AND pr.status_code < 300
+		  AND pr.crawled = 1
+		  AND (pr.canonical = '' OR pr.canonical = pr.url)
+		  AND (pr.title IS NULL OR pr.title = '')
+	`
+
+	var result []string
+
+	rows, err := ds.DB.Query(query, crawlId)
+	if err != nil {
+		log.Printf("GetWithoutTitlePageURLs: %v\n", err)
+		return result
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item string
+		err := rows.Scan(&item)
+		if err != nil {
+			log.Printf("GetWithoutTitlePageURLs scan: %v\n", err)
+			continue
+		}
+		result = append(result, item)
+	}
+
+	return result
+}
+
+func (ds *DashboardRepository) GetPageURLsByTitleLength(crawlId int64, minLength int64, maxLength int64) []string {
+	query := `
+		SELECT url
+		FROM pagereports
+		WHERE crawl_id = ?
+		  AND media_type = 'text/html'
+		  AND status_code >= 200
+		  AND status_code < 300
+		  AND crawled = 1
+		  AND (canonical = '' OR canonical = url)
+		  AND title IS NOT NULL
+		  AND title != ''
+		  AND CHAR_LENGTH(title) BETWEEN ? AND ?
+	`
+
+	var result []string
+
+	rows, err := ds.DB.Query(query, crawlId, minLength, maxLength)
+	if err != nil {
+		log.Printf("GetPageURLsByTitleLength: %v\n", err)
+		return result
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item string
+		err := rows.Scan(&item)
+		if err != nil {
+			log.Printf("GetPageURLsByTitleLength scan: %v\n", err)
+			continue
+		}
+		result = append(result, item)
+	}
+
+	return result
+}
+
+func (ds *DashboardRepository) GetMultipleTitlesPageURLs(crawlId int64) []string {
+	query := `
+		SELECT url
+		FROM (SELECT pr.url,
+					 COUNT(*) OVER (PARTITION BY pr.title) AS title_count
+			  FROM pagereports pr
+			  WHERE pr.crawl_id = ?
+				AND pr.media_type = 'text/html'
+				AND pr.status_code >= 200
+				AND pr.status_code < 300
+				AND pr.crawled = 1
+				AND (pr.canonical = '' OR pr.canonical = pr.url OR pr.canonical IS NULL)) ranked
+		WHERE title_count > 1
+	`
+
+	var result []string
+
+	rows, err := ds.DB.Query(query, crawlId)
+	if err != nil {
+		log.Printf("GetMultipleTitlesPageURLs: %v\n", err)
+		return result
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item string
+		err := rows.Scan(&item)
+		if err != nil {
+			log.Printf("GetMultipleTitlesPageURLs scan: %v\n", err)
+			continue
+		}
+		result = append(result, item)
+	}
+
+	return result
+}
+
+func (ds *DashboardRepository) GetDuplicateTitle(crawlId int64) []string {
+	query := `
+		SELECT title
+		FROM (SELECT title, COUNT(*) as cnt
+			  FROM pagereports
+			  WHERE crawl_id = ?
+				AND media_type = 'text/html'
+				AND status_code >= 200
+				AND status_code < 300
+				AND (canonical = '' OR canonical = url)
+				AND crawled = 1
+				AND title != ''
+			  GROUP BY title
+			  HAVING cnt > 1) as duplicates
+	`
+
+	var result []string
+
+	rows, err := ds.DB.Query(query, crawlId)
+	if err != nil {
+		log.Printf("GetDuplicateTitle: %v\n", err)
+		return result
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item string
+		err := rows.Scan(&item)
+		if err != nil {
+			log.Printf("GetDuplicateTitle scan: %v\n", err)
+			continue
+		}
+		result = append(result, item)
+	}
+
+	return result
+}
+
+func (ds *DashboardRepository) GetDuplicateTitleURLsByTitle(crawlId int64, title string) []string {
+	query := `
+		SELECT url
+			  FROM pagereports
+			  WHERE crawl_id = ?
+				AND media_type = 'text/html'
+				AND status_code >= 200
+				AND status_code < 300
+				AND (canonical = '' OR canonical = url)
+				AND crawled = 1
+				AND title != ''
+				AND title = ?
+	`
+
+	var result []string
+
+	rows, err := ds.DB.Query(query, crawlId, title)
+	if err != nil {
+		log.Printf("GetDuplicateTitleURLsByTitle: %v\n", err)
+		return result
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item string
+		err := rows.Scan(&item)
+		if err != nil {
+			log.Printf("GetDuplicateTitleURLsByTitle scan: %v\n", err)
+			continue
+		}
+		result = append(result, item)
+	}
+
+	return result
+}
+
+func (ds *DashboardRepository) GetWithoutDescriptionPageURLs(crawlId int64) []string {
+	query := `
+		SELECT
+			pr.url
+		FROM pagereports pr
+		WHERE pr.crawl_id = ?
+			AND pr.media_type = 'text/html'
+			AND pr.status_code >= 200
+			AND pr.status_code < 300
+			AND (pr.canonical = '' OR pr.canonical = pr.url)
+			AND pr.crawled = 1
+			AND description = '' OR description IS NULL
+	`
+
+	var result []string
+
+	rows, err := ds.DB.Query(query, crawlId)
+	if err != nil {
+		log.Printf("GetWithoutDescriptionPageURLs: %v\n", err)
+		return result
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item string
+		err := rows.Scan(&item)
+		if err != nil {
+			log.Printf("GetWithoutDescriptionPageURLs scan: %v\n", err)
+			continue
+		}
+		result = append(result, item)
+	}
+
+	return result
+}
+
+func (ds *DashboardRepository) GetPageURLsByDescriptionLength(crawlId int64, minLength int64, maxLength int64) []string {
+	query := `
+		SELECT url
+		FROM pagereports pr
+		WHERE pr.crawl_id = ?
+		  AND pr.media_type = 'text/html'
+		  AND pr.status_code >= 200
+		  AND pr.status_code < 300
+		  AND (pr.canonical = '' OR pr.canonical = pr.url)
+		  AND pr.crawled = 1
+		  AND description is not null
+		  AND CHAR_LENGTH(description) BETWEEN ? AND ?
+	`
+
+	var result []string
+
+	rows, err := ds.DB.Query(query, crawlId, minLength, maxLength)
+	if err != nil {
+		log.Printf("GetPageURLsByDescriptionLength: %v\n", err)
+		return result
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item string
+		err := rows.Scan(&item)
+		if err != nil {
+			log.Printf("GetPageURLsByDescriptionLength scan: %v\n", err)
+			continue
+		}
+		result = append(result, item)
+	}
+
+	return result
+}
+
+func (ds *DashboardRepository) GetMultipleDescriptionPageURLs(crawlId int64) []string {
+	query := `
+		SELECT url
+		FROM (SELECT pr.url,
+					 COUNT(*) OVER (PARTITION BY pr.description) AS description_count
+			  FROM pagereports pr
+			  WHERE pr.crawl_id = ?
+				AND pr.media_type = 'text/html'
+				AND pr.status_code >= 200
+				AND pr.status_code < 300
+				AND pr.crawled = 1
+				AND (pr.canonical = '' OR pr.canonical = pr.url OR pr.canonical IS NULL)) ranked
+		WHERE description_count > 1
+	`
+	var result []string
+
+	rows, err := ds.DB.Query(query, crawlId)
+	if err != nil {
+		log.Printf("GetMultipleDescriptionPageURLs: %v\n", err)
+		return result
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item string
+		err := rows.Scan(&item)
+		if err != nil {
+			log.Printf("GetMultipleDescriptionPageURLs scan: %v\n", err)
+			continue
+		}
+		result = append(result, item)
+	}
+
+	return result
+}
+
+func (ds *DashboardRepository) GetDuplicateDescription(crawlId int64) []string {
+	query := `
+		SELECT description
+		FROM (SELECT description, COUNT(*) as cnt
+			  FROM pagereports
+			  WHERE crawl_id = ?
+				AND media_type = 'text/html'
+				AND status_code >= 200
+				AND status_code < 300
+				AND (canonical = '' OR canonical = url)
+				AND crawled = 1
+				AND description != ''
+			  GROUP BY description
+			  HAVING cnt > 1) as duplicates
+	`
+	var result []string
+
+	rows, err := ds.DB.Query(query, crawlId)
+	if err != nil {
+		log.Printf("GetDuplicateDescription: %v\n", err)
+		return result
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item string
+		err := rows.Scan(&item)
+		if err != nil {
+			log.Printf("GetDuplicateDescription scan: %v\n", err)
+			continue
+		}
+		result = append(result, item)
+	}
+
+	return result
+}
+
+func (ds *DashboardRepository) GetDuplicateDescriptionURLsByDescription(crawlId int64, description string) []string {
+	query := `
+		SELECT url
+		FROM pagereports
+		WHERE crawl_id = ?
+		  AND media_type = 'text/html'
+		  AND status_code >= 200
+		  AND status_code < 300
+		  AND (canonical = '' OR canonical = url)
+		  AND crawled = 1
+		  AND description = ?
+	`
+	var result []string
+
+	rows, err := ds.DB.Query(query, crawlId, description)
+	if err != nil {
+		log.Printf("GetDuplicateDescriptionURLsByDescription: %v\n", err)
+		return result
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item string
+		err := rows.Scan(&item)
+		if err != nil {
+			log.Printf("GetDuplicateDescriptionURLsByDescription scan: %v\n", err)
+			continue
+		}
+		result = append(result, item)
+	}
+
+	return result
+}
+
+func (ds *DashboardRepository) GetURLsByMediaType(crawlId int64, mediaType string) []string {
+	query := `
+		SELECT url
+		FROM pagereports
+		WHERE crawl_id = ?
+		  AND crawled = 1
+		  AND media_type = ?
+	`
+	var result []string
+
+	rows, err := ds.DB.Query(query, crawlId, mediaType)
+	if err != nil {
+		log.Printf("GetURLsByMediaType: %v\n", err)
+		return result
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item string
+		err := rows.Scan(&item)
+		if err != nil {
+			log.Printf("GetURLsByMediaType scan: %v\n", err)
+			continue
+		}
+		result = append(result, item)
+	}
+
+	return result
+}
+
+func (ds *DashboardRepository) GetNonHTMLMediaURLs(crawlId int64) []string {
+	query := `
+		SELECT url
+		FROM pagereports
+		WHERE crawl_id = ?
+		  AND crawled = 1
+		  AND media_type != 'text/html'
+		  AND media_type != 'image/jpeg'
+		  AND media_type != 'image/jpg'
+		  AND media_type != 'image/webp'
+		  AND media_type != 'image/png'
+		  AND media_type != 'image/gif'
+	`
+	var result []string
+
+	rows, err := ds.DB.Query(query, crawlId)
+	if err != nil {
+		log.Printf("GetNonHTMLMediaURLs: %v\n", err)
+		return result
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item string
+		err := rows.Scan(&item)
+		if err != nil {
+			log.Printf("GetNonHTMLMediaURLs scan: %v\n", err)
+			continue
+		}
+		result = append(result, item)
+	}
+
+	return result
+}
+
+func (ds *DashboardRepository) GetURLsByDepthRange(crawlId int64, left int, right int) []string {
+	query := `
+		select url
+		from pagereports
+		where crawl_id = ?
+		  AND depth BETWEEN ? AND ?;
+	`
+	var result []string
+
+	rows, err := ds.DB.Query(query, crawlId, left, right)
+	if err != nil {
+		log.Printf("GetURLsByDepthRange: %v\n", err)
+		return result
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var item string
+		err := rows.Scan(&item)
+		if err != nil {
+			log.Printf("GetURLsByDepthRange scan: %v\n", err)
+			continue
+		}
+		result = append(result, item)
+	}
+
+	return result
+}

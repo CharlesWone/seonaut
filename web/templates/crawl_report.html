@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="{{ .Lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    {{ if .Refresh }}
+    <meta http-equiv="refresh" content="120"/>
+    {{ end }}
+    <title>
+        {{ trans .PageTitle }} - SEOnaut
+    </title>
+    <link rel="stylesheet" href="/resources/style.css">
+</head>
+<body class="dark">
+<div id="main">
+
+    {{ with .Data }}
+
+    <div class="panel">
+
+        <div class="box box-highlight box-first">
+            <div class="col col-main">
+                <div class="content">
+                    <h2>{{ trans "CRAWL_REPORT" }}</h2>
+                </div>
+            </div>
+
+            <div class="col col-actions-l">
+                <div class="main-action">
+                    <div class="content">
+                        <a href="{{ .Project.URL }}" target="_blank">{{ .Project.Host }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="crawl_report_body">
+            {{ .Content }}
+        </div>
+
+        {{ if .ArchiveExists }}
+        <div class="box">
+            <div class="col col-main">
+                <div class="content">
+                    <h2>{{ trans "EXPORT_WACZ" }}</h2>
+                    <p>{{ trans "EXPORT_WACZ_MESSAGE" }}</p>
+                </div>
+            </div>
+
+            <div class="col col-actions">
+                <a class="icon-text highlight borderless main" href="/export/wazc?pid={{ .Project.Id }}">{{ trans
+                    "DOWNLOAD" }}</a>
+            </div>
+        </div>
+        {{ end }}
+    </div>
+
+    {{ end}}
+
+
+</div>
+
+</body>
+</html>

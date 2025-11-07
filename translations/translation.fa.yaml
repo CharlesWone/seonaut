@@ -175,6 +175,7 @@ PAGE_DETAILS_LINK: جزئیات صفحه
 ANALYZE_DATA: تحلیل داده‌های خام
 ANALYZE_DATA_MESSAGE: داده‌های خود را برای تحلیل و گزارش‌گیری بیشتر صادر کنید
 ANALYZE_DATA_LINK: صادرات داده
+CRAWL_REPORT_LINK: گزارش خزنده
 URL_CRAWLED: "1 URL خزش شده."
 URLS_CRAWLED: "%1% URL خزش شده است."
 CANONICAL: متعارف
@@ -269,6 +270,7 @@ EXPORT_ALL: صادرات تمام مشکلات
 EXPORT_ALL_MESSAGE: صادرات تمام مشکلات با URL‌های تحت تأثیر، نوع مشکل و اولویت.
 EXPORT_WACZ: صادرات بایگانی WACZ
 EXPORT_WACZ_MESSAGE: صادرات داده‌های خزیده شده پروژه شما به عنوان یک فایل WACZ برای بایگانی یا پخش مجدد.
+CRAWL_REPORT: گزارش خزنده
 
 # =============================================
 # CONTEXT: Resources pages. It includes the tabs for images, links, scripts, etc...
@@ -389,6 +391,7 @@ EXPLORER_PAGE_TITLE: کاوشگر URL
 DELETE_ACCOUNT_VIEW_PAGE_TITLE: حذف حساب کاربری
 ARCHIVE_VIEW_PAGE_TITLE: بایگانی منبع کد
 SUPPORT_SEONAUT_VIEW_PAGE_TITLE: پروژه SEOnaut
+CRAWL_REPORT_VIEW_PAGE_TITLE: گزارش خزنده
 
 # =============================================
 # CONTEXT: Issue types. Name and description of the issue types. Displayed in the issue index page.
