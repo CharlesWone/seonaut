@@ -7,9 +7,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/stjudewashere/seonaut/internal/utils"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/stjudewashere/seonaut/internal/config"
@@ -21,6 +23,7 @@ type DingTalkService struct {
 	config           *config.DingTalkConfig
 	client           *http.Client
 	dashboardService *DashboardService
+	serverConfig     *config.HTTPServerConfig
 }
 
 // DingTalkMessage represents the message structure for DingTalk webhook
@@ -42,11 +45,12 @@ type DingTalkAt struct {
 }
 
 // NewDingTalkService creates a new DingTalk service instance
-func NewDingTalkService(config *config.DingTalkConfig, dashboardService *DashboardService) *DingTalkService {
+func NewDingTalkService(config *config.DingTalkConfig, dashboardService *DashboardService, serverConfig *config.HTTPServerConfig) *DingTalkService {
 	return &DingTalkService{
 		config:           config,
 		client:           &http.Client{Timeout: 10 * time.Second},
 		dashboardService: dashboardService,
+		serverConfig:     serverConfig,
 	}
 }
 
@@ -88,6 +92,10 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 		statusEmoji = "🟢"
 	}
 
+	// 报告链接
+	enc, _ := utils.EncryptParam(strconv.FormatInt(project.Id, 10))
+	crawlReportLink := fmt.Sprintf("%s/crawlReport/%s", strings.TrimRight(s.serverConfig.URL, "/"), enc)
+
 	// Get additional statistics from dashboard service
 	imageAltCount := s.dashboardService.GetImageAltCount(crawl.Id)
 	schemeCount := s.dashboardService.GetSchemeCount(crawl.Id)
@@ -102,6 +110,7 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 	text := fmt.Sprintf(`
 ### %s SEO审计报告完成
 - **网站：** %s
+- **报告链接：** %s
 - **审计时间：** %s
 - **审计耗时：** %s
 
@@ -152,6 +161,7 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 *报告生成时间：%s*`,
 		statusEmoji,
 		project.URL,
+		crawlReportLink,
 		crawl.Start.Format("2006-01-02 15:04:05"),
 		formatDuration(duration),
 		crawl.TotalURLs,

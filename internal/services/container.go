@@ -287,7 +287,7 @@ func (c *Container) InitReplayService() {
 
 // Init the DingTalk notification service.
 func (c *Container) InitDingTalkService() {
-	c.DingTalkService = NewDingTalkService(c.Config.DingTalk, c.DashboardService)
+	c.DingTalkService = NewDingTalkService(c.Config.DingTalk, c.DashboardService, c.Config.HTTPServer)
 }
 
 // Init the cron manager.
