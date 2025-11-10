@@ -14,6 +14,11 @@ type userHandler struct {
 // signupGetHandler handles the GET signup request and displays the sign up form.
 // It allows users to sign up by providing their email and password.
 func (h *userHandler) signupGetHandler(w http.ResponseWriter, r *http.Request) {
+	// 如果没有启用注册功能
+	if !h.Config.AuthConfig.EnableRegister {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 	pageView := &PageView{
 		Lang:      h.Container.Config.UIConfig.Language,
 		Theme:     h.Container.Config.UIConfig.Theme,
@@ -33,6 +38,12 @@ func (h *userHandler) signupGetHandler(w http.ResponseWriter, r *http.Request) {
 // In case of error the signup template is rendered with the pre-populated form using the
 // data's email field.
 func (h *userHandler) signupPostHandler(w http.ResponseWriter, r *http.Request) {
+	// 如果没有启用注册功能
+	if !h.Config.AuthConfig.EnableRegister {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	err := r.ParseForm()
 	if err != nil {
 		http.Redirect(w, r, "/signup", http.StatusSeeOther)
@@ -134,10 +145,13 @@ func (h *userHandler) signinGetHandler(w http.ResponseWriter, r *http.Request) {
 		Theme:     h.Container.Config.UIConfig.Theme,
 		PageTitle: "SIGNIN_VIEW_PAGE_TITLE",
 		Data: &struct {
-			Email        string
-			Error        bool
-			ErrorMessage string
-		}{},
+			Email          string
+			Error          bool
+			ErrorMessage   string
+			EnableRegister bool
+		}{
+			EnableRegister: h.Config.AuthConfig.EnableRegister,
+		},
 	}
 
 	h.Renderer.RenderTemplate(w, "signin", pageView, pageView.Lang)

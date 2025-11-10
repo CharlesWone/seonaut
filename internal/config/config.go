@@ -41,6 +41,10 @@ type DingTalkConfig struct {
 	Secret     string `mapstructure:"secret"`
 }
 
+type AuthConfig struct {
+	EnableRegister bool `mapstructure:"enable_register"`
+}
+
 // Config stores the configuration for the application.
 type Config struct {
 	Crawler    *CrawlerConfig    `mapstructure:"crawler"`
@@ -48,6 +52,7 @@ type Config struct {
 	DB         *DBConfig         `mapstructure:"database"`
 	UIConfig   *UIConfig         `mapstructure:"UI"`
 	DingTalk   *DingTalkConfig   `mapstructure:"dingtalk"`
+	AuthConfig *AuthConfig       `mapstructure:"auth"`
 }
 
 // NewConfig loads the configuration from the specified file and path.

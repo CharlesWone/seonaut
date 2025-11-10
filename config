@@ -21,3 +21,6 @@ theme = "dark"
 enabled = true
 webhook_url = "https://oapi.dingtalk.com/robot/send?access_token=244bcae4d36ccc8882d0dd9922121f79c815c5cebcd8b1c9b55cdd02a1875cd2"
 secret = ""
+
+[auth]
+enable_register = false
