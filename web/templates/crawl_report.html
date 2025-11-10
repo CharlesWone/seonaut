@@ -36,7 +36,11 @@
         </div>
 
         <div id="crawl_report_body">
-            {{ .Content }}
+            {{ if .Crawling }}
+                <h2>{{ trans "CRAWLING" }}</h2>
+            {{ else }}
+                {{ .Content }}
+            {{ end }}
         </div>
 
         {{ if .ArchiveExists }}

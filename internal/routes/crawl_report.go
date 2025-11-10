@@ -27,12 +27,18 @@ func (h *crawlReportHandler) indexHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	// 获取爬虫报告 markdown格式
-	markdown := h.CrawlReportService.GetCrawlReportMarkdown(&pv.Crawl, &pv.Project)
-	// 转换为HTML
-	html := h.CrawlReportService.MarkdownToHTML(markdown)
-
-	archiveExists := h.Container.ArchiveService.ArchiveExists(&pv.Project)
+	var html template.HTML
+	var archiveExists bool
+	if pv.Crawl.Crawling {
+		html = "<h2>爬取中...</h2>"
+		archiveExists = false
+	} else {
+		// 获取爬虫报告 markdown格式
+		markdown := h.CrawlReportService.GetCrawlReportMarkdown(&pv.Crawl, &pv.Project)
+		// 转换为HTML
+		html = h.CrawlReportService.MarkdownToHTML(markdown)
+		archiveExists = h.Container.ArchiveService.ArchiveExists(&pv.Project)
+	}
 
 	// 渲染模板视图
 	h.Renderer.RenderTemplate(w, "crawl_report", &PageView{
@@ -43,10 +49,12 @@ func (h *crawlReportHandler) indexHandler(w http.ResponseWriter, r *http.Request
 			Project       models.Project
 			ArchiveExists bool
 			Content       template.HTML
+			Crawling      bool
 		}{
 			Project:       pv.Project,
 			ArchiveExists: archiveExists,
 			Content:       html,
+			Crawling:      pv.Crawl.Crawling,
 		},
 	}, "en")
 }
