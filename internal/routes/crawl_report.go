@@ -3,9 +3,11 @@ package routes
 import (
 	"github.com/stjudewashere/seonaut/internal/models"
 	"github.com/stjudewashere/seonaut/internal/services"
+	"github.com/stjudewashere/seonaut/internal/utils"
 	"html/template"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type crawlReportHandler struct {
@@ -13,17 +15,31 @@ type crawlReportHandler struct {
 }
 
 func (h *crawlReportHandler) indexHandler(w http.ResponseWriter, r *http.Request) {
-	// 解析请求参数
-	pid, err := strconv.Atoi(r.URL.Query().Get("pid"))
+	// 提取路径参数
+	pathParam := strings.TrimPrefix(r.URL.Path, "/crawlReport/")
+	if pathParam == "" || pathParam == "/" {
+		http.Error(w, "missing param", http.StatusBadRequest)
+		return
+	}
+
+	// 解密参数
+	idStr, err := utils.DecryptParam(pathParam)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Error(w, "invalid param", http.StatusBadRequest)
+		return
+	}
+
+	// 转为int64
+	pid, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "invalid param", http.StatusBadRequest)
 		return
 	}
 
 	// 获取项目视图：项目和项目最后一次的爬虫信息
 	pv, err := h.ProjectViewService.GetProjectViewNoAuth(pid)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Error(w, "invalid param", http.StatusBadRequest)
 		return
 	}
 

@@ -1,7 +1,9 @@
 package services
 
 import (
+	"github.com/stjudewashere/seonaut/internal/utils"
 	"net/url"
+	"strconv"
 
 	"github.com/stjudewashere/seonaut/internal/models"
 )
@@ -10,7 +12,7 @@ type (
 	ProjectViewServiceRepository interface {
 		FindProjectsByUser(int) []models.Project
 		FindProjectById(id int, uid int) (models.Project, error)
-		FindProjectByIdNoAuth(id int) (models.Project, error)
+		FindProjectByIdNoAuth(id int64) (models.Project, error)
 
 		GetLastCrawl(*models.Project) models.Crawl
 	}
@@ -49,7 +51,7 @@ func (s *ProjectViewService) GetProjectView(id, uid int) (*models.ProjectView, e
 	return v, nil
 }
 
-func (s *ProjectViewService) GetProjectViewNoAuth(id int) (*models.ProjectView, error) {
+func (s *ProjectViewService) GetProjectViewNoAuth(id int64) (*models.ProjectView, error) {
 	project, err := s.repository.FindProjectByIdNoAuth(id)
 	if err != nil {
 		return nil, err
@@ -79,6 +81,9 @@ func (s *ProjectViewService) GetProjectViews(uid int) []models.ProjectView {
 
 	projects := s.repository.FindProjectsByUser(uid)
 	for _, p := range projects {
+		// 加密项目ID
+		token, _ := utils.EncryptParam(strconv.FormatInt(p.Id, 10))
+		p.EncryptedId = token
 		pv := models.ProjectView{
 			Project: p,
 			Crawl:   s.repository.GetLastCrawl(&p),

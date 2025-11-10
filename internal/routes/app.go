@@ -59,7 +59,8 @@ func NewServer(container *services.Container) {
 
 	// Crawl Report routes
 	crawlReportHandler := crawlReportHandler{container}
-	http.HandleFunc("GET /crawlReport", crawlReportHandler.indexHandler)
+	// Crawl Report route 路劲参数传参
+	http.HandleFunc("GET /crawlReport/", crawlReportHandler.indexHandler)
 
 	// Issues routes
 	issueHandler := issueHandler{container}

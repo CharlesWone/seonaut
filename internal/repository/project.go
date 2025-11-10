@@ -170,7 +170,7 @@ func (ds *ProjectRepository) FindProjectById(id int, uid int) (models.Project, e
 	return p, nil
 }
 
-func (ds *ProjectRepository) FindProjectByIdNoAuth(id int) (models.Project, error) {
+func (ds *ProjectRepository) FindProjectByIdNoAuth(id int64) (models.Project, error) {
 	query := `
 		SELECT
 			id,

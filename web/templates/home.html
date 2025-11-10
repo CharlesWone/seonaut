@@ -95,7 +95,7 @@
 					<a href="/issues?pid={{ .Project.Id }}">{{ trans "SITE_ISSUES_LINK" }}</a>
 					<a href="/explorer?pid={{ .Project.Id }}">{{ trans "PAGE_DETAILS_LINK" }}</a>
 					<a href="/export?pid={{ .Project.Id }}">{{ trans "ANALYZE_DATA_LINK" }}</a>
-					<a href="/crawlReport?pid={{ .Project.Id }}">{{ trans "CRAWL_REPORT_LINK" }}</a>
+					<a href="/crawlReport/{{ .Project.EncryptedId }}">{{ trans "CRAWL_REPORT_LINK" }}</a>
 				{{ end }}
 			{{ end }}
 

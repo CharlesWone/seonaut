@@ -21,4 +21,5 @@ type Project struct {
 	UserAgent          string
 	CronExpr           string
 	DingtalkWebhookUrl string
+	EncryptedId        string // 加密后的id
 }
