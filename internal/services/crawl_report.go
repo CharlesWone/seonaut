@@ -316,13 +316,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			if len(urls) > 0 {
 				var lines []string
 				for _, url := range urls {
-					lines = append(lines, "  🚩 "+url)
+					lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 				}
-				suggestions = append(suggestions,
-					"```text\n"+
-						strings.Join(lines, "\n")+"\n"+
-						"```",
-				)
+				suggestions = append(suggestions, strings.Join(lines, "\n"))
 			}
 		} else {
 			suggestions = append(suggestions, fmt.Sprintf("- **图片Alt属性：** 发现 %d 张图片缺少Alt属性。建议为所有图片添加描述性的Alt文本，提升可访问性和SEO效果。", imageAltCount.NonAlt))
@@ -340,13 +336,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			if len(urls) > 0 {
 				var lines []string
 				for _, url := range urls {
-					lines = append(lines, "  🚩 "+url)
+					lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 				}
-				suggestions = append(suggestions,
-					"```text\n"+
-						strings.Join(lines, "\n")+"\n"+
-						"```",
-				)
+				suggestions = append(suggestions, strings.Join(lines, "\n"))
 			}
 		} else {
 			suggestions = append(suggestions, fmt.Sprintf("- **HTTPS迁移：** 发现 %d 个页面仍使用HTTP协议。建议将全部页面迁移至HTTPS，提升安全性和SEO排名。", schemeCount.HTTP))
@@ -373,13 +365,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			if len(urls) > 0 {
 				var lines []string
 				for _, url := range urls {
-					lines = append(lines, "  🚩 "+url)
+					lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 				}
-				suggestions = append(suggestions,
-					"```text\n"+
-						strings.Join(lines, "\n")+"\n"+
-						"```",
-				)
+				suggestions = append(suggestions, strings.Join(lines, "\n"))
 			}
 		}
 		if error5xx > 0 {
@@ -389,13 +377,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			if len(urls) > 0 {
 				var lines []string
 				for _, url := range urls {
-					lines = append(lines, "  🚩 "+url)
+					lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 				}
-				suggestions = append(suggestions,
-					"```text\n"+
-						strings.Join(lines, "\n")+"\n"+
-						"```",
-				)
+				suggestions = append(suggestions, strings.Join(lines, "\n"))
 			}
 		}
 	}
@@ -410,13 +394,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			if len(urls) > 0 {
 				var lines []string
 				for _, url := range urls {
-					lines = append(lines, "  🚩 "+url)
+					lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 				}
-				suggestions = append(suggestions,
-					"```text\n"+
-						strings.Join(lines, "\n")+"\n"+
-						"```",
-				)
+				suggestions = append(suggestions, strings.Join(lines, "\n"))
 			}
 		}
 		if titleStats.ShortTitle > 0 {
@@ -426,13 +406,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			if len(urls) > 0 {
 				var lines []string
 				for _, url := range urls {
-					lines = append(lines, "  🚩 "+url)
+					lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 				}
-				suggestions = append(suggestions,
-					"```text\n"+
-						strings.Join(lines, "\n")+"\n"+
-						"```",
-				)
+				suggestions = append(suggestions, strings.Join(lines, "\n"))
 			}
 		}
 		if titleStats.LongTitle > 0 {
@@ -442,13 +418,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			if len(urls) > 0 {
 				var lines []string
 				for _, url := range urls {
-					lines = append(lines, "  🚩 "+url)
+					lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 				}
-				suggestions = append(suggestions,
-					"```text\n"+
-						strings.Join(lines, "\n")+"\n"+
-						"```",
-				)
+				suggestions = append(suggestions, strings.Join(lines, "\n"))
 			}
 		}
 		if titleStats.MultipleTitles > 0 {
@@ -458,13 +430,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			if len(urls) > 0 {
 				var lines []string
 				for _, url := range urls {
-					lines = append(lines, "  🚩 "+url)
+					lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 				}
-				suggestions = append(suggestions,
-					"```text\n"+
-						strings.Join(lines, "\n")+"\n"+
-						"```",
-				)
+				suggestions = append(suggestions, strings.Join(lines, "\n"))
 			}
 		}
 		if titleStats.DuplicateTitle > 0 {
@@ -478,13 +446,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 				if len(urls) > 0 {
 					var lines []string
 					for _, url := range urls {
-						lines = append(lines, "  🚩 "+title+" "+url)
+						lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 					}
-					suggestions = append(suggestions,
-						"```text\n"+
-							strings.Join(lines, "\n")+"\n"+
-							"```",
-					)
+					suggestions = append(suggestions, strings.Join(lines, "\n"))
 				}
 			}
 		}
@@ -500,13 +464,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			if len(urls) > 0 {
 				var lines []string
 				for _, url := range urls {
-					lines = append(lines, "  🚩 "+url)
+					lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 				}
-				suggestions = append(suggestions,
-					"```text\n"+
-						strings.Join(lines, "\n")+"\n"+
-						"```",
-				)
+				suggestions = append(suggestions, strings.Join(lines, "\n"))
 			}
 		}
 		if descriptionStats.ShortDescription > 0 {
@@ -516,13 +476,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			if len(urls) > 0 {
 				var lines []string
 				for _, url := range urls {
-					lines = append(lines, "  🚩 "+url)
+					lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 				}
-				suggestions = append(suggestions,
-					"```text\n"+
-						strings.Join(lines, "\n")+"\n"+
-						"```",
-				)
+				suggestions = append(suggestions, strings.Join(lines, "\n"))
 			}
 		}
 		if descriptionStats.LongDescription > 0 {
@@ -532,13 +488,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			if len(urls) > 0 {
 				var lines []string
 				for _, url := range urls {
-					lines = append(lines, "  🚩 "+url)
+					lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 				}
-				suggestions = append(suggestions,
-					"```text\n"+
-						strings.Join(lines, "\n")+"\n"+
-						"```",
-				)
+				suggestions = append(suggestions, strings.Join(lines, "\n"))
 			}
 		}
 		if descriptionStats.MultipleDescriptions > 0 {
@@ -548,13 +500,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			if len(urls) > 0 {
 				var lines []string
 				for _, url := range urls {
-					lines = append(lines, "  🚩 "+url)
+					lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 				}
-				suggestions = append(suggestions,
-					"```text\n"+
-						strings.Join(lines, "\n")+"\n"+
-						"```",
-				)
+				suggestions = append(suggestions, strings.Join(lines, "\n"))
 			}
 		}
 		if descriptionStats.DuplicateDescription > 0 {
@@ -568,13 +516,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 				if len(urls) > 0 {
 					var lines []string
 					for _, url := range urls {
-						lines = append(lines, "  🚩 "+description+" "+url)
+						lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 					}
-					suggestions = append(suggestions,
-						"```text\n"+
-							strings.Join(lines, "\n")+"\n"+
-							"```",
-					)
+					suggestions = append(suggestions, strings.Join(lines, "\n"))
 				}
 			}
 		}
@@ -600,13 +544,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			if len(urls) > 0 {
 				var lines []string
 				for _, url := range urls {
-					lines = append(lines, "  🚩 "+url)
+					lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 				}
-				suggestions = append(suggestions,
-					"```text\n"+
-						strings.Join(lines, "\n")+"\n"+
-						"```",
-				)
+				suggestions = append(suggestions, strings.Join(lines, "\n"))
 			}
 		}
 	}
@@ -619,13 +559,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			if len(urls) > 0 {
 				var lines []string
 				for _, url := range urls {
-					lines = append(lines, "  🚩 "+url)
+					lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 				}
-				suggestions = append(suggestions,
-					"```text\n"+
-						strings.Join(lines, "\n")+"\n"+
-						"```",
-				)
+				suggestions = append(suggestions, strings.Join(lines, "\n"))
 			}
 		}
 	}
@@ -648,13 +584,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 					if len(urls) > 0 {
 						var lines []string
 						for _, url := range urls {
-							lines = append(lines, "  🚩 "+url)
+							lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 						}
-						suggestions = append(suggestions,
-							"```text\n"+
-								strings.Join(lines, "\n")+"\n"+
-								"```",
-						)
+						suggestions = append(suggestions, strings.Join(lines, "\n"))
 					}
 				} else {
 					suggestions = append(suggestions, fmt.Sprintf("- **PNG格式图片：** 发现 %d 个PNG格式页面（%.1f%%）。照片应该使用JPEG或WebP格式，PNG会带来不必要的体积膨胀。建议将PNG格式的照片转换为JPEG或WebP格式，以减小文件体积，提升页面加载速度。", mt.Count, percentage))
@@ -663,13 +595,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 					if len(urls) > 0 {
 						var lines []string
 						for _, url := range urls {
-							lines = append(lines, "  🚩 "+url)
+							lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 						}
-						suggestions = append(suggestions,
-							"```text\n"+
-								strings.Join(lines, "\n")+"\n"+
-								"```",
-						)
+						suggestions = append(suggestions, strings.Join(lines, "\n"))
 					}
 				}
 			} else if mt.MediaType == "image/gif" && percentage > 5 {
@@ -679,13 +607,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 				if len(urls) > 0 {
 					var lines []string
 					for _, url := range urls {
-						lines = append(lines, "  🚩 "+url)
+						lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 					}
-					suggestions = append(suggestions,
-						"```text\n"+
-							strings.Join(lines, "\n")+"\n"+
-							"```",
-					)
+					suggestions = append(suggestions, strings.Join(lines, "\n"))
 				}
 			} else if mt.MediaType != "text/html" && mt.MediaType != "image/jpeg" && mt.MediaType != "image/jpg" && mt.MediaType != "image/webp" && mt.MediaType != "image/png" && mt.MediaType != "image/gif" && percentage > 10 {
 				suggestions = append(suggestions, fmt.Sprintf("- **非HTML媒体类型：** 发现 %d 个%s类型页面（%.1f%%）。请检查这些页面是否应该被搜索引擎索引，如果不需要，建议在robots.txt中阻止或使用noindex标签。", mt.Count, mt.MediaType, percentage))
@@ -694,13 +618,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 				if len(urls) > 0 {
 					var lines []string
 					for _, url := range urls {
-						lines = append(lines, "  🚩 "+url)
+						lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 					}
-					suggestions = append(suggestions,
-						"```text\n"+
-							strings.Join(lines, "\n")+"\n"+
-							"```",
-					)
+					suggestions = append(suggestions, strings.Join(lines, "\n"))
 				}
 			}
 		}
@@ -735,18 +655,14 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 					if len(urls) > 0 {
 						var lines []string
 						for _, url := range urls {
-							lines = append(lines, "  🚩 "+url)
+							lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 						}
 						allOtherUrls = append(allOtherUrls, lines...)
 					}
 				}
 
 				suggestions = append(suggestions, fmt.Sprintf("- **其他媒体类型：** 发现 %d 个其他类型页面（%.1f%%），包含：%s。请检查这些媒体类型是否合理，必要时进行优化。", otherCount, otherPercentage, otherTypes))
-				suggestions = append(suggestions,
-					"```text\n"+
-						strings.Join(allOtherUrls, "\n")+"\n"+
-						"```",
-				)
+				suggestions = append(suggestions, strings.Join(allOtherUrls, "\n"))
 			}
 		}
 	}
@@ -778,13 +694,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 				if len(urls) > 0 {
 					var lines []string
 					for _, url := range urls {
-						lines = append(lines, "  🚩 "+url)
+						lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 					}
-					suggestions = append(suggestions,
-						"```text\n"+
-							strings.Join(lines, "\n")+"\n"+
-							"```",
-					)
+					suggestions = append(suggestions, strings.Join(lines, "\n"))
 				}
 			} else if depth5_8Percent > 20 {
 				suggestions = append(suggestions, fmt.Sprintf("- **页面深度：** 发现深度5-8层的页面占比为 %.1f%%%%，超过20%%%%的阈值。建议优化网站导航结构，尽量将重要页面控制在3-4层以内。", depth5_8Percent))
@@ -793,13 +705,9 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 				if len(urls) > 0 {
 					var lines []string
 					for _, url := range urls {
-						lines = append(lines, "  🚩 "+url)
+						lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
 					}
-					suggestions = append(suggestions,
-						"```text\n"+
-							strings.Join(lines, "\n")+"\n"+
-							"```",
-					)
+					suggestions = append(suggestions, strings.Join(lines, "\n"))
 				}
 			}
 		}
