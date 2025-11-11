@@ -1,7 +1,7 @@
 [server]
 host = "0.0.0.0"
 port = 9000
-url = "http://localhost:9000/seonaut" # https://seo.bitwafgroup.org https://seo.bitwafgroup.org/seonaut
+url = "https://seo.bitwafgroup.org/seonaut" # 访问url，例如："https://seo.bitwafgroup.org"、"https://seo.bitwafgroup.org/seonaut"
 context_path = "/seonaut" # 上下文路径，如："/seonaut"，不需要就留空串""
 
 [database]
