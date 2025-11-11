@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"encoding/gob"
+	"github.com/stjudewashere/seonaut/internal/config"
 	"net/http"
 
 	"github.com/stjudewashere/seonaut/internal/models"
@@ -24,12 +25,13 @@ type (
 	}
 
 	CookieSession struct {
-		repository CookieSessionRepository
-		cookie     *sessions.CookieStore
+		repository   CookieSessionRepository
+		cookie       *sessions.CookieStore
+		serverConfig *config.HTTPServerConfig
 	}
 )
 
-func NewCookieSession(r CookieSessionRepository) *CookieSession {
+func NewCookieSession(r CookieSessionRepository, serverConfig *config.HTTPServerConfig) *CookieSession {
 	authKeyOne := securecookie.GenerateRandomKey(64)
 	encryptionKeyOne := securecookie.GenerateRandomKey(32)
 
@@ -47,9 +49,16 @@ func NewCookieSession(r CookieSessionRepository) *CookieSession {
 	gob.Register(models.User{})
 
 	return &CookieSession{
-		repository: r,
-		cookie:     cookie,
+		repository:   r,
+		cookie:       cookie,
+		serverConfig: serverConfig,
 	}
+}
+
+// 重定向函数
+func (s *CookieSession) redirect(w http.ResponseWriter, r *http.Request, path string, code int) {
+	contextPath := s.serverConfig.ContextPath
+	http.Redirect(w, r, contextPath+path, code)
 }
 
 // requireAuth is a middleware function that wraps the provided handler function and enforces authentication.
@@ -60,7 +69,7 @@ func (s *CookieSession) Auth(f func(w http.ResponseWriter, r *http.Request)) htt
 		if err != nil {
 			session.Options.MaxAge = -1
 			session.Save(r, w)
-			http.Redirect(w, r, "/signin", http.StatusSeeOther)
+			s.redirect(w, r, "/signin", http.StatusSeeOther)
 			return
 		}
 
@@ -68,7 +77,7 @@ func (s *CookieSession) Auth(f func(w http.ResponseWriter, r *http.Request)) htt
 		if !ok || !authenticated {
 			session.Options.MaxAge = -1
 			session.Save(r, w)
-			http.Redirect(w, r, "/signin", http.StatusSeeOther)
+			s.redirect(w, r, "/signin", http.StatusSeeOther)
 			return
 		}
 
@@ -76,7 +85,7 @@ func (s *CookieSession) Auth(f func(w http.ResponseWriter, r *http.Request)) htt
 		if !ok {
 			session.Options.MaxAge = -1
 			session.Save(r, w)
-			http.Redirect(w, r, "/signin", http.StatusSeeOther)
+			s.redirect(w, r, "/signin", http.StatusSeeOther)
 			return
 		}
 
@@ -88,7 +97,7 @@ func (s *CookieSession) Auth(f func(w http.ResponseWriter, r *http.Request)) htt
 
 		user, err := s.repository.FindUserByEmail(email)
 		if err != nil {
-			http.Redirect(w, r, "/signin", http.StatusSeeOther)
+			s.redirect(w, r, "/signin", http.StatusSeeOther)
 			return
 		}
 

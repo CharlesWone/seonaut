@@ -16,7 +16,7 @@
 		<div class="col col-actions-l">
 			<div class="main-action">
 				<div class="content">
-					<a href="/dashboard?pid={{ .Project.Id }}">{{ .Project.Host }}</a>
+					<a href="{{url "/dashboard"}}?pid={{ .Project.Id }}">{{ .Project.Host }}</a>
 				</div>
 			</div>
 		</div>
@@ -241,7 +241,7 @@
 			<div class="col col-main">
 				<div class="content-s">
 
-					<input type="submit" value="{{ trans "SAVE" }}" class="inline"> <a href="/" class="button">{{ trans "CANCEL" }}</a>
+					<input type="submit" value="{{ trans "SAVE" }}" class="inline"> <a href="{{url "/"}}" class="button">{{ trans "CANCEL" }}</a>
 
 				</div>
 			</div>	
@@ -252,7 +252,7 @@
 	<div class="box bg-alert">
 		<div class="col col-main">
 			<div class="content">
-				<a href="/project/delete?pid={{ .Project.Id }}">
+				<a href="{{url "/project/delete"}}?pid={{ .Project.Id }}">
 					{{ trans "DELETE_PROJECT" }}
 				</a>
 				<p>

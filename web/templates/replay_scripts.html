@@ -17,6 +17,7 @@
 
     (function() {
         const projectId = {{ .ProjectView.Project.Id }};
+        const ContextPath = "{{ .ContextPath }}"; // 从 data 里取
 
         const getAbsoluteUrl = (url) => {
             // Check if the URL is already absolute
@@ -34,6 +35,7 @@
                 const urlObj = new URL(url, {{ .RequestedURL }});
                 if (urlObj.protocol === "http:" || urlObj.protocol === "https:") {
                     return `/replay?pid=${projectId}&url=${encodeURIComponent(urlObj.href)}`;
+                    return `${ContextPath}/replay?pid=${projectId}&url=${encodeURIComponent(urlObj.href)}`;
                 }
             } catch (e) {
                 console.warn(`Invalid URL: ${url}`);

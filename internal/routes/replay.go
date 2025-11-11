@@ -22,19 +22,19 @@ type replayHandler struct {
 func (h *replayHandler) proxyHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
 	pid, err := strconv.Atoi(r.URL.Query().Get("pid"))
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
 	pv, err := h.ProjectViewService.GetProjectView(pid, user.Id)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
@@ -53,9 +53,11 @@ func (h *replayHandler) proxyHandler(w http.ResponseWriter, r *http.Request) {
 	data := &struct {
 		RequestedURL string
 		ProjectView  *models.ProjectView
+		ContextPath  string
 	}{
 		ProjectView:  pv,
 		RequestedURL: requestedURL,
+		ContextPath:  h.Config.HTTPServer.ContextPath,
 	}
 
 	record, err := h.Container.ArchiveService.ReadArchiveRecord(&pv.Project, requestedURL)
@@ -105,7 +107,7 @@ func (h *replayHandler) proxyHandler(w http.ResponseWriter, r *http.Request) {
 				return urlStr
 			}
 
-			return fmt.Sprintf("/replay?pid=%d&url=%s", pv.Project.Id, u.String())
+			return fmt.Sprintf("%s/replay?pid=%d&url=%s", h.Config.HTTPServer.ContextPath, pv.Project.Id, u.String())
 		}
 
 		return urlStr

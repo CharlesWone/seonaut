@@ -14,12 +14,12 @@
 		<div class="col col-main">
 			<div class="content">
 				{{ if .Eid }}
-					<a href="/issues?pid={{ .ProjectView.Project.Id }}">{{ trans "SITE_ISSUES" }}</a> 
-					/ 
-					<a href="/issues/view?pid={{ .ProjectView.Project.Id }}&eid={{ .Eid }}">{{ trans .Eid }}</a>
+					<a href="{{url "/issues"}}?pid={{ .ProjectView.Project.Id }}">{{ trans "SITE_ISSUES" }}</a>
+					/
+					<a href="{{url "/issues/view"}}?pid={{ .ProjectView.Project.Id }}&eid={{ .Eid }}">{{ trans .Eid }}</a>
 					{{ $parameters = printf "%s&eid=%s" $parameters .Eid }}
 				{{ else if .Ep }}
-					<a href="/explorer?pid={{ .ProjectView.Project.Id }}">{{ trans "PAGE_DETAILS_LINK" }}</a>
+					<a href="{{url "/explorer"}}?pid={{ .ProjectView.Project.Id }}">{{ trans "PAGE_DETAILS_LINK" }}</a>
 					{{ $parameters = printf "%s&ep=%s" $parameters .Ep }}
 				{{ end }}
 
@@ -30,7 +30,7 @@
 		<div class="col col-actions-l">
 			<div class="main-action">
 				<div class="content">
-					<a href="/dashboard?pid={{ .ProjectView.Project.Id }}">{{ .ProjectView.Project.Host }}</a>
+					<a href="{{url "/dashboard"}}?pid={{ .ProjectView.Project.Id }}">{{ .ProjectView.Project.Host }}</a>
 				</div>
 			</div>
 		</div>
@@ -73,47 +73,47 @@
 
 					<ul>
 						<li>
-							<a href="/resources{{ printf "%s&t=details" $parameters }}">{{ trans "DETAILS_TAB" }}</a>
+							<a href="{{url "/resources"}}{{ printf "%s&t=details" $parameters }}">{{ trans "DETAILS_TAB" }}</a>
 						</li>
 
 						<li>
-							<a href="/resources{{ printf "%s&t=inlinks" $parameters }}">{{ trans "INLINKS_TAB" }}</a>
+							<a href="{{url "/resources"}}{{ printf "%s&t=inlinks" $parameters }}">{{ trans "INLINKS_TAB" }}</a>
 						</li>
 
 						<li>
-							<a href="/resources{{ printf "%s&t=internal" $parameters }}">{{ trans "INTERNAL_TAB" }}</a>
+							<a href="{{url "/resources"}}{{ printf "%s&t=internal" $parameters }}">{{ trans "INTERNAL_TAB" }}</a>
 						</li>
 
 						<li>
-							<a href="/resources{{ printf "%s&t=external" $parameters }}">{{ trans "EXTERNAL_TAB" }}</a>
+							<a href="{{url "/resources"}}{{ printf "%s&t=external" $parameters }}">{{ trans "EXTERNAL_TAB" }}</a>
 						</li>
 
 						<li>
-							<a href="/resources{{ printf "%s&t=redirections" $parameters }}">{{ trans "REDIRECTIONS_TAB" }}</a>
+							<a href="{{url "/resources"}}{{ printf "%s&t=redirections" $parameters }}">{{ trans "REDIRECTIONS_TAB" }}</a>
 						</li>
 
 						<li>
-							<a href="/resources{{ printf "%s&t=images" $parameters }}">{{ trans "IMAGES_TAB" }}</a>
+							<a href="{{url "/resources"}}{{ printf "%s&t=images" $parameters }}">{{ trans "IMAGES_TAB" }}</a>
 						</li>
 
 						<li>
-							<a href="/resources{{ printf "%s&t=audios" $parameters }}">{{ trans "AUDIOS_TAB" }}</a>
+							<a href="{{url "/resources"}}{{ printf "%s&t=audios" $parameters }}">{{ trans "AUDIOS_TAB" }}</a>
 						</li>
 
 						<li>
-							<a href="/resources{{ printf "%s&t=videos" $parameters }}">{{ trans "VIDEOS_TAB" }}</a>
+							<a href="{{url "/resources"}}{{ printf "%s&t=videos" $parameters }}">{{ trans "VIDEOS_TAB" }}</a>
 						</li>
 
 						<li>
-							<a href="/resources{{ printf "%s&t=iframes" $parameters }}">{{ trans "IFRAMES_TAB" }}</a>
+							<a href="{{url "/resources"}}{{ printf "%s&t=iframes" $parameters }}">{{ trans "IFRAMES_TAB" }}</a>
 						</li>
 
 						<li>
-							<a href="/resources{{ printf "%s&t=scripts" $parameters }}">{{ trans "SCRIPTS_TAB" }}</a>
+							<a href="{{url "/resources"}}{{ printf "%s&t=scripts" $parameters }}">{{ trans "SCRIPTS_TAB" }}</a>
 						</li>
 
 						<li>
-							<a href="/resources{{ printf "%s&t=styles" $parameters }}">{{ trans "STYLES_TAB" }}</a>
+							<a href="{{url "/resources"}}{{ printf "%s&t=styles" $parameters }}">{{ trans "STYLES_TAB" }}</a>
 						</li>
 					</ul>
 				</details>
@@ -431,9 +431,9 @@
 							<div class="content">
 								{{ if $archived }}
 								<ul>
-									<li><a href="/archive{{ $parameters }}">{{ trans "VIEW_ARCHIVE" }}</a></li>
+									<li><a href="{{url "/archive"}}{{ $parameters }}">{{ trans "VIEW_ARCHIVE" }}</a></li>
 									{{ if and $IsHTML (eq .StatusCode 200) }}
-										<li><a href="/replay?pid={{ $projectId }}&url={{ .URL }}" target="_blank">{{ trans "OPEN_IN_BROWSER" }}</a></li>
+										<li><a href="{{url "/replay"}}?pid={{ $projectId }}&url={{ .URL }}" target="_blank">{{ trans "OPEN_IN_BROWSER" }}</a></li>
 									{{ end }}
 								</ul>
 								{{ else }}
@@ -456,7 +456,7 @@
 								<ul>
 									{{ range $errorTypes }}
 										<li>
-											<a href="/issues/view?pid={{ $pid }}&eid={{ . }}">{{ trans . }}</a>
+											<a href="{{url "/issues/view"}}?pid={{ $pid }}&eid={{ . }}">{{ trans . }}</a>
 										</li>
 									{{ end }}
 								</ul>
@@ -479,7 +479,7 @@
 						<div class="content">
 							{{ if .Link.Text }}{{ .Link.Text }}<br/>{{ end }}
 							{{ if .PageReport.Title }}{{ .PageReport.Title }}<br/>{{ end }}
-							<a href="/resources?pid={{ $pid }}&rid={{ .PageReport.Id }}&ep=1" class="url">
+							<a href="{{url "/resources"}}?pid={{ $pid }}&rid={{ .PageReport.Id }}&ep=1" class="url">
 								{{ .PageReport.URL }}
 							</a>
 							{{ if .Link.NoFollow }}<p><span class="alert">{{ trans "NOFOLLOW" }}</span></p>{{ end }}
@@ -487,7 +487,7 @@
 					</div>
 
 					<div class="col col-actions">
-						<a href="/resources?pid={{ $pid }}&rid={{ .PageReport.Id }}&ep=1" class="highlight">
+						<a href="{{url "/resources"}}?pid={{ $pid }}&rid={{ .PageReport.Id }}&ep=1" class="highlight">
 							{{ trans "VIEW_DETAILS" }}
 						</a>
 					</div>
@@ -501,7 +501,7 @@
 			<div class="col prev">
 				<div class="content">
 					{{ if (gt .PageReportView.Paginator.CurrentPage 1) }}
-					<a href="/resources{{ printf "%s&p=%d" $parameters .PageReportView.Paginator.PreviousPage }}">{{ trans "PREV" }}</a>
+					<a href="{{url "/resources"}}{{ printf "%s&p=%d" $parameters .PageReportView.Paginator.PreviousPage }}">{{ trans "PREV" }}</a>
 					{{ else }}
 						{{ trans "PREV" }}
 					{{ end }}
@@ -517,7 +517,7 @@
 			<div class="col next">
 				<div class="content">
 					{{ if (gt .PageReportView.Paginator.TotalPages .PageReportView.Paginator.CurrentPage) }}
-						<a href="/resources{{ printf "%s&p=%d" $parameters .PageReportView.Paginator.NextPage }}">{{ trans "NEXT" }}</a>
+						<a href="{{url "/resources"}}{{ printf "%s&p=%d" $parameters .PageReportView.Paginator.NextPage }}">{{ trans "NEXT" }}</a>
 					{{ else }}
 						{{ trans "NEXT" }}
 					{{ end }}
@@ -533,12 +533,12 @@
 					<div class="col col-main">
 						<div class="content">
 						{{ if .Title }}{{ .Title }}<br/>{{ end }}
-							<a href="/resources?pid={{ $pid }}&rid={{ .Id }}&ep=1" class="url">{{ .URL }}</a>
+							<a href="{{url "/resources"}}?pid={{ $pid }}&rid={{ .Id }}&ep=1" class="url">{{ .URL }}</a>
 						</div>
 					</div>
 
 					<div class="col col-actions">
-						<a href="/resources?pid={{ $pid }}&rid={{ .Id }}&ep=1">{{ trans "VIEW_DETAILS" }}</a>
+						<a href="{{url "/resources"}}?pid={{ $pid }}&rid={{ .Id }}&ep=1">{{ trans "VIEW_DETAILS" }}</a>
 					</div>
 				</div>
 			{{ end }}
@@ -552,7 +552,7 @@
 			<div class="col prev">
 				<div class="content">
 					{{ if (gt .PageReportView.Paginator.CurrentPage 1) }}
-					<a href="/resources?{{ printf "%s&p=%d" $parameters .PageReportView.Paginator.PreviousPage }}">{{ trans "PREV" }}</a>
+					<a href="{{url "/resources"}}?{{ printf "%s&p=%d" $parameters .PageReportView.Paginator.PreviousPage }}">{{ trans "PREV" }}</a>
 					{{ else }}
 						{{ trans "PREV" }}
 					{{ end }}
@@ -564,7 +564,7 @@
 			<div class="col next">
 				<div class="content">
 					{{ if (gt .PageReportView.Paginator.TotalPages .PageReportView.Paginator.CurrentPage) }}
-						<a href="/resources{{ printf "%s&p=%d" $parameters .PageReportView.Paginator.NextPage }}">{{ trans "NEXT" }}</a>
+						<a href="{{url "/resources"}}{{ printf "%s&p=%d" $parameters .PageReportView.Paginator.NextPage }}">{{ trans "NEXT" }}</a>
 					{{ else }}
 						{{ trans "NEXT" }}
 					{{ end }}
@@ -591,7 +591,7 @@
 						<div class="content">
 						{{ if .Link.Text }}{{ .Link.Text }}<br/>{{ end }}
 						{{ if .PageReport.Title }}{{ .PageReport.Title }}<br/>{{ end }}
-						<a href="/resources?pid={{ $pid }}&rid={{ .PageReport.Id }}&ep=1" class="url">
+						<a href="{{url "/resources"}}?pid={{ $pid }}&rid={{ .PageReport.Id }}&ep=1" class="url">
 							{{ .Link.URL }}
 						</a>
 						{{ if .Link.NoFollow }}<br><span class="alert">{{ trans "NOFOLLOW" }}</span>{{ end }}
@@ -600,7 +600,7 @@
 
 					{{ if .PageReport.Crawled }}
 					<div class="col col-actions">
-						<a href="/resources?pid={{ $pid }}&rid={{ .PageReport.Id }}&ep=1" class="highlight">
+						<a href="{{url "/resources"}}?pid={{ $pid }}&rid={{ .PageReport.Id }}&ep=1" class="highlight">
 							{{ trans "VIEW_DETAILS" }}
 						</a>
 					</div>
@@ -619,7 +619,7 @@
 			<div class="col prev">
 				<div class="content">
 					{{ if (gt .PageReportView.Paginator.CurrentPage 1) }}
-						<a href="/resources{{ printf "%s&p=%d" $parameters .PageReportView.Paginator.PreviousPage }}">{{ trans "PREV" }}</a>
+						<a href="{{url "/resources"}}{{ printf "%s&p=%d" $parameters .PageReportView.Paginator.PreviousPage }}">{{ trans "PREV" }}</a>
 					{{ else }}
 						{{ trans "PREV" }}
 					{{ end }}
@@ -635,7 +635,7 @@
 			<div class="col next">
 				<div class="content">
 					{{ if (gt .PageReportView.Paginator.TotalPages .PageReportView.Paginator.CurrentPage) }}
-						<a href="/resources{{ printf "%s&p=%d" $parameters .PageReportView.Paginator.NextPage }}">{{ trans "NEXT" }}</a>
+						<a href="{{url "/resources"}}{{ printf "%s&p=%d" $parameters .PageReportView.Paginator.NextPage }}">{{ trans "NEXT" }}</a>
 					{{ else }}
 						{{ trans "NEXT" }}
 					{{ end }}
@@ -680,7 +680,7 @@
 			<div class="col prev">
 				<div class="content">
 					{{ if (gt .PageReportView.Paginator.CurrentPage 1) }}
-					<a href="/resources{{ printf "%s&p=%d" $parameters .PageReportView.Paginator.PreviousPage }}">{{ trans "PREV" }}</a>
+					<a href="{{url "/resources"}}{{ printf "%s&p=%d" $parameters .PageReportView.Paginator.PreviousPage }}">{{ trans "PREV" }}</a>
 					{{ else }}
 						{{ trans "PREV" }}
 					{{ end }}
@@ -692,7 +692,7 @@
 			<div class="col next">
 				<div class="content">
 					{{ if (gt .PageReportView.Paginator.TotalPages .PageReportView.Paginator.CurrentPage) }}
-					<a href="/resources{{ printf "%s&p=%d" $parameters .PageReportView.Paginator.NextPage }}">{{ trans "NEXT" }}</a>
+					<a href="{{url "/resources"}}{{ printf "%s&p=%d" $parameters .PageReportView.Paginator.NextPage }}">{{ trans "NEXT" }}</a>
 					{{ else }}
 						{{ trans "NEXT" }}
 					{{ end }}

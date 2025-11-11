@@ -17,24 +17,24 @@ type issueHandler struct {
 func (h *issueHandler) indexHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
 	pid, err := strconv.Atoi(r.URL.Query().Get("pid"))
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
 	pv, err := h.ProjectViewService.GetProjectView(pid, user.Id)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
 	if pv.Crawl.TotalURLs == 0 {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
@@ -60,19 +60,19 @@ func (h *issueHandler) indexHandler(w http.ResponseWriter, r *http.Request) {
 func (h *issueHandler) viewHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
 	eid := r.URL.Query().Get("eid")
 	if eid == "" {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
 	pid, err := strconv.Atoi(r.URL.Query().Get("pid"))
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
@@ -83,13 +83,13 @@ func (h *issueHandler) viewHandler(w http.ResponseWriter, r *http.Request) {
 
 	pv, err := h.ProjectViewService.GetProjectView(pid, user.Id)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
 	paginatorView, err := h.IssueService.GetPaginatedReportsByIssue(pv.Crawl.Id, page, eid)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 

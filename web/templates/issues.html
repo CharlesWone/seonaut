@@ -16,7 +16,7 @@
 		<div class="col col-actions-l">
 			<div class="main-action">
 				<div class="content">
-					<a href="/dashboard?pid={{ .ProjectView.Project.Id }}">{{ .ProjectView.Project.Host }}</a>
+					<a href="{{url "/dashboard"}}?pid={{ .ProjectView.Project.Id }}">{{ .ProjectView.Project.Host }}</a>
 				</div>
 			</div>
 		</div>
@@ -57,7 +57,7 @@
 				</div>
 
 				<div class="col col-actions highlight">
-					<a class="icon-text highlight borderless main" href="/issues/view?pid={{ $pid }}&eid={{ .ErrorType }}">{{ trans "VIEW_ISSUES" }}</a>
+					<a class="icon-text highlight borderless main" href="{{url "/issues/view"}}?pid={{ $pid }}&eid={{ .ErrorType }}">{{ trans "VIEW_ISSUES" }}</a>
 				</div>
 			</div>
 		{{ end }}
@@ -85,7 +85,7 @@
 				</div>
 
 				<div class="col col-actions highlight">
-					<a class="icon-text highlight borderless main" href="/issues/view?pid={{ $pid }}&eid={{ .ErrorType }}">{{ trans "VIEW_ISSUES" }}</a>
+					<a class="icon-text highlight borderless main" href="{{url "/issues/view"}}?pid={{ $pid }}&eid={{ .ErrorType }}">{{ trans "VIEW_ISSUES" }}</a>
 				</div>
 			</div>
 		{{ end }}
@@ -113,7 +113,7 @@
 				</div>
 
 				<div class="col col-actions highlight">
-					<a class="icon-text highlight borderless main" href="/issues/view?pid={{ $pid }}&eid={{ .ErrorType }}">{{ trans "VIEW_ISSUES" }}</a>
+					<a class="icon-text highlight borderless main" href="{{url "/issues/view"}}?pid={{ $pid }}&eid={{ .ErrorType }}">{{ trans "VIEW_ISSUES" }}</a>
 				</div>
 			</div>
 		{{ end }}

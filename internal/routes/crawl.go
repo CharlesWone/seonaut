@@ -33,35 +33,35 @@ type crawlHandler struct {
 func (h *crawlHandler) startHandler(w http.ResponseWriter, r *http.Request) {
 	pid, err := strconv.Atoi(r.URL.Query().Get("pid"))
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
 	p, err := h.ProjectService.FindProject(pid, user.Id)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
 	if p.BasicAuth {
-		http.Redirect(w, r, "/crawl/auth?id="+strconv.Itoa(pid), http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/crawl/auth?id="+strconv.Itoa(pid))
 		return
 	}
 
 	err = h.CrawlerService.StartCrawler(p, models.BasicAuth{})
 	if err != nil {
 		log.Printf("start crawler for %s error: %v\n", p.URL, err)
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
-	http.Redirect(w, r, "/crawl/live?pid="+strconv.Itoa(pid), http.StatusSeeOther)
+	redirect(w, r, http.StatusSeeOther, h.Container, "/crawl/live?pid="+strconv.Itoa(pid))
 }
 
 // stopHandler handles the crawler stopping.
@@ -72,19 +72,19 @@ func (h *crawlHandler) startHandler(w http.ResponseWriter, r *http.Request) {
 func (h *crawlHandler) stopHandler(w http.ResponseWriter, r *http.Request) {
 	pid, err := strconv.Atoi(r.URL.Query().Get("pid"))
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
 	p, err := h.ProjectService.FindProject(pid, user.Id)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
@@ -98,7 +98,7 @@ func (h *crawlHandler) stopHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/crawl/live?pid="+strconv.Itoa(pid), http.StatusSeeOther)
+	redirect(w, r, http.StatusSeeOther, h.Container, "/crawl/live?pid="+strconv.Itoa(pid))
 }
 
 // handleCrawlAuth handles the crawling of a project with BasicAuth.
@@ -108,19 +108,19 @@ func (h *crawlHandler) stopHandler(w http.ResponseWriter, r *http.Request) {
 func (h *crawlHandler) authGetHandler(w http.ResponseWriter, r *http.Request) {
 	pid, err := strconv.Atoi(r.URL.Query().Get("pid"))
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
 	p, err := h.ProjectService.FindProject(pid, user.Id)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
@@ -140,25 +140,25 @@ func (h *crawlHandler) authGetHandler(w http.ResponseWriter, r *http.Request) {
 func (h *crawlHandler) authPostHandler(w http.ResponseWriter, r *http.Request) {
 	pid, err := strconv.Atoi(r.URL.Query().Get("pid"))
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
 	p, err := h.ProjectService.FindProject(pid, user.Id)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
 	err = r.ParseForm()
 	if err != nil {
-		http.Redirect(w, r, "/crawl/auth", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/crawl/auth")
 		return
 	}
 
@@ -170,11 +170,11 @@ func (h *crawlHandler) authPostHandler(w http.ResponseWriter, r *http.Request) {
 	err = h.CrawlerService.StartCrawler(p, basicAuth)
 	if err != nil {
 		log.Printf("start basic auth crawler for %s error: %v\n", p.URL, err)
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
-	http.Redirect(w, r, "/crawl/live?pid="+strconv.Itoa(pid), http.StatusSeeOther)
+	redirect(w, r, http.StatusSeeOther, h.Container, "/crawl/live?pid="+strconv.Itoa(pid))
 }
 
 // liveCrawlHandler handles the request for the live crawling of a project.
@@ -184,30 +184,30 @@ func (h *crawlHandler) authPostHandler(w http.ResponseWriter, r *http.Request) {
 func (h *crawlHandler) liveCrawlHandler(w http.ResponseWriter, r *http.Request) {
 	pid, err := strconv.Atoi(r.URL.Query().Get("pid"))
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
 	pv, err := h.ProjectViewService.GetProjectView(pid, user.Id)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
 	if !pv.Crawl.Crawling {
-		http.Redirect(w, r, "/dashboard?pid="+strconv.Itoa(pid), http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/dashboard?pid="+strconv.Itoa(pid))
 		return
 	}
 
 	configURL, err := url.Parse(h.Config.HTTPServer.URL)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 

@@ -20,13 +20,13 @@ type explorerHandler struct {
 func (h *explorerHandler) indexHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
 	pid, err := strconv.Atoi(r.URL.Query().Get("pid"))
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
@@ -37,7 +37,7 @@ func (h *explorerHandler) indexHandler(w http.ResponseWriter, r *http.Request) {
 
 	pv, err := h.ProjectViewService.GetProjectView(pid, user.Id)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
@@ -45,7 +45,7 @@ func (h *explorerHandler) indexHandler(w http.ResponseWriter, r *http.Request) {
 
 	paginatorView, err := h.ReportService.GetPaginatedReports(pv.Crawl.Id, page, term)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 

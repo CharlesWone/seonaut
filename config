@@ -1,7 +1,8 @@
 [server]
 host = "0.0.0.0"
 port = 9000
-url = "http://localhost:9000"
+url = "http://localhost:9000/seonaut" # https://seo.bitwafgroup.org https://seo.bitwafgroup.org/seonaut
+context_path = "/seonaut" # 上下文路径，如："/seonaut"，不需要就留空串""
 
 [database]
 server = "db"
@@ -23,4 +24,4 @@ webhook_url = "https://oapi.dingtalk.com/robot/send?access_token=244bcae4d36ccc8
 secret = ""
 
 [auth]
-enable_register = false
+enable_register = false # 是否开启注册 true|false

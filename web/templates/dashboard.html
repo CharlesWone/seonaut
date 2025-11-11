@@ -48,7 +48,7 @@
 			</div>
 
 			<div class="col col-actions">
-				<a class="icon-text highlight borderless main" href="/issues?pid={{ .ProjectView.Project.Id }}">{{ trans "VIEW_ISSUES" }}</a>
+				<a class="icon-text highlight borderless main" href="{{url "/issues"}}?pid={{ .ProjectView.Project.Id }}"> {{ trans "VIEW_ISSUES" }}</a>
 			</div>
 		</div>
 
@@ -241,15 +241,14 @@
 				<div class="content">
 					<h2>{{ trans "EXPLORE_ISSUES" }}</h2>
 					<p>{{ trans "EXPLORE_ISSUES_MESSAGE" }} </p>
-					<p><a href="/issues?pid={{ .ProjectView.Project.Id }}">{{ trans "SITE_ISSUES_LINK" }}</a></p>
-				</div>
+					<p><a href="{{url "/issues"}}?pid={{ .ProjectView.Project.Id }}">{{ trans "SITE_ISSUES_LINK" }}</a></p>				</div>
 			</div>
 
 			<div class="col">
 				<div class="content">
 					<h2>{{ trans "ANALYZE_DATA" }}</h2>
 					<p>{{ trans "ANALYZE_DATA_MESSAGE" }}</p>
-					<p><a href="/export?pid={{ .ProjectView.Project.Id }}">{{ trans "ANALYZE_DATA_LINK" }} </a></p>
+					<p><a href="{{url "/export"}}?pid={{ .ProjectView.Project.Id }}">{{ trans "ANALYZE_DATA_LINK" }} </a></p>
 				</div>
 			</div>
 		</div>

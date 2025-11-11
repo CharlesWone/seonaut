@@ -62,10 +62,9 @@
 			<div class="col col-main">
 				<div class="content-s">
 
-					<input type="submit" value="{{ trans "SAVE" }}" class="inline"> <a href="/" class="button">{{ trans "CANCEL" }}</a>
-
+					<input type="submit" value="{{ trans "SAVE" }}" class="inline"> <a href="{{url "/"}}" class="button">{{ trans "CANCEL" }}</a>
 				</div>
-			</div>	
+			</div>
 		</div>
 
 	</form>
@@ -73,7 +72,7 @@
 	<div class="box box-highlight">
 		<div class="col col-main">
 			<div class="content-s">
-				<a href="/account/password">{{ trans "CHANGE_PASSWORD" }}</a>
+                <a href="{{url "/account/password"}}">{{ trans "CHANGE_PASSWORD" }}</a>
 			</div>
 		</div>
 	</div>
@@ -81,14 +80,14 @@
 	<div class="box bg-alert">
 		<div class="col col-main">
 			<div class="content">
-				<a href="/account/delete">
-					{{ trans "DELETE_ACCOUNT" }}
-				</a>
+                <a href="{{url "/account/delete"}}">
+                {{ trans "DELETE_ACCOUNT" }}
+                </a>
 				<p>
 					{{ trans "DELETE_ACCOUNT_MESSAGE" }}<br>
 					{{ trans "DELETE_ACCOUNT_MESSAGE_CONFIRMATION" }}
 				</p>
-			</div>		
+			</div>
 		</div>
 	</div>
 

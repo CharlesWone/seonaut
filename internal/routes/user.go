@@ -16,7 +16,7 @@ type userHandler struct {
 func (h *userHandler) signupGetHandler(w http.ResponseWriter, r *http.Request) {
 	// 如果没有启用注册功能
 	if !h.Config.AuthConfig.EnableRegister {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 	pageView := &PageView{
@@ -40,13 +40,13 @@ func (h *userHandler) signupGetHandler(w http.ResponseWriter, r *http.Request) {
 func (h *userHandler) signupPostHandler(w http.ResponseWriter, r *http.Request) {
 	// 如果没有启用注册功能
 	if !h.Config.AuthConfig.EnableRegister {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
 	err := r.ParseForm()
 	if err != nil {
-		http.Redirect(w, r, "/signup", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signup")
 		return
 	}
 
@@ -86,7 +86,7 @@ func (h *userHandler) signupPostHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	h.CookieSession.SetSession(u, w, r)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	redirect(w, r, http.StatusSeeOther, h.Container, "/")
 }
 
 // deleteGetHandler handles the HTTP GET request for the delete user account functionality.
@@ -95,7 +95,7 @@ func (h *userHandler) signupPostHandler(w http.ResponseWriter, r *http.Request) 
 func (h *userHandler) deleteGetHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
@@ -121,19 +121,19 @@ func (h *userHandler) deleteGetHandler(w http.ResponseWriter, r *http.Request) {
 func (h *userHandler) deletePostHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
 	crawling := h.ProjectViewService.UserIsCrawling(user.Id)
 	if crawling {
-		http.Redirect(w, r, "/account/delete", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/account/delete")
 		return
 	}
 
 	h.UserService.DeleteUser(user)
 	h.CookieSession.DestroySession(w, r)
-	http.Redirect(w, r, "/signin", http.StatusSeeOther)
+	redirect(w, r, http.StatusSeeOther, h.Container, "/signin")
 }
 
 // signinGetHandler handles the HTTP GET request for the sign-in functionality.
@@ -165,7 +165,7 @@ func (h *userHandler) signinGetHandler(w http.ResponseWriter, r *http.Request) {
 func (h *userHandler) signinPostHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		http.Redirect(w, r, "/signin", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signin")
 		return
 	}
 
@@ -179,11 +179,13 @@ func (h *userHandler) signinPostHandler(w http.ResponseWriter, r *http.Request) 
 			Theme:     h.Container.Config.UIConfig.Theme,
 			PageTitle: "SIGNIN_VIEW_PAGE_TITLE",
 			Data: &struct {
-				Email string
-				Error bool
+				Email          string
+				Error          bool
+				EnableRegister bool
 			}{
-				Email: email,
-				Error: true,
+				Email:          email,
+				Error:          true,
+				EnableRegister: h.Config.AuthConfig.EnableRegister,
 			},
 		}
 
@@ -192,7 +194,7 @@ func (h *userHandler) signinPostHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	h.CookieSession.SetSession(u, w, r)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	redirect(w, r, http.StatusSeeOther, h.Container, "/")
 }
 
 // editGetHandler handles the HTTP GET request for the account edit page.
@@ -200,7 +202,7 @@ func (h *userHandler) signinPostHandler(w http.ResponseWriter, r *http.Request) 
 func (h *userHandler) editGetHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
@@ -225,13 +227,13 @@ func (h *userHandler) editGetHandler(w http.ResponseWriter, r *http.Request) {
 func (h *userHandler) editPostHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
 	err := r.ParseForm()
 	if err != nil {
-		http.Redirect(w, r, "/signin", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signin")
 		return
 	}
 
@@ -266,7 +268,7 @@ func (h *userHandler) editPostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	redirect(w, r, http.StatusSeeOther, h.Container, "/")
 }
 
 // changePasswordGetHandler handles the HTTP GET request for the password change page.
@@ -274,7 +276,7 @@ func (h *userHandler) editPostHandler(w http.ResponseWriter, r *http.Request) {
 func (h *userHandler) changePasswordGetHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
@@ -299,13 +301,13 @@ func (h *userHandler) changePasswordGetHandler(w http.ResponseWriter, r *http.Re
 func (h *userHandler) changePasswordPostHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
 	err := r.ParseForm()
 	if err != nil {
-		http.Redirect(w, r, "/signin", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signin")
 		return
 	}
 
@@ -342,7 +344,7 @@ func (h *userHandler) changePasswordPostHandler(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	redirect(w, r, http.StatusSeeOther, h.Container, "/")
 }
 
 // signoutHandler handles the user's signout request.
@@ -350,5 +352,5 @@ func (h *userHandler) changePasswordPostHandler(w http.ResponseWriter, r *http.R
 // the sign-in page.
 func (h *userHandler) signoutHandler(w http.ResponseWriter, r *http.Request) {
 	h.CookieSession.DestroySession(w, r)
-	http.Redirect(w, r, "/signin", http.StatusSeeOther)
+	redirect(w, r, http.StatusSeeOther, h.Container, "/signin")
 }

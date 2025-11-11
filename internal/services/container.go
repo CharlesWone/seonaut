@@ -262,7 +262,7 @@ func (c *Container) InitTranslator() {
 func (c *Container) InitRenderer() {
 	renderer, err := NewRenderer(&RendererConfig{
 		TemplatesFolder: "web/templates",
-	}, c.Translator)
+	}, c.Translator, c.Config.HTTPServer)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -272,7 +272,7 @@ func (c *Container) InitRenderer() {
 
 // Create cookie session handler
 func (c *Container) InitCookieSession() {
-	c.CookieSession = NewCookieSession(c.userRepository)
+	c.CookieSession = NewCookieSession(c.userRepository, c.Config.HTTPServer)
 }
 
 // Init the WACZ archiver service.

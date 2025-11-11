@@ -43,21 +43,22 @@
             {{ end }}
         </div>
 
-        {{ if .ArchiveExists }}
-        <div class="box">
-            <div class="col col-main">
-                <div class="content">
-                    <h2>{{ trans "EXPORT_WACZ" }}</h2>
-                    <p>{{ trans "EXPORT_WACZ_MESSAGE" }}</p>
-                </div>
-            </div>
+        <!--{{ if .ArchiveExists }}-->
+        <!--<div class="box">-->
+        <!--    <div class="col col-main">-->
+        <!--        <div class="content">-->
+        <!--            <h2>{{ trans "EXPORT_WACZ" }}</h2>-->
+        <!--            <p>{{ trans "EXPORT_WACZ_MESSAGE" }}</p>-->
+        <!--        </div>-->
+        <!--    </div>-->
 
-            <div class="col col-actions">
-                <a class="icon-text highlight borderless main" href="/export/wazc?pid={{ .Project.Id }}">{{ trans
-                    "DOWNLOAD" }}</a>
-            </div>
-        </div>
-        {{ end }}
+        <!--    <div class="col col-actions">-->
+        <!--        <a class="icon-text highlight borderless main" href="{{url "/export/wazc"}}?pid={{ .Project.Id }}">-->
+        <!--        {{ trans "DOWNLOAD" }}-->
+        <!--        </a>-->
+        <!--    </div>-->
+        <!--</div>-->
+        <!--{{ end }}-->
     </div>
 
     {{ end}}

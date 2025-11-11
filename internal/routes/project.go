@@ -22,14 +22,15 @@ func (h *projectHandler) indexHandler(w http.ResponseWriter, r *http.Request) {
 	// all the routes starting with / and matching non-existing routes that should
 	// return a 404 not found. We handle it here making sure to serve the projects index
 	// in case the path is /.
-	if r.URL.Path != "/" {
+	// r.URL.Path = /seonaut/ 而h.Config.HTTPServer.ContextPath中不是/结尾
+	if strings.TrimRight(r.URL.Path, "/") != h.Config.HTTPServer.ContextPath {
 		http.NotFound(w, r)
 		return
 	}
 
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
@@ -58,7 +59,7 @@ func (h *projectHandler) indexHandler(w http.ResponseWriter, r *http.Request) {
 func (h *projectHandler) addGetHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
@@ -85,14 +86,14 @@ func (h *projectHandler) addGetHandler(w http.ResponseWriter, r *http.Request) {
 func (h *projectHandler) addPostHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
 	err := r.ParseForm()
 	if err != nil {
 		log.Printf("serveProjectAdd ParseForm: %v\n", err)
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
@@ -206,7 +207,7 @@ func (h *projectHandler) addPostHandler(w http.ResponseWriter, r *http.Request) 
 	project.Id = id
 	h.CronManagerService.AddJob(*project)
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	redirect(w, r, http.StatusSeeOther, h.Container, "/")
 }
 
 // deleteGetHandler handles the deletion of a project.
@@ -214,19 +215,19 @@ func (h *projectHandler) addPostHandler(w http.ResponseWriter, r *http.Request) 
 func (h *projectHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
 	pid, err := strconv.Atoi(r.URL.Query().Get("pid"))
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
 	p, err := h.ProjectService.FindProject(pid, user.Id)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
@@ -234,7 +235,7 @@ func (h *projectHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	// 删除定时任务
 	h.CronManagerService.DeleteJob(p)
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	redirect(w, r, http.StatusSeeOther, h.Container, "/")
 }
 
 // editGetHandler displays the edition form of a project.
@@ -244,19 +245,19 @@ func (h *projectHandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 func (h *projectHandler) editGetHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
 	pid, err := strconv.Atoi(r.URL.Query().Get("pid"))
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
 	p, err := h.ProjectService.FindProject(pid, user.Id)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
@@ -293,25 +294,25 @@ func (h *projectHandler) editGetHandler(w http.ResponseWriter, r *http.Request) 
 func (h *projectHandler) editPostHandler(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.CookieSession.GetUser(r.Context())
 	if !ok {
-		http.Redirect(w, r, "/signout", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/signout")
 		return
 	}
 
 	pid, err := strconv.Atoi(r.URL.Query().Get("pid"))
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
 	p, err := h.ProjectService.FindProject(pid, user.Id)
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
 	err = r.ParseForm()
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		redirect(w, r, http.StatusSeeOther, h.Container, "/")
 		return
 	}
 
@@ -417,5 +418,5 @@ func (h *projectHandler) editPostHandler(w http.ResponseWriter, r *http.Request)
 	// 更新定时任务
 	h.CronManagerService.UpdateProject(p)
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	redirect(w, r, http.StatusSeeOther, h.Container, "/")
 }

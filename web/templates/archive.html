@@ -9,15 +9,15 @@
 		<div class="col col-main">
 			<div class="content">
 				{{ if .Eid }}
-					<a href="/issues?pid={{ .ProjectView.Project.Id }}">{{ trans "SITE_ISSUES" }}</a> 
-					/ 
-					<a href="/issues/view?pid={{ .ProjectView.Project.Id }}&eid={{ .Eid }}">{{ trans .Eid }}</a>
+					<a href="{{url "/issues"}}?pid={{ .ProjectView.Project.Id }}">{{ trans "SITE_ISSUES" }}</a>
 					/
-					<a href="/resources?pid={{ .ProjectView.Project.Id }}&rid={{ .PageReportView.PageReport.Id }}&eid={{ .Eid }}">{{ trans "DETAILS" }}</a>	
+					<a href="{{url "/issues/view"}}?pid={{ .ProjectView.Project.Id }}&eid={{ .Eid }}">{{ trans .Eid }}</a>
+					/
+					<a href="{{url "/resources"}}?pid={{ .ProjectView.Project.Id }}&rid={{ .PageReportView.PageReport.Id }}&eid={{ .Eid }}">{{ trans "DETAILS" }}</a>
 				{{ else if .Ep }}
-					<a href="/explorer?pid={{ .ProjectView.Project.Id }}">{{ trans "PAGE_DETAILS" }}</a>
+					<a href="{{url "/explorer"}}?pid={{ .ProjectView.Project.Id }}">{{ trans "PAGE_DETAILS" }}</a>
 					/
-					<a href="/resources?pid={{ .ProjectView.Project.Id }}&rid={{ .PageReportView.PageReport.Id }}&ep=1">{{ trans "DETAILS" }}</a>	
+					<a href="{{url "/resources"}}?pid={{ .ProjectView.Project.Id }}&rid={{ .PageReportView.PageReport.Id }}&ep=1">{{ trans "DETAILS" }}</a>
 				{{ end }}
 			</div>
 		</div>
@@ -25,7 +25,7 @@
 		<div class="col col-actions-l">
 			<div class="main-action">
 				<div class="content">
-					<a href="/dashboard?pid={{ .ProjectView.Project.Id }}">{{ .ProjectView.Project.Host }}</a>
+					<a href="{{url "/dashboard"}}?pid={{ .ProjectView.Project.Id }}">{{ .ProjectView.Project.Host }}</a>
 				</div>
 			</div>
 		</div>
@@ -59,7 +59,7 @@
 				{{ end }}
 
 				{{ $parameters := printf "?pid=%d&rid=%d" .ProjectView.Project.Id .PageReportView.PageReport.Id }}
-				<a href="/archive/download{{ $parameters }}">{{ trans "DOWNLOAD" }}</a>
+				<a href="{{url "/archive/download"}}{{ $parameters }}">{{ trans "DOWNLOAD" }}</a>
 			</div>
 		</div>
 	</div>

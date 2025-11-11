@@ -6,7 +6,7 @@
 			<div class="content">
 	
 				<div id="header">
-					<span class="logo"><a href="/signin">SEOnaut</a></span>
+					<span class="logo"><a href="{{url "/signin"}}">SEOnaut</a></span>
 				</div>
 	
 				<div class="form-container">
@@ -28,7 +28,7 @@
 					{{ if .Data.EnableRegister }}
 					<div class="box-footer">
 						<div class="content">
-							{{ trans "NEW_USER" }} <a href="/signup">{{ trans "NEW_USER_SIGNUP" }}</a>
+							{{ trans "NEW_USER" }} <a href="{{url "/signup"}}">{{ trans "NEW_USER_SIGNUP" }}</a>
 						</div>
 					</div>
 					{{ end }}

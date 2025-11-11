@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"github.com/stjudewashere/seonaut/internal/config"
 	"html/template"
 	"io"
 	"log"
@@ -29,7 +30,8 @@ type (
 )
 
 // NewRenderer returns a new template renderer with the specified configuration.
-func NewRenderer(config *RendererConfig, translator RendererTranslator) (*Renderer, error) {
+func NewRenderer(config *RendererConfig, translator RendererTranslator, serverConfig *config.HTTPServerConfig) (*Renderer, error) {
+	contextPath := serverConfig.ContextPath
 	r := &Renderer{
 		translator: translator,
 		config:     config,
@@ -42,6 +44,9 @@ func NewRenderer(config *RendererConfig, translator RendererTranslator) (*Render
 		"is_rtl":     r.isRTL,
 		"trans":      func(s string, args ...interface{}) string { return s },   // This gets replaced with the user lang in the RenderTemplate
 		"trans_date": func(d time.Time, f string) string { return d.Format(f) }, // This gets replaced with the user lang in the RenderTemplate
+		"url": func(p string) string {
+			return contextPath + p
+		},
 	}
 
 	var err error

@@ -16,7 +16,7 @@ type crawlReportHandler struct {
 
 func (h *crawlReportHandler) indexHandler(w http.ResponseWriter, r *http.Request) {
 	// 提取路径参数
-	pathParam := strings.TrimPrefix(r.URL.Path, "/crawlReport/")
+	pathParam := strings.TrimPrefix(r.URL.Path, h.Config.HTTPServer.ContextPath+"/crawlReport/")
 	if pathParam == "" || pathParam == "/" {
 		http.Error(w, "missing param", http.StatusBadRequest)
 		return

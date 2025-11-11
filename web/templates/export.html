@@ -14,7 +14,7 @@
 		<div class="col col-actions-l">
 			<div class="main-action">
 				<div class="content">
-					<a href="/dashboard?pid={{ .Project.Id }}">{{ .Project.Host }}</a>
+					<a href="{{url "/dashboard"}}?pid={{ .Project.Id }}">{{ .Project.Host }}</a>
 				</div>
 			</div>
 		</div>
@@ -29,7 +29,7 @@
 		</div>
 	
 		<div class="col col-actions">
-			<a class="icon-text highlight borderless main" href="/export/sitemap?pid={{ .Project.Id }}">{{ trans "DOWNLOAD" }}</a>
+			<a class="icon-text highlight borderless main" href="{{url "/export/sitemap"}}?pid={{ .Project.Id }}"> {{ trans "DOWNLOAD" }}</a>
 		</div>
 	</div>
 	
@@ -42,7 +42,7 @@
 		</div>
 	
 		<div class="col col-actions">
-			<a class="icon-text highlight borderless main" href="/export/csv?pid={{ .Project.Id }}">{{ trans "DOWNLOAD" }}</a>
+			<a class="icon-text highlight borderless main" href="{{url "/export/csv"}}?pid={{ .Project.Id }}"> {{ trans "DOWNLOAD" }}</a>
 		</div>
 	</div>
 
@@ -55,7 +55,7 @@
 		</div>
 
 		<div class="col col-actions">
-			<a class="icon-text highlight borderless main" href="/export/resources?pid={{ .Project.Id }}&t=internal">{{ trans "DOWNLOAD" }}</a>
+			<a class="icon-text highlight borderless main" href="{{url "/export/resources"}}?pid={{ .Project.Id }}&t=internal">{{ trans "DOWNLOAD" }}</a>
 		</div>
 	</div>
 
@@ -68,7 +68,7 @@
 		</div>
 		
 		<div class="col col-actions">
-			<a class="icon-text highlight borderless main" href="/export/resources?pid={{ .Project.Id }}&t=external">{{ trans "DOWNLOAD" }}</a>
+			<a class="icon-text highlight borderless main" href="{{url "/export/resources"}}?pid={{ .Project.Id }}&t=external">{{ trans "DOWNLOAD" }}</a>
 		</div>
 	</div>
 
@@ -81,7 +81,7 @@
 		</div>
 
 		<div class="col col-actions">
-			<a class="icon-text highlight borderless main" href="/export/resources?pid={{ .Project.Id }}&t=images">{{ trans "DOWNLOAD" }}</a>
+			<a class="icon-text highlight borderless main" href="{{url "/export/resources"}}?pid={{ .Project.Id }}&t=images">{{ trans "DOWNLOAD" }}</a>
 		</div>
 	</div>
 
@@ -94,7 +94,7 @@
 		</div>
 		
 		<div class="col col-actions">
-			<a class="icon-text highlight borderless main" href="/export/resources?pid={{ .Project.Id }}&t=scripts">{{ trans "DOWNLOAD" }}</a>
+			<a class="icon-text highlight borderless main" href="{{url "/export/resources"}}?pid={{ .Project.Id }}&t=scripts">{{ trans "DOWNLOAD" }}</a>
 		</div>
 	</div>
 
@@ -107,7 +107,7 @@
 		</div>
 
 		<div class="col col-actions">
-			<a class="icon-text highlight borderless main" href="/export/resources?pid={{ .Project.Id }}&t=styles">{{ trans "DOWNLOAD" }}</a>
+			<a class="icon-text highlight borderless main" href="{{url "/export/resources"}}?pid={{ .Project.Id }}&t=styles">{{ trans "DOWNLOAD" }}</a>
 		</div>
 	</div>
 
@@ -120,7 +120,7 @@
 		</div>
 
 		<div class="col col-actions">
-			<a class="icon-text highlight borderless main" href="/export/resources?pid={{ .Project.Id }}&t=iframes">{{ trans "DOWNLOAD" }}</a>
+			<a class="icon-text highlight borderless main" href="{{url "/export/resources"}}?pid={{ .Project.Id }}&t=iframes">{{ trans "DOWNLOAD" }}</a>
 		</div>
 	</div>
 
@@ -133,7 +133,7 @@
 		</div>
 
 		<div class="col col-actions">
-			<a class="icon-text highlight borderless main" href="/export/resources?pid={{ .Project.Id }}&t=audios">{{ trans "DOWNLOAD" }}</a>
+			<a class="icon-text highlight borderless main" href="{{url "/export/resources"}}?pid={{ .Project.Id }}&t=audios">{{ trans "DOWNLOAD" }}</a>
 		</div>
 	</div>
 
@@ -146,7 +146,7 @@
 		</div>
 
 		<div class="col col-actions">
-			<a class="icon-text highlight borderless main" href="/export/resources?pid={{ .Project.Id }}&t=videos">{{ trans "DOWNLOAD" }}</a>
+			<a class="icon-text highlight borderless main" href="{{url "/export/resources"}}?pid={{ .Project.Id }}&t=videos">{{ trans "DOWNLOAD" }}</a>
 		</div>
 	</div>
 
@@ -159,7 +159,7 @@
 		</div>
 
 		<div class="col col-actions">
-			<a class="icon-text highlight borderless main" href="/export/resources?pid={{ .Project.Id }}&t=hreflangs">{{ trans "DOWNLOAD" }}</a>
+			<a class="icon-text highlight borderless main" href="{{url "/export/resources"}}?pid={{ .Project.Id }}&t=hreflangs">{{ trans "DOWNLOAD" }}</a>
 		</div>
 	</div>
 
@@ -172,7 +172,7 @@
 		</div>
 
 		<div class="col col-actions">
-			<a class="icon-text highlight borderless main" href="/export/resources?pid={{ .Project.Id }}&t=issues">{{ trans "DOWNLOAD" }}</a>
+			<a class="icon-text highlight borderless main" href="{{url "/export/resources"}}?pid={{ .Project.Id }}&t=issues">{{ trans "DOWNLOAD" }}</a>
 		</div>
 	</div>
 
@@ -186,7 +186,7 @@
 			</div>
 
 			<div class="col col-actions">
-				<a class="icon-text highlight borderless main" href="/export/wazc?pid={{ .Project.Id }}">{{ trans "DOWNLOAD" }}</a>
+				<a class="icon-text highlight borderless main" href="{{url "/export/wazc"}}?pid={{ .Project.Id }}">{{ trans "DOWNLOAD" }}</a>
 			</div>
 		</div>
 	{{ end }}

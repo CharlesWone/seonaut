@@ -32,7 +32,7 @@
 		</div>
 
 		<div class="col col-actions borderless highlight">
-				<a class="progress-stop" id="progress-stop" href="/crawl/stop?pid={{ .Data.Project.Id }}">
+				<a class="progress-stop" id="progress-stop" href="{{url "/crawl/stop"}}?pid={{ .Data.Project.Id }}">
 					{{ trans "STOP_CRAWLER" }}
 				</a>
 				<div class="progress-stopping" id="progress-stopping">
@@ -153,7 +153,7 @@
 
 		// const protocol = {{ if .Data.Secure }}"wss://" {{ else }}"ws://"{{ end }}
 		const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-		let conn = new WebSocket(protocol + document.location.host + "/crawl/ws?pid={{ .Data.Project.Id }}")
+		let conn = new WebSocket(protocol + document.location.host + "{{url "/crawl/ws"}}?pid={{ .Data.Project.Id }}")
 
 		conn.onclose = evt => {
 			conn = null
@@ -203,9 +203,9 @@
 				conn.close()
 				let totalURLs = msg.Data
 				if (totalURLs > 0) {
-					window.location = "/dashboard?pid={{ .Data.Project.Id }}"
+					window.location = "{{url "/dashboard"}}?pid={{ .Data.Project.Id }}"
 				} else {
-					window.location = "/"
+					window.location = "{{url "/"}}"
 				}
 				break
 			}

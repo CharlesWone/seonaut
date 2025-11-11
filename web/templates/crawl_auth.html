@@ -29,7 +29,7 @@
 		</div>
 	</div>
 
-	<form method="POST" action="/crawl/auth?pid={{ .Data.Project.Id }}">
+	<form method="POST" action="{{url "/crawl/auth"}}?pid={{ .Data.Project.Id }}">
 		<div class="box soft">
 			<div class="col col-main">
 				<div class="content">
@@ -52,7 +52,7 @@
 			<div class="col col-main">
 				<div class="content-s">
 
-					<input type="submit" value="{{ trans "CRAWL_NOW" }}" class="inline"> <a href="/" class="button">{{ trans "CANCEL" }}</a>
+					<input type="submit" value="{{ trans "CRAWL_NOW" }}" class="inline"> <a href="{{url "/"}}" class="button">{{ trans "CANCEL" }}</a>
 
 				</div>
 			</div>
