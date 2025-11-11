@@ -10,6 +10,7 @@ port = 3306
 user = "seonaut"
 password = "seonaut"
 database = "seonaut"
+loc = "Asia/Shanghai"  # 时区配置，针对MySQL的timestamp： "UTC"、"Asia/Shanghai"、"Local" 等
 
 [crawler]
 agent = "Mozilla/5.0 (compatible; SEOnautBot/1.0; +https://seonaut.org/bot)"
@@ -24,4 +25,4 @@ webhook_url = "https://oapi.dingtalk.com/robot/send?access_token=244bcae4d36ccc8
 secret = ""
 
 [auth]
-enable_register = false # 是否开启注册 true|false
+enable_register = true # 是否开启注册 true|false

@@ -27,6 +27,7 @@ type DBConfig struct {
 	User   string `mapstructure:"user"`
 	Pass   string `mapstructure:"password"`
 	Name   string `mapstructure:"database"`
+	Loc    string `mapstructure:"loc"`
 }
 
 // UIConfig stores the UI settings.

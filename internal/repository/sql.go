@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/stjudewashere/seonaut/internal/config"
@@ -29,13 +30,16 @@ const (
 
 // SqlConnect creates a new SQL connection with the provided configuration.
 func SqlConnect(config *config.DBConfig) (*sql.DB, error) {
+	// 对loc参数进行URL编码
+	loc := url.QueryEscape(config.Loc)
 	db, err := sql.Open("mysql", fmt.Sprintf(
-		"%s:%s@tcp(%s:%d)/%s?parseTime=true&multiStatements=true",
+		"%s:%s@tcp(%s:%d)/%s?parseTime=true&multiStatements=true&loc=%s",
 		config.User,
 		config.Pass,
 		config.Server,
 		config.Port,
 		config.Name,
+		loc,
 	))
 
 	if err != nil {
