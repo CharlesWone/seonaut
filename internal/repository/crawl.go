@@ -161,7 +161,7 @@ func (ds *CrawlRepository) GetLastCrawls(p models.Project, limit int) []models.C
 // DeleteCrawlData deletes all the crawl's data in a batch process. It removes the crawl's associated
 // links, external_links, hreflangs, issues, images and any other data associated to it.
 func (ds *CrawlRepository) DeleteCrawlData(crawl *models.Crawl) {
-	log.Printf("DeleteCrawlData start, url: %s", crawl.URL)
+	log.Printf("DeleteCrawlData start, crawl_id: %d, url: %s", crawl.Id, crawl.URL)
 
 	tables := []string{
 		"links", "external_links", "hreflangs", "issues",
@@ -176,7 +176,7 @@ func (ds *CrawlRepository) DeleteCrawlData(crawl *models.Crawl) {
 		}
 	}
 
-	log.Printf("DeleteCrawlData finished, url: %s", crawl.URL)
+	log.Printf("DeleteCrawlData finished, crawl_id: %d, url: %s", crawl.Id, crawl.URL)
 }
 
 func (ds *CrawlRepository) deleteTableData(cid int64, table string) error {
@@ -212,7 +212,7 @@ func (ds *CrawlRepository) deleteTableData(cid int64, table string) error {
 		if rowsAffected == 0 {
 			break
 		}
-		log.Printf("Deleted %d rows from %s, crawl_id: %d", rowsAffected, table, cid)
+		log.Printf("Deleted %d rows from %s", rowsAffected, table)
 
 		// 控制删除速度，避免对数据库造成压力
 		time.Sleep(100 * time.Millisecond)
@@ -257,8 +257,8 @@ func (ds *CrawlRepository) DeleteProjectCrawls(p *models.Project) {
 func (ds *CrawlRepository) DeleteUnfinishedCrawls() {
 	query := `
 		SELECT
-			crawls.id
-		FROM crawls
+			crawls.id, projects.url
+		FROM crawls LEFT JOIN projects ON crawls.project_id = projects.id
 		WHERE crawls.issues_end IS NULL
 	`
 	count := 0
@@ -273,7 +273,7 @@ func (ds *CrawlRepository) DeleteUnfinishedCrawls() {
 	placeholders := []string{}
 	for rows.Next() {
 		c := &models.Crawl{}
-		err := rows.Scan(&c.Id)
+		err := rows.Scan(&c.Id, &c.URL)
 		if err != nil {
 			log.Printf("DeleteUnfinishedCrawls: %v\n", err)
 			continue
