@@ -161,39 +161,64 @@ func (ds *CrawlRepository) GetLastCrawls(p models.Project, limit int) []models.C
 // DeleteCrawlData deletes all the crawl's data in a batch process. It removes the crawl's associated
 // links, external_links, hreflangs, issues, images and any other data associated to it.
 func (ds *CrawlRepository) DeleteCrawlData(crawl *models.Crawl) {
-	var deleteFunc func(cid int64, table string)
-	deleteFunc = func(cid int64, table string) {
-		query := fmt.Sprintf("DELETE FROM %s WHERE crawl_id = ? ORDER BY id DESC LIMIT 1000", table)
-		_, err := ds.DB.Exec(query, cid)
-		if err != nil {
-			log.Printf("DeleteCrawlData: cid %d table %s %v\n", cid, table, err)
-			return
-		}
+	log.Printf("DeleteCrawlData start, url: %s", crawl.URL)
 
-		query = fmt.Sprintf("SELECT count(*) FROM %s WHERE crawl_id = ?", table)
-		row := ds.DB.QueryRow(query, cid)
-		var c int
-		if err := row.Scan(&c); err != nil {
-			log.Printf("DeleteCrawlData count: pid %d table %s %v\n", cid, table, err)
-		}
+	tables := []string{
+		"links", "external_links", "hreflangs", "issues",
+		"images", "scripts", "styles", "iframes",
+		"audios", "videos", "pagereports",
+	}
 
-		if c > 0 {
-			time.Sleep(1500 * time.Millisecond)
-			deleteFunc(cid, table)
+	for _, table := range tables {
+		if err := ds.deleteTableData(crawl.Id, table); err != nil {
+			log.Printf("DeleteCrawlData failed: table %s, error: %v", table, err)
+			// 可以选择继续删除其他表，或直接返回
 		}
 	}
 
-	deleteFunc(crawl.Id, "links")
-	deleteFunc(crawl.Id, "external_links")
-	deleteFunc(crawl.Id, "hreflangs")
-	deleteFunc(crawl.Id, "issues")
-	deleteFunc(crawl.Id, "images")
-	deleteFunc(crawl.Id, "scripts")
-	deleteFunc(crawl.Id, "styles")
-	deleteFunc(crawl.Id, "iframes")
-	deleteFunc(crawl.Id, "audios")
-	deleteFunc(crawl.Id, "videos")
-	deleteFunc(crawl.Id, "pagereports")
+	log.Printf("DeleteCrawlData finished, url: %s", crawl.URL)
+}
+
+func (ds *CrawlRepository) deleteTableData(cid int64, table string) error {
+	maxRetries := 3
+	deleteRetryCount := 0
+	rowsAffectedRetryCount := 0
+
+	for {
+		result, err := ds.DB.Exec(
+			fmt.Sprintf("DELETE FROM %s WHERE crawl_id = ? LIMIT 1000", table),
+			cid,
+		)
+		if err != nil {
+			deleteRetryCount++
+			if deleteRetryCount > maxRetries {
+				return fmt.Errorf("delete failed after %d retries: %w", maxRetries, err)
+			}
+			time.Sleep(time.Duration(deleteRetryCount) * time.Second)
+			continue
+		}
+
+		rowsAffected, err := result.RowsAffected()
+		if err != nil {
+			rowsAffectedRetryCount++
+			if rowsAffectedRetryCount > maxRetries {
+				return fmt.Errorf("get rows affected failed: %w", err)
+			}
+			time.Sleep(time.Duration(rowsAffectedRetryCount) * time.Second)
+			continue
+		}
+
+		// 如果没有删除任何数据，说明已完成
+		if rowsAffected == 0 {
+			break
+		}
+		log.Printf("Deleted %d rows from %s, crawl_id: %d", rowsAffected, table, cid)
+
+		// 控制删除速度，避免对数据库造成压力
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	return nil
 }
 
 // DeleteProjectCrawls deletes all of the project's crawls and associated data.
