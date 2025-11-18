@@ -38,9 +38,7 @@ type UIConfig struct {
 
 // DingTalkConfig stores the DingTalk webhook configuration.
 type DingTalkConfig struct {
-	Enabled    bool   `mapstructure:"enabled"`
-	WebhookURL string `mapstructure:"webhook_url"`
-	Secret     string `mapstructure:"secret"`
+	Enabled bool `mapstructure:"enabled"`
 }
 
 type AuthConfig struct {

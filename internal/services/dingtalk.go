@@ -219,15 +219,6 @@ func (s *DingTalkService) sendMessage(message DingTalkMessage, webhookUrl string
 
 	req.Header.Set("Content-Type", "application/json")
 
-	// Add signature if secret is configured
-	if s.config.Secret != "" {
-		timestamp := strconv.FormatInt(time.Now().UnixNano()/1e6, 10)
-		signature := s.generateSignature(s.config.Secret, timestamp)
-
-		req.Header.Set("timestamp", timestamp)
-		req.Header.Set("sign", signature)
-	}
-
 	// 设置超时时间
 	s.client.Timeout = 60 * time.Second
 	resp, err := s.client.Do(req)
