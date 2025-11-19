@@ -84,7 +84,6 @@ func NewTranslator(path string, defaultLang string) (*Translator, error) {
 		if !strings.HasPrefix(file.Name(), "translation.") || !strings.HasSuffix(file.Name(), ".yaml") {
 			continue
 		}
-
 		parts := strings.Split(file.Name(), ".")
 		if len(parts) != 3 {
 			continue
