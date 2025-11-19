@@ -80,6 +80,22 @@ func (s *CrawlerHandler) responseCallback(crawl *models.Crawl, p *models.Project
 		pageReport.InSitemap = r.InSitemap
 		pageReport.Crawled = !pageReport.Timeout && (p.FollowNofollow || !pageReport.Nofollow)
 
+		// 解析主域名，用于判断外链
+		mainURL, _ := url.Parse(p.URL)
+		mainDomain := strings.TrimPrefix(mainURL.Host, "www.")
+
+		// 辅助函数：判断 URL 是否是外链
+		isExternalURL := func(u *url.URL) bool {
+			uHost := strings.TrimPrefix(u.Host, "www.")
+			if uHost == mainDomain {
+				return false
+			}
+			if p.AllowSubdomains && strings.HasSuffix(uHost, "."+mainDomain) {
+				return false
+			}
+			return true
+		}
+
 		// Add link URLs to the crawler considering the nofollow attribute as well as
 		// the projects FollowNoFollow option. In case the URL is blocked by the robots.txt
 		// file a new blocked PageReport is saved. Both internal and external links
@@ -113,6 +129,11 @@ func (s *CrawlerHandler) responseCallback(crawl *models.Crawl, p *models.Project
 		for _, u := range s.getInderictURLs(pageReport) {
 			err := c.AddRequest(&crawler.RequestMessage{URL: u, Data: requestData})
 			if errors.Is(err, crawler.ErrBlockedByRobotstxt) {
+				// 检查是否是外链：外链的 robots.txt 阻止不应计入当前项目的统计
+				if isExternalURL(u) {
+					// 是外链，不计入统计
+					continue
+				}
 				s.saveBlockedPageReport(u, crawl)
 				crawl.BlockedByRobotstxt++
 			}
@@ -123,6 +144,11 @@ func (s *CrawlerHandler) responseCallback(crawl *models.Crawl, p *models.Project
 		for _, u := range s.getResourceURLs(pageReport) {
 			err := c.AddRequest(&crawler.RequestMessage{URL: u, IgnoreDomain: true, Data: requestData})
 			if errors.Is(err, crawler.ErrBlockedByRobotstxt) {
+				// 检查是否是外链：外链的 robots.txt 阻止不应计入当前项目的统计
+				if isExternalURL(u) {
+					// 是外链，不计入统计
+					continue
+				}
 				s.saveBlockedPageReport(u, crawl)
 				crawl.BlockedByRobotstxt++
 			}
@@ -147,6 +173,11 @@ func (s *CrawlerHandler) responseCallback(crawl *models.Crawl, p *models.Project
 
 				err = c.AddRequest(&crawler.RequestMessage{URL: pl, IgnoreDomain: true, Data: requestData})
 				if errors.Is(err, crawler.ErrBlockedByRobotstxt) {
+					// 检查是否是外链：外链的 robots.txt 阻止不应计入当前项目的统计
+					if isExternalURL(pl) {
+						// 是外链，不计入统计
+						continue
+					}
 					s.saveBlockedPageReport(pl, crawl)
 					crawl.BlockedByRobotstxt++
 				}
@@ -196,6 +227,11 @@ func (s *CrawlerHandler) responseCallback(crawl *models.Crawl, p *models.Project
 
 			err = c.AddRequest(&crawler.RequestMessage{URL: u, IgnoreDomain: true, Data: requestData})
 			if errors.Is(err, crawler.ErrBlockedByRobotstxt) {
+				// 检查是否是外链：外链的 robots.txt 阻止不应计入当前项目的统计
+				if isExternalURL(u) {
+					// 是外链，不计入统计
+					continue
+				}
 				s.saveBlockedPageReport(u, crawl)
 				crawl.BlockedByRobotstxt++
 			}
@@ -204,6 +240,13 @@ func (s *CrawlerHandler) responseCallback(crawl *models.Crawl, p *models.Project
 		// Check the external links if the project is set to do so.
 		if p.CheckExternalLinks {
 			s.checkExternalLinks(c.Client, pageReport)
+		}
+
+		// 在调用 updateStatus 之前，检查当前页面是否是外链
+		// 如果是外链且被 robots.txt 阻止，不应计入统计
+		if pageReport.BlockedByRobotstxt && isExternalURL(pageReport.ParsedURL) {
+			// 当前页面是外链且被 robots.txt 阻止，清除标记以避免计入统计
+			pageReport.BlockedByRobotstxt = false
 		}
 
 		// Save the pageReport if it hasn't the noindex attribute or if the project
