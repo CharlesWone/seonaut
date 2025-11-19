@@ -96,6 +96,34 @@ func (s *CrawlerHandler) responseCallback(crawl *models.Crawl, p *models.Project
 			return true
 		}
 
+		// 重新分类链接：修复 parser.go 中简单字符串比较导致的问题
+		// parser.go 中的判断逻辑 u.Host != p.ParsedURL.Host 没有考虑 www. 前缀和子域名
+		// 这会导致二级域名（如 sub.example.com）被误判为外链
+		var internalLinks []models.Link
+		var externalLinks []models.Link
+
+		// 重新分类内部链接
+		for _, l := range pageReport.Links {
+			if isExternalURL(l.ParsedURL) {
+				externalLinks = append(externalLinks, l)
+			} else {
+				internalLinks = append(internalLinks, l)
+			}
+		}
+
+		// 重新分类外部链接
+		for _, l := range pageReport.ExternalLinks {
+			if isExternalURL(l.ParsedURL) {
+				externalLinks = append(externalLinks, l)
+			} else {
+				internalLinks = append(internalLinks, l)
+			}
+		}
+
+		// 更新 pageReport 中的链接分类
+		pageReport.Links = internalLinks
+		pageReport.ExternalLinks = externalLinks
+
 		// Add link URLs to the crawler considering the nofollow attribute as well as
 		// the projects FollowNoFollow option. In case the URL is blocked by the robots.txt
 		// file a new blocked PageReport is saved. Both internal and external links
