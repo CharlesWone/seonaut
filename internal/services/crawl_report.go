@@ -436,7 +436,7 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			}
 		}
 		if titleStats.DuplicateTitle > 0 {
-			suggestions = append(suggestions, fmt.Sprintf("- **重复标题：** 发现 %d 个页面使用重复标题。建议为每个页面创建唯一标题，提升页面区分度和SEO效果。", titleStats.DuplicateTitle))
+			suggestions = append(suggestions, fmt.Sprintf("- **重复标题：** 发现 %d 个重复标题。建议为每个页面创建唯一标题，提升页面区分度和SEO效果。", titleStats.DuplicateTitle))
 			// 后续优化为一条sql
 			// 获取重复标题
 			titles := s.dashboardService.GetDuplicateTitle(crawl.Id)
@@ -446,7 +446,7 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 				if len(urls) > 0 {
 					var lines []string
 					for _, url := range urls {
-						lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
+						lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 【%s】 [%s](%s)", title, url, url))
 					}
 					suggestions = append(suggestions, strings.Join(lines, "\n"))
 				}
@@ -506,7 +506,7 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			}
 		}
 		if descriptionStats.DuplicateDescription > 0 {
-			suggestions = append(suggestions, fmt.Sprintf("- **重复描述：** 发现 %d 个页面使用重复描述。建议为每个页面创建唯一描述，提升页面吸引力。", descriptionStats.DuplicateDescription))
+			suggestions = append(suggestions, fmt.Sprintf("- **重复描述：** 发现 %d 个重复描述。建议为每个页面创建唯一描述，提升页面吸引力。", descriptionStats.DuplicateDescription))
 			// 后续优化为一条sql
 			// 获取重复的描述
 			descriptions := s.dashboardService.GetDuplicateDescription(crawl.Id)
@@ -516,7 +516,7 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 				if len(urls) > 0 {
 					var lines []string
 					for _, url := range urls {
-						lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
+						lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 【%s】 [%s](%s)", description, url, url))
 					}
 					suggestions = append(suggestions, strings.Join(lines, "\n"))
 				}
