@@ -587,7 +587,7 @@ func (ds *DashboardRepository) GetPageURLsByTitleLength(crawlId int64, minLength
 		  AND (canonical = '' OR canonical = url)
 		  AND title IS NOT NULL
 		  AND title != ''
-		  AND CHAR_LENGTH(title) BETWEEN ? AND ?
+		  AND LENGTH(title) BETWEEN ? AND ?
 	`
 
 	var result []string
@@ -775,7 +775,7 @@ func (ds *DashboardRepository) GetPageURLsByDescriptionLength(crawlId int64, min
 		  AND (pr.canonical = '' OR pr.canonical = pr.url)
 		  AND pr.crawled = 1
 		  AND description is not null
-		  AND CHAR_LENGTH(description) BETWEEN ? AND ?
+		  AND LENGTH(description) BETWEEN ? AND ?
 	`
 
 	var result []string
