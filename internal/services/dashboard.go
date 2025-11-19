@@ -34,7 +34,7 @@ type (
 		GetMultipleDescriptionPageURLs(crawlId int64) []string
 		GetDuplicateDescription(crawlId int64) []string
 		GetDuplicateDescriptionURLsByDescription(crawlId int64, description string) []string
-		GetURLsByMediaType(crawlId int64, mediaType string) []string
+		GetURLsByMediaType(crawlId int64, mediaType string, deduplication bool) []string
 		GetNonHTMLMediaURLs(crawlId int64) []string
 		GetURLsByDepthRange(crawlId int64, left int, right int) []string
 	}
@@ -183,8 +183,8 @@ func (s *DashboardService) GetDuplicateDescriptionURLsByDescription(crawlId int6
 	return s.repository.GetDuplicateDescriptionURLsByDescription(crawlId, description)
 }
 
-func (s *DashboardService) GetURLsByMediaType(crawlId int64, mediaType string) []string {
-	return s.repository.GetURLsByMediaType(crawlId, mediaType)
+func (s *DashboardService) GetURLsByMediaType(crawlId int64, mediaType string, deduplication bool) []string {
+	return s.repository.GetURLsByMediaType(crawlId, mediaType, deduplication)
 }
 
 func (s *DashboardService) GetNonHTMLMediaURLs(crawlId int64) []string {

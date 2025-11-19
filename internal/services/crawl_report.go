@@ -436,7 +436,7 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			}
 		}
 		if titleStats.DuplicateTitle > 0 {
-			suggestions = append(suggestions, fmt.Sprintf("- **重复标题：** 发现 %d 个页面使用重复标题。建议为每个页面创建唯一标题，提升页面区分度和SEO效果。", titleStats.DuplicateTitle))
+			suggestions = append(suggestions, fmt.Sprintf("- **重复标题：** 发现 %d 个重复标题。建议为每个页面创建唯一标题，提升页面区分度和SEO效果。", titleStats.DuplicateTitle))
 			// 后续优化为一条sql
 			// 获取重复标题
 			titles := s.dashboardService.GetDuplicateTitle(crawl.Id)
@@ -446,7 +446,7 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 				if len(urls) > 0 {
 					var lines []string
 					for _, url := range urls {
-						lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
+						lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 【%s】 [%s](%s)", title, url, url))
 					}
 					suggestions = append(suggestions, strings.Join(lines, "\n"))
 				}
@@ -506,7 +506,7 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			}
 		}
 		if descriptionStats.DuplicateDescription > 0 {
-			suggestions = append(suggestions, fmt.Sprintf("- **重复描述：** 发现 %d 个页面使用重复描述。建议为每个页面创建唯一描述，提升页面吸引力。", descriptionStats.DuplicateDescription))
+			suggestions = append(suggestions, fmt.Sprintf("- **重复描述：** 发现 %d 个重复描述。建议为每个页面创建唯一描述，提升页面吸引力。", descriptionStats.DuplicateDescription))
 			// 后续优化为一条sql
 			// 获取重复的描述
 			descriptions := s.dashboardService.GetDuplicateDescription(crawl.Id)
@@ -516,7 +516,7 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 				if len(urls) > 0 {
 					var lines []string
 					for _, url := range urls {
-						lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 [%s](%s)", url, url))
+						lines = append(lines, fmt.Sprintf("&nbsp;&nbsp;🚩 【%s】 [%s](%s)", description, url, url))
 					}
 					suggestions = append(suggestions, strings.Join(lines, "\n"))
 				}
@@ -555,7 +555,7 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 		if externalFollowRatio > 0.5 {
 			suggestions = append(suggestions, fmt.Sprintf("- **外部follow链接：** 发现 %.1f%%%% 的外部链接使用了follow属性，超过50%%%%的阈值。这可能导致SEO权重外流，建议为外部链接添加nofollow属性。", externalFollowRatio*100))
 			// 查询nofollow为 0 的外部链接
-			urls := s.externalLinkService.GetExternalLinkURLsByNofollow(crawl.Id, 0)
+			urls := s.externalLinkService.GetExternalLinkURLsByNofollow(crawl.Id, 0, true)
 			if len(urls) > 0 {
 				var lines []string
 				for _, url := range urls {
@@ -580,7 +580,7 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 				if percentage > 10 {
 					suggestions = append(suggestions, fmt.Sprintf("- **PNG格式图片：** 发现 %d 个PNG格式页面（%.1f%%），属于高风险异常。照片应该使用JPEG或WebP格式，PNG会带来不必要的体积膨胀，影响页面加载速度。建议将PNG格式的照片转换为JPEG或WebP格式。", mt.Count, percentage))
 					// 查询 媒体类型为 image/png 的url
-					urls := s.dashboardService.GetURLsByMediaType(crawl.Id, mt.MediaType)
+					urls := s.dashboardService.GetURLsByMediaType(crawl.Id, mt.MediaType, false)
 					if len(urls) > 0 {
 						var lines []string
 						for _, url := range urls {
@@ -591,7 +591,7 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 				} else {
 					suggestions = append(suggestions, fmt.Sprintf("- **PNG格式图片：** 发现 %d 个PNG格式页面（%.1f%%）。照片应该使用JPEG或WebP格式，PNG会带来不必要的体积膨胀。建议将PNG格式的照片转换为JPEG或WebP格式，以减小文件体积，提升页面加载速度。", mt.Count, percentage))
 					// 查询 媒体类型为 image/png 的url
-					urls := s.dashboardService.GetURLsByMediaType(crawl.Id, mt.MediaType)
+					urls := s.dashboardService.GetURLsByMediaType(crawl.Id, mt.MediaType, false)
 					if len(urls) > 0 {
 						var lines []string
 						for _, url := range urls {
@@ -603,7 +603,7 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			} else if mt.MediaType == "image/gif" && percentage > 5 {
 				suggestions = append(suggestions, fmt.Sprintf("- **GIF格式图片：** 发现 %d 个GIF格式页面（%.1f%%）。建议使用WebP或视频格式替代GIF，以获得更好的压缩效果和性能。", mt.Count, percentage))
 				// 查询 媒体类型为 image/gif 的url
-				urls := s.dashboardService.GetURLsByMediaType(crawl.Id, mt.MediaType)
+				urls := s.dashboardService.GetURLsByMediaType(crawl.Id, mt.MediaType, false)
 				if len(urls) > 0 {
 					var lines []string
 					for _, url := range urls {
@@ -614,7 +614,7 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 			} else if mt.MediaType != "text/html" && mt.MediaType != "image/jpeg" && mt.MediaType != "image/jpg" && mt.MediaType != "image/webp" && mt.MediaType != "image/png" && mt.MediaType != "image/gif" && percentage > 10 {
 				suggestions = append(suggestions, fmt.Sprintf("- **非HTML媒体类型：** 发现 %d 个%s类型页面（%.1f%%）。请检查这些页面是否应该被搜索引擎索引，如果不需要，建议在robots.txt中阻止或使用noindex标签。", mt.Count, mt.MediaType, percentage))
 				// 根据媒体类型查询
-				urls := s.dashboardService.GetURLsByMediaType(crawl.Id, mt.MediaType)
+				urls := s.dashboardService.GetURLsByMediaType(crawl.Id, mt.MediaType, false)
 				if len(urls) > 0 {
 					var lines []string
 					for _, url := range urls {
@@ -651,7 +651,7 @@ func (s *CrawlReportService) generateOptimizationSuggestions(
 				var allOtherUrls []string
 				for i := 4; i < len(allMediaTypes); i++ {
 					// 根据媒体类型查询
-					urls := s.dashboardService.GetURLsByMediaType(crawl.Id, allMediaTypes[i].MediaType)
+					urls := s.dashboardService.GetURLsByMediaType(crawl.Id, allMediaTypes[i].MediaType, false)
 					if len(urls) > 0 {
 						var lines []string
 						for _, url := range urls {
