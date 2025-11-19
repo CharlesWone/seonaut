@@ -1,0 +1,546 @@
+# =============================================
+# GLOBAL PARAMETERS GUIDE
+# =============================================
+# NOTE: Never translate placeholders like %1% or %2%.
+
+# =============================================
+# COMMON: Reusable UI elements (buttons, pagination, etc.)
+# =============================================
+VIEW_DETAILS: 查看详情
+DOWNLOAD: 下载
+CRAWLED_ON: "抓取于 %1%"  # %1% 将被替换为日期
+CRAWLED: 已抓取
+PREV: ← 上一页                  # 分页：上一页链接
+NEXT: 下一页 →                  # 分页：下一页链接
+EMAIL_LABEL: "邮箱："         # 表单标签：用于登录和注册页面
+PASSWORD_LABEL: "密码："   # 表单标签：用于登录和注册页面
+SAVE: 保存
+DELETE: 删除
+CANCEL: 取消
+
+# =============================================
+# CONTEXT: Sign in page
+# =============================================
+SIGN_IN: 登录
+SIGIN_ERROR: 邮箱地址或密码无效。
+NEW_USER: 首次使用 SEOnaut？
+NEW_USER_SIGNUP: 注册
+SIGNIN_MESSAGE: 欢迎回来！登录以查看详细报告，发现提升网站可抓取性和排名机会。
+# =============================================
+# CONTEXT: Sign up page
+# =============================================
+SIGN_UP: 注册
+CREATE_ACCOUNT: 创建您的 SEOnaut 账号
+HAVE_ACCOUNT: 已有账号？
+SIGNIN_LINK: 登录
+SIGNUP_MESSAGE: SEOnaut 可以扫描网站问题、按影响优先级排序修复，并提供优化建议，提升在线可见度。立即注册开始优化您的网站！
+# =============================================
+# CONTEXT: Edit user account page
+# =============================================
+EDIT_ACCOUNT: 编辑账号
+CURRENT_PASSWORD: "当前密码：" # 表单标签
+NEW_PASSWORD: "新密码："         # 表单标签
+LANGUAGE_LABEL: "语言："           # 表单标签
+CHANGE_PASSWORD: 修改密码
+DELETE_ACCOUNT_MESSAGE: 如果您不再想继续使用 SEOnaut，可以在这里删除账号。
+DELETE_ACCOUNT_MESSAGE_CONFIRMATION: 删除前会再次确认。
+THEME_LABEL: "主题："
+GENERIC_ERROR: 发生错误，请重试。
+INVALID_LANG_ERROR: 不支持的语言。
+NEW_PASSWORD_IS_INVALID: 新密码无效。
+CURRENT_PASSWORD_INCORRECT: 当前密码不正确。
+
+# =============================================
+# CONTEXT: Delete user account page
+# =============================================
+DELETE_ACCOUNT: 删除账号
+DELETE_ACCOUNT_WARNING: 删除账号将同时删除所有项目数据和抓取历史。
+THIS_IS_PERMANENT: 此操作不可逆。
+NO_TURNING_BACK: 一旦完成，无法恢复。
+ARE_YOU_SURE: 您确定要继续吗？
+PROJECT_CRAWLING: 有一个或多个项目正在抓取或删除中。
+WAIT_BEFORE_DELETING: 请等待进程完成后，再删除账号。
+
+# =============================================
+# CONTEXT: Page header (navigation menu)
+# =============================================
+PROJECTS: 项目
+ACCOUNT: 账号
+LOGOUT: 退出登录
+# =============================================
+# CONTEXT: Page footer (additional links)
+# =============================================
+SUPPORT: ❤️ 支持一下
+OFFICIAL_WEBSITE: SEOnaut 官网
+# =============================================
+# CONTEXT: Add project page. Contains the form to add new projects.
+#          The same fields are also used in the Edit project page.
+# =============================================
+ADD_PROJECT: 添加项目
+URL_LABEL: "网址："
+URL_LABEL_MESSAGE: 完整的项目网址，需包含 http:// 或 https://
+URL_NOT_VALID: 网址无效。
+IGNORE_ROBOTS_CHECKBOX: 忽略 robots.txt
+IGNORE_ROBOTS_HELP: 勾选后爬虫将忽略 robots.txt 中的任何限制。
+FOLLOW_NOFOLLOW_CHECKBOX: 跟随 nofollow 内部链接
+FOLLOW_NOFOLLOW_HELP: 勾选后爬虫将忽略链接和 robots meta 标签中的 nofollow 属性。
+INCLUDE_NOINDEX_CHECKBOX: 包含 noindex 页面到报告
+INCLUDE_NOINDEX_HELP: 勾选后具有 noindex 属性的页面也会包含在报告中。
+CRAWL_SITEMAP_CHECKBOX: 抓取 sitemap
+CRAWL_SITEMAP_HELP: 勾选后 sitemap.xml 中的网址也会被抓取。
+ALLOW_SUBDOMAINS_CHECKBOX: 允许子域名
+ALLOW_SUBDOMAINS_HELP: 勾选后爬虫也会抓取子域名下的网址。
+CHECK_EXTERNAL_LINKS_CHECKBOX: 检查外部链接
+CHECK_EXTERNAL_LINKS_HELP: 勾选后爬虫会查找损坏的外部链接。
+CREATE_WACZ_CHECKBOX: 创建 WACZ 存档
+CREATE_WACZ_HELP: 勾选后将创建 WACZ 存档，可作为导出选项。
+USE_AUTH_CHECKBOX: 使用 HTTP 基本认证
+USE_AUTH_HELP: 如果您的站点使用 HTTP 基本认证保护，请勾选此项。
+CUSTOM_USERAGENT_CHECKBOX: 自定义 User-Agent
+CUSTOM_USERAGENT_HELP: 为 SEOnaut 爬虫设置自定义 User-Agent。
+ENTER_USERAGENT_LABEL: "输入自定义 User-Agent 字符串："
+USERAGENT_NOT_VALID: User-Agent 无效。
+ENABLE_SCHEDULING_CRAWLING_CHECKBOX: 启用定时抓取
+ENABLE_SCHEDULING_CRAWLING_HELP: 根据 cron 表达式定时抓取。
+ENTER_CRON_EXPRESSION_LABEL: "输入 cron 表达式："
+CRON_EXPRESSION_NOT_VALID: cron 表达式无效。
+DINGTALK_CHECKBOX: 钉钉推送 Webhook 地址
+DINGTALK_CHECKBOX_HELP: 抓取完成后将报告推送到钉钉群。
+DINGTALK_CHECKBOX_LABEL: "输入钉钉 Webhook 地址："
+# =============================================
+# CONTEXT: Edit project page. Contains the edit project form.
+#          The form uses the same fields as the Add project page.
+# =============================================
+EDIT_PROJECT: 编辑项目
+EDIT_ERROR: 发生错误，项目未能保存。
+DELETE_PROJECT: 删除项目
+DELETE_PROJECT_MESSAGE: 此操作将删除 %1% 项目及其所有相关数据。 # %1% 将被替换为项目网址
+DELETE_CANT_BE_UNDONE: 删除项目需要几分钟，且无法撤销。
+
+# =============================================
+# CONTEXT: Projects page. This is the homepage for logged in users.
+# =============================================
+WELCOME: 欢迎使用 SEOnaut
+WE_LOVE_CRAWLABLE_WEBSITES: 我们 ❤️ 可抓取的网站
+NO_PROJECTS: 您还没有任何项目。
+ONE_PROJECT: 当前有一个项目。
+YOU_HAVE_PROJECTS: 当前有 %1% 个项目。 # %1% 将被替换为大于1的数字
+ADD_FIRST_PROJECT: 添加您的第一个项目。
+GAIN_INSIGHTS: 深入了解您的网站。
+DELETING_PROJECT: 正在删除项目
+DELETING_PLEASE_WAIT: 这可能需要几分钟，请稍候...
+CANT_ACCESS_SITE: SEOnaut 机器人无法访问您的网站。请检查网址是否正确，或是否被 robots.txt 或基本 HTTP 认证阻止。
+CRAWL_NOW: 立即抓取
+CRAWLING: 抓取中...
+
+# =============================================
+# CONTEXT: Project dashboard page (charts, crawl details, etc.)
+# =============================================
+DASHBOARD: 仪表盘
+ISSUES_MESSAGE: "检测到 %1% 个严重问题和 %2% 个警告。" # %1% 和 %2% 将被替换为数字
+CRAWL_HISTORY: 抓取历史
+ISSUES_HISTORY: 问题历史
+ISSUE_TYPES: 问题类型
+CURRENT_CRAWL: 当前抓取
+CRAWL_DURATION: 抓取耗时 %1%  # %1 将被替换为时间，如 37s
+FOLLOWING_LINKS: 跟随 nofollow 内部链接。
+NOT_FOLLOWING_LINKS: 不跟随 nofollow 链接。
+INCLUDING_NOINDEX: 包含 noindex 页面。
+NOT_INCLUDING_NOINDEX: 不包含 noindex 页面。
+CRAWLING_SITEMAP: 抓取 sitemap 中的网址
+NOT_CRAWLING_SITEMAP: 不抓取 sitemap 中的网址
+SITEMAP_BLOCKED: Sitemap 被阻止。
+SITEMAP_FOUND: 发现 Sitemap。
+SITEMAP_NOT_FOUND: 未发现 Sitemap。
+IGNORING_ROBOTS: 忽略 robots.txt 文件。
+RESPECTING_ROBOTS: 遵守 robots.txt 文件。
+ROBOTS_FOUND: 发现 robots.txt。
+ROBOTS_NOT_FOUND: 未发现 robots.txt。
+LINKS: 链接
+CANONICAL_URLS: 规范 URL
+IMAGES_ALT: 图片 Alt 属性
+HTTPS: HTTPS
+MEDIA_TYPE: 媒体类型
+STATUS_CODE: 状态码
+STATUS_BY_DEPTH: 按深度统计状态码
+NEXT_ACTIONS: 后续操作
+EXPLORE_ISSUES: 查看站点问题
+EXPLORE_ISSUES_MESSAGE: 发现影响网站性能的问题。
+SITE_ISSUES_LINK: 站点问题
+PAGE_DETAILS_LINK: 页面详情
+ANALYZE_DATA: 分析原始数据
+ANALYZE_DATA_MESSAGE: 导出数据用于进一步分析和报告。
+ANALYZE_DATA_LINK: 数据导出
+CRAWL_REPORT_LINK: 抓取报告
+URL_CRAWLED: 已抓取 1 个 URL。       # 单数
+URLS_CRAWLED: "已抓取 %1% 个 URL。" # 复数，%1% 将被替换为大于1的数字
+CANONICAL: 规范
+NON_CANONICAL: 非规范
+INDEX: 可索引
+NOINDEX: 不可索引
+BLOCKED: 已阻止
+WITH_ALT: 有 Alt 属性
+WITHOUT_ALT: 无 Alt 属性
+CRITICAL: 严重
+ALERT: 警告
+WARNING: 注意
+ISSUES: 问题
+FOLLOW: Follow
+NOFOLLOW: Nofollow
+INTERNAL: 内部
+EXTERNAL: 外部
+TOTAL: 总数
+SPONSORED: Sponsored
+UGC: UGC
+SCHEME: 协议
+SAVE_AS_IMAGE: 保存为图片
+
+# =============================================
+# CONTEXT: Live crawler page.
+# =============================================
+LIVE_CRAWLING: 实时抓取
+STOP_CRAWLER: 停止抓取
+STOPPING_CRAWLER: 正在停止抓取...
+LIVE_CRAWL_JAVASCRIPT_ERROR: 您的浏览器不支持实时抓取，需要 JavaScript 支持。
+LIVE_CRAWL_WEBSOCKET_ERROR: 您的浏览器不支持实时抓取，需要 WebSocket 支持。
+CONNECTING_TO_SERVER: 正在连接服务器，请稍候...
+CRAWL_COMPLETED: 抓取完成。正在生成报告，请稍候...
+
+# =============================================
+# CONTEXT: Crawl HTTP Basic auth page. (username and password form for HTTP Basic authentication)
+# =============================================
+HTTP_BASIC_AUTH: HTTP 基本认证
+HTTP_BASIC_AUTH_MESSAGE: 此项目启用了 HTTP 基本认证，必须提供凭据才能开始抓取。
+HTTP_BASIC_AUTH_PRIVACY: 凭据不会存储在服务器上，每次抓取都需要重新输入。
+HTTP_BASIC_USERNAME_LABEL: "用户名："
+HTTP_BASIC_PASSWORD_LABEL: "密码："
+
+# =============================================
+# CONTEXT: Issues index page.
+# =============================================
+NO_ISSUES_MESSAGE: SEOnaut 未在您的站点检测到任何问题。
+CRITICAL_MESSAGE: "请优先修复这些问题，它们很可能正在伤害您的排名。"
+ALERTS_MESSAGE: 修复这些问题有助于提升站点 SEO 表现。
+WARNINGS_MESSAGE: 这些问题根据您的目标可能影响不大，但值得关注。
+PASSED_CHECKS: 通过的检查
+PASSED_CHECKS_MESSAGE: 您的站点已成功通过以下检查。
+
+# =============================================
+# CONTEXT: Specific issue page.
+# =============================================
+SITE_ISSUES: 站点问题
+VIEW_ISSUES: 查看问题
+URL_AFFECTED: 1 个 URL 受影响        # 单数
+URLS_AFFECTED: "%1% 个 URL 受影响"  # 复数，%1% 将被替换为大于1的数字
+DOWNLOAD_URLS: 下载 URL 列表
+NO_ISSUES: 一切正常
+
+# =============================================
+# CONTEXT: Data export page
+# =============================================
+DATA_EXPORT: 数据导出
+EXPORT_SITEMAP: 导出 sitemap.xml
+EXPORT_SITEMAP_MESSAGE: 下载包含站点所有规范页面的 sitemap.xml 文件。
+EXPORT_CVS: 导出为 CSV
+EXPORT_CVS_MESSAGE: 导出所有已抓取 URL（包含所有 MIME 类型）以及状态码、文件大小等信息。
+EXPORT_INTERNAL_LINKS: 导出内部链接
+EXPORT_INTERNAL_LINKS_MESSAGE: 导出网站所有内部链接，包括来源、目标和锚文本。
+EXPORT_EXTERNAL_LINKS: 导出外部链接
+EXPORT_EXTERNAL_LINKS_MESSAGE: 导出网站所有外部链接，包括来源、目标和锚文本。
+EXPORT_IMAGES: 导出图片
+EXPORT_IMAGES_MESSAGE: 导出网站所有图片 URL，包括来源、图片地址和 Alt 文本。
+EXPORT_SCRIPTS: 导出脚本
+EXPORT_SCRIPTS_MESSAGE: 导出网站所有脚本 URL，包括来源和脚本地址。
+EXPORT_STYLES: 导出样式表
+EXPORT_STYLES_MESSAGE: 导出网站所有 CSS 样式表 URL，包括来源和样式表地址。
+EXPORT_IFRAMES: 导出内嵌框架
+EXPORT_IFRAMES_MESSAGE: 导出网站所有 iframe URL，包括来源和 iframe 地址。
+EXPORT_AUDIOS: 导出音频
+EXPORT_AUDIOS_MESSAGE: 导出网站所有音频 URL，包括来源和音频地址。
+EXPORT_VIDEOS: 导出视频
+EXPORT_VIDEOS_MESSAGE: 导出网站所有视频 URL，包括来源和视频地址。
+EXPORT_HREFLANGS: 导出 Hreflang
+EXPORT_HREFLANGS_MESSAGE: 导出网站所有 hreflang URL，包括来源页面、语言以及 hreflang 目标页面和语言。
+EXPORT_ALL: 导出所有问题
+EXPORT_ALL_MESSAGE: 导出所有问题及其受影响的 URL、问题类型和优先级。
+EXPORT_WACZ: 导出 WACZ 存档
+EXPORT_WACZ_MESSAGE: 将项目抓取数据导出为 WACZ 文件，用于归档或回放。
+CRAWL_REPORT: 抓取报告
+
+# =============================================
+# CONTEXT: Resources pages. It includes the tabs for images, links, scripts, etc...
+# =============================================
+DETAILS_TAB: 详情
+DETAILS_TAB_INFO: URL 基本信息。
+INLINKS_TAB: 内部入链
+INLINKS_TAB_INFO: 从本站其他页面指向此 URL 的链接。
+INTERNAL_TAB: 内部链接
+INTERNAL_TAB_INFO: 此 URL HTML 中指向本站其他页面的链接。
+EXTERNAL_TAB: 外部链接
+EXTERNAL_TAB_INFO: 此 URL HTML 中指向外部网站的链接。
+REDIRECTIONS_TAB: 重定向到此页
+REDIRECTIONS_TAB_INFO: 从本站重定向到此 URL 的页面。
+IMAGES_TAB: 图片
+IMAGES_TAB_INFO: 此 URL HTML 中包含的图片（CSS 背景图不包含）。
+AUDIOS_TAB: 音频
+AUDIOS_TAB_INFO: 此 URL HTML 中包含的音频文件。
+VIDEOS_TAB: 视频
+VIDEOS_TAB_INFO: 此 URL HTML 中包含的视频文件。
+IFRAMES_TAB: 内嵌框架
+IFRAMES_TAB_INFO: 此 URL HTML 中包含的 iframe。
+SCRIPTS_TAB: 脚本
+SCRIPTS_TAB_INFO: 此 URL 中加载的脚本文件。
+STYLES_TAB: 样式表
+STYLES_TAB_INFO: 此 URL 中加载的 CSS 文件。
+CONTENT_TYPE: 内容类型
+TITLE: 标题
+DESCRIPTION: 描述
+H1: H1
+H2: H2
+URL_BLOCKED: 此 URL 被 robots.txt 阻止
+URL_NOT_BLOCKED: 此 URL 未被 robots.txt 阻止
+SITEMAP: 站点地图
+URL_IN_SITEMAP: 此 URL 在站点地图中
+URL_NOT_IN_SITEMAP: 此 URL 不在站点地图中
+SIZE: 大小
+ROBOTS: Robots
+REDIRECT_URL: 重定向地址
+REFRESH: 刷新
+LANGUAGE: 语言
+HREFLANG: Hreflang
+URL: 网址
+WORDS: 字数
+DEPTH: 深度
+TTFB: 首字节时间
+WACZ_ARCHIVE: WACZ 存档
+VIEW_ARCHIVE: 查看归档响应
+OPEN_IN_BROWSER: 在浏览器中打开
+NO_LINKS: 此页面没有入链。
+NO_REDIRECTS: 没有页面重定向到此页。
+PAGE_HAS_NOFOLLOW: 此页面含有 nofollow meta 标签。
+PAGE_LINKS_ARE_NOFOLLOW: 此页面中的链接被视为 nofollow（即使没有 nofollow 属性）。
+NO_INTERNAL_LINKS: 此页面没有内部链接。
+BROKEN_LINK: 失效链接
+NO_EXTERNAL_LINKS: 此页面没有外部链接。
+NO_ALT_ATTRIBUTE: 没有 Alt 属性
+NO_IMAGES: 此页面没有图片。
+NO_IFRAMES: 此页面没有 iframe。
+NO_AUDIOS: 此页面没有音频。
+POSTER_LABEL: "封面图："
+NO_VIDEOS: 此页面没有视频。
+NO_SCRIPTS: 此页面没有脚本。
+NO_STYLES: 此页面没有样式表。
+
+# =============================================
+# CONTEXT: URL explorer page.
+# =============================================
+URL_EXPLORER: URL 浏览器
+SEARCH_TERM_LABEL: "搜索词：" # 表单标签
+OPEN_URL: 打开 URL
+NO_URLS_FOUND: 未找到 URL
+SEARCH: 搜索
+# =============================================
+# CONTEXT: Archive page.
+# =============================================
+DETAILS: 详情
+PAGE_DETAILS: 页面详情
+HEADERS: 响应头
+HEADERS_MESSAGE: 爬虫接收到的响应头信息。
+BODY: 响应体
+BODY_MESSAGE: 爬虫接收到的响应体内容。
+# =============================================
+# CONTEXT: Replay banner.
+#   =============================================
+REPLAY_BANNER: 您正在查看此页面的归档版本
+#   =============================================
+# CONTEXT: Page titles used in the <title> HTML tags.
+#   =============================================
+PROJECTS_VIEW_PAGE_TITLE: 项目列表
+ADD_PROJECT_PAGE_TITLE: 添加项目
+EDIT_PROJECT_PAGE_TITLE: 编辑项目
+ISSUES_VIEW_PAGE_TITLE: 项目问题
+ISSUES_DETAIL_PAGE_TITLE: 问题详情
+RESOURCES_VIEW_DETAILS_PAGE_TITLE: URL 资源详情
+RESOURCES_VIEW_INLINKS_PAGE_TITLE: URL 入链
+RESOURCES_VIEW_INTERNAL_PAGE_TITLE: URL 内部链接
+RESOURCES_VIEW_EXTERNAL_PAGE_TITLE: URL 外部链接
+RESOURCES_VIEW_REDIRECTIONS_PAGE_TITLE: URL 重定向
+RESOURCES_VIEW_IMAGES_PAGE_TITLE: URL 图片
+RESOURCES_VIEW_SCRIPTS_PAGE_TITLE: URL 脚本
+RESOURCES_VIEW_STYLES_PAGE_TITLE: URL 样式表
+RESOURCES_VIEW_IFRAMES_PAGE_TITLE: URL 内嵌框架
+RESOURCES_VIEW_AUDIOS_PAGE_TITLE: URL 音频
+RESOURCES_VIEW_VIDEOS_PAGE_TITLE: URL 视频
+SIGNUP_VIEW_PAGE_TITLE: 注册
+SIGNIN_VIEW_PAGE_TITLE: 登录
+ACCOUNT_VIEW_PAGE_TITLE: 编辑账号
+PROJECT_DASHBOARD_PAGE_TITLE: 项目仪表盘
+CRAWL_LIVE_PAGE_TITLE: 实时抓取项目
+EXPORT_VIEW_PAGE_TITLE: 导出
+CRAWL_AUTH_VIEW_PAGE_TITLE: 项目 HTTP 基本认证
+EXPLORER_PAGE_TITLE: URL 浏览器
+DELETE_ACCOUNT_VIEW_PAGE_TITLE: 删除账号
+ARCHIVE_VIEW_PAGE_TITLE: 查看源代码归档
+SUPPORT_SEONAUT_VIEW_PAGE_TITLE: SEOnaut 项目
+CRAWL_REPORT_VIEW_PAGE_TITLE: 抓取报告
+#   =============================================
+# CONTEXT: Issue types.
+#   =============================================
+ERROR_50x: 返回 50x 状态码的 URL
+ERROR_50x_DESC: 通常由服务器错误或配置问题导致，受影响页面无法正常加载，会吓跑用户并惹恼搜索引擎。
+ERROR_40x: 返回 40x 状态码的 URL
+ERROR_40x_DESC: 这些页面丢失了，用户和搜索引擎都会迷路。大量 404 会让搜索引擎认为网站维护不佳，影响抓取效率和权威性。
+ERROR_30x: 返回 30x 状态码的 URL
+ERROR_30x_DESC: 重定向会把用户和搜索引擎引导到别的页面。重定向会拖慢加载速度、迷惑用户并浪费爬虫预算。
+ERROR_REDIRECT_CHAIN: 存在重定向链的 URL
+ERROR_REDIRECT_CHAIN_DESC: 重定向链是指多个连续重定向。会让用户沮丧，也让搜索引擎难以高效抓取和索引内容。
+ERROR_REDIRECT_LOOP: 存在重定向循环的 URL
+ERROR_REDIRECT_LOOP_DESC: 两个 URL 互相重定向形成死循环。会阻止用户和搜索引擎到达最终页面，破坏用户体验并阻止正常抓取索引。
+ERROR_DUPLICATED_TITLE: 标题重复的页面
+ERROR_DUPLICATED_TITLE_DESC: 标题是页面 SEO 最重要的元素之一，重复标题会导致页面在相同关键词上互相竞争，迷惑搜索引擎。
+ERROR_LONG_TITLE: 标题过长的页面
+ERROR_LONG_TITLE_DESC: 过长标题不影响 SEO，但会在搜索结果中被截断，通常点击率更低。
+ERROR_SHORT_TITLE: 标题过短的页面
+ERROR_SHORT_TITLE_DESC: 标题太短。搜索引擎更喜欢较长的描述性标题。
+ERROR_EMPTY_TITLE: 缺少标题的页面
+ERROR_EMPTY_TITLE_DESC: 标题帮助搜索引擎理解页面内容，也常显示在搜索结果中。没有标题会降低排名、显得不专业。
+ERROR_EMPTY_DESCRIPTION: 缺少 meta description 的页面
+ERROR_EMPTY_DESCRIPTION_DESC: 描述不是排名因素，但搜索引擎常用来展示搜索结果片段。
+ERROR_SHORT_DESCRIPTION: meta description 过短的页面
+ERROR_SHORT_DESCRIPTION_DESC: 过短的描述会让搜索引擎自行生成片段，通常效果更差。
+ERROR_LONG_DESCRIPTION: meta description 过长的页面
+ERROR_LONG_DESCRIPTION_DESC: 过长描述会被截断，影响搜索结果吸引力。
+ERROR_DUPLICATED_DESCRIPTION: meta description 重复的页面
+ERROR_DUPLICATED_DESCRIPTION_DESC: 建议每个页面使用唯一的描述，帮助搜索引擎更好理解页面。
+ERROR_LITTLE_CONTENT: 内容过少的页面
+ERROR_LITTLE_CONTENT_DESC: 内容很少的页面对用户和搜索引擎都没有价值，建议补充内容。
+ERROR_IMAGES_NO_ALT: 图片缺少 Alt 属性的页面
+ERROR_IMAGES_NO_ALT_DESC: Alt 属性提升可访问性，也帮助搜索引擎理解图片。
+ERROR_NO_H1: 缺少 H1 标题的页面
+ERROR_NO_H1_DESC: H1 描述页面主要主题，缺少它会让用户和搜索引擎难以判断页面讲什么。
+ERROR_NO_LANG: 缺少语言属性的页面
+ERROR_NO_LANG_DESC: lang 属性对屏幕阅读器很有用，部分搜索引擎也会参考，但不直接影响排名。
+ERROR_HTTP_LINKS: HTTPS 页面包含 HTTP 链接
+ERROR_HTTP_LINKS_DESC: 从安全页面链接到不安全页面。全站 HTTPS 有助于排名和用户信任。
+ERROR_HREFLANG_RETURN: 缺少回指 hreflang 的页面
+ERROR_HREFLANG_RETURN_DESC: hreflang 必须双向引用，否则搜索引擎可能忽略。
+ERROR_TOO_MANY_LINKS: 链接过多的页面
+ERROR_TOO_MANY_LINKS_DESC: 页面链接太多会稀释每个链接传递的权重。确保链接相关，或对不重要的使用 nofollow。
+ERROR_INTERNAL_NOFOLLOW: 内部 nofollow 链接
+ERROR_INTERNAL_NOFOLLOW_DESC: 内部链接一般不应使用 nofollow，除非你不想让搜索引擎索引目标页面。
+ERROR_EXTERNAL_WITHOUT_NOFOLLOW: 外部 follow 链接
+ERROR_EXTERNAL_WITHOUT_NOFOLLOW_DESC: follow 外部链接会传递权重到别的网站，需注意评论区等用户生成内容。
+ERROR_CANONICALIZED_NON_CANONICAL: 规范指向非规范页面
+ERROR_CANONICALIZED_NON_CANONICAL_DESC: canonical 应指向规范页面，否则会导致索引混乱。
+ERROR_NOT_VALID_HEADINGS: 标题层级不正确的页面
+ERROR_NOT_VALID_HEADINGS_DESC: 标题应从 H1 开始并保持清晰层级，有助于搜索引擎理解内容和提升可访问性。
+ERROR_HREFLANG_TO_NON_CANONICAL: hreflang 指向非规范页面
+ERROR_HREFLANG_TO_NON_CANONICAL_DESC: hreflang 应指向规范版本，否则会迷惑搜索引擎。
+ERROR_NOFOLLOW_INDEXABLE: nofollow 链接指向可索引页面
+ERROR_NOFOLLOW_INDEXABLE_DESC: nofollow 应配合 noindex 使用，否则搜索引擎仍可能索引目标页面。
+ERROR_NO_INDEXABLE: 不可索引页面
+ERROR_NO_INDEXABLE_DESC: 使用 noindex 的页面不会被搜索引擎收录，通常用于不重要的页面，请检查是否误设。
+ERROR_HREFLANG_NO_INDEXABLE: hreflang 指向不可索引页面
+ERROR_HREFLANG_NO_INDEXABLE_DESC: hreflang 应指向可索引页面，否则会造成混淆。
+ERROR_BLOCKED: 被 robots.txt 阻止的 URL
+ERROR_BLOCKED_DESC: 被 robots.txt 阻止的页面不会被搜索引擎抓取，请确保重要页面未被误拦。
+ERROR_ORPHAN: 孤儿页面
+ERROR_ORPHAN_DESC: 站点内没有任何链接指向的页面，用户无法访问，也浪费爬虫资源。
+NO_INDEX_IN_SITEMAP: 不可索引页面出现在 sitemap 中
+NO_INDEX_IN_SITEMAP_DESC: 不可索引页面不应出现在 sitemap 中，会发送矛盾信号。
+BLOCKED_IN_SITEMAP: 被阻止页面出现在 sitemap 中
+BLOCKED_IN_SITEMAP_DESC: 被 robots.txt 阻止的页面不应出现在 sitemap 中，会发送矛盾信号。
+NON_CANONICAL_IN_SITEMAP: 非规范页面出现在 sitemap 中
+NON_CANONICAL_IN_SITEMAP_DESC: 非规范页面不应出现在 sitemap 中，会误导搜索引擎。
+INCOMING_FOLLOW_NOFOLLOW: 同时存在 follow 和 nofollow 入链的页面
+INCOMING_FOLLOW_NOFOLLOW_DESC: 同时存在两种入链会稀释权重信号，迷惑搜索引擎。
+INVALID_LANG: lang 属性无效的页面
+INVALID_LANG_DESC: 无效的 lang 属性会影响搜索引擎识别语言和屏幕阅读器。
+HTTP_SCHEME: 使用 HTTP 协议的页面
+HTTP_SCHEME_DESC: 使用 HTTP 而非 HTTPS，会影响安全性和排名。
+DEAD_END: 死胡同页面（无出口链接）
+DEAD_END_DESC: 没有任何链接指向其他页面的页面，会影响用户和爬虫继续浏览。
+ERROR_CANONICALIZED_NON_INDEXABLE: 规范指向不可索引页面
+ERROR_CANONICALIZED_NON_INDEXABLE_DESC: 这会让搜索引擎认为不可索引页面是首选版本，导致内容无法被发现。
+ERROR_HREFLANG_REDIRECT: hreflang 指向重定向页面
+ERROR_HREFLANG_REDIRECT_DESC: hreflang 指向 30x 重定向会让搜索引擎困惑。
+ERROR_CANONICAL_REDIRECT: canonical 指向重定向
+ERROR_CANONICAL_REDIRECT_DESC: canonical 应指向最终页面，而不是重定向中间页。
+ERROR_HREFLANG_ERROR: hreflang 指向错误页面
+ERROR_HREFLANG_ERROR_DESC: hreflang 指向 40x/50x 错误页面，会影响多语言版本索引。
+ERROR_CANONICAL_ERROR: canonical 指向错误页面
+ERROR_CANONICAL_ERROR_DESC: canonical 指向 40x/50x 错误页面，搜索引擎无法抓取首选版本。
+ERROR_MULTIPLE_CANONICAL_TAGS: 多个 canonical 标签
+ERROR_MULTIPLE_CANONICAL_TAGS_DESC: 一个页面只能有一个 canonical，否则搜索引擎会困惑。
+ERROR_RELATIVE_CANONICAL_URL: canonical 使用相对路径
+ERROR_RELATIVE_CANONICAL_URL_DESC: 建议使用绝对路径，避免长期问题。
+ERROR_HREFLANG_XDEFAULT: 缺少 x-default hreflang
+ERROR_HREFLANG_XDEFAULT_DESC: 缺少 x-default 会导致不匹配语言的用户显示错误版本。
+ERROR_HREFLANG_SELF_REFERENCE: 缺少自引用 hreflang
+ERROR_HREFLANG_SELF_REFERENCE_DESC: 必须包含当前页面自身的 hreflang 自引用。
+ERROR_HREFLANG_MISMATCHING_LANG: hreflang 与 lang 属性不匹配
+ERROR_HREFLANG_MISMATCHING_LANG_DESC: 两者不一致会迷惑搜索引擎。
+ERROR_HREFLANG_RELATIVE_URL: hreflang 使用相对路径
+ERROR_HREFLANG_RELATIVE_URL_DESC: hreflang 必须使用绝对路径。
+ERROR_CANONICAL_MISMATCH: HTML 与 HTTP 头中的 canonical 不一致
+ERROR_CANONICAL_MISMATCH_DESC: 不一致会导致搜索引擎困惑，影响排名。
+ERROR_MISSING_HSTS: 缺少 HSTS 头
+ERROR_MISSING_HSTS_DESC: 缺少 HSTS 会降低安全性，可能影响 SEO。
+ERROR_MISSING_CSP: 缺少内容安全策略
+ERROR_MISSING_CSP_DESC: 缺少 CSP 增加安全风险，搜索引擎可能降权。
+ERROR_CONTENT_TYPE_OPTIONS: 缺少 X-Content-Type-Options 头
+ERROR_CONTENT_TYPE_OPTIONS_DESC: 缺少此头会带来内容类型安全风险。
+ERROR_LARGE_IMAGE: 大尺寸图片
+ERROR_LARGE_IMAGE_DESC: 大图会拖慢页面加载，影响用户体验和 SEO。
+ERROR_LONG_ALT_TEXT: Alt 文本过长的图片
+ERROR_LONG_ALT_TEXT_DESC: Alt 文本应简洁明了，过长反而降低可读性。
+ERROR_MULTIPLE_TITLES: 多个 title 标签
+ERROR_MULTIPLE_TITLES_DESC: 一个页面只能有一个 title，否则搜索引擎会困惑。
+ERROR_MULTIPLE_DESCRIPTIONS: 多个 description meta 标签
+ERROR_MULTIPLE_DESCRIPTIONS_DESC: 同上，只能有一个。
+ERROR_PAGE_DEPTH: 深度过高的页面
+ERROR_PAGE_DEPTH_DESC: 深度过高难以被用户和搜索引擎发现。
+ERROR_MULTIPLE_LANG_REFERENCE: hreflang 中引用了多个语言
+ERROR_MULTIPLE_LANG_REFERENCE_DESC: 会导致搜索引擎错误识别语言。
+ERROR_DUPLICATED_CONTENT: 内容完全重复的页面
+ERROR_DUPLICATED_CONTENT_DESC: 会稀释排名、浪费爬虫预算。
+ERROR_EXTERNAL_LINK_REDIRECT: 外部链接指向重定向
+ERROR_EXTERNAL_LINK_REDIRECT_DESC: 不影响自身排名，但影响用户体验，建议替换为最终地址。
+ERROR_EXTERNAL_LINK_BROKEN: 外部失效链接
+ERROR_EXTERNAL_LINK_BROKEN_DESC: 会让用户沮丧，建议修复或删除。
+ERROR_TIMEOUT: 抓取超时
+ERROR_TIMEOUT_DESC: 搜索引擎也可能无法访问，建议检查服务器性能。
+ERROR_UNDERSCORE_URL: URL 中含下划线
+ERROR_UNDERSCORE_URL_DESC: 部分搜索引擎会把下划线当作连接符，建议改用短横线。
+ERROR_SLOW_TTFB: 首字节时间过慢
+ERROR_SLOW_TTFB_DESC: 会拖慢整体加载，影响核心网页指标和排名。
+ERROR_HTTP_FORM: HTTP 页面上的表单
+ERROR_HTTP_FORM_DESC: 不安全，会触发浏览器警告，影响信任和排名。
+ERROR_INSECURE_FORM: 表单 action 为 HTTP
+ERROR_INSECURE_FORM_DESC: 数据易被拦截，影响安全和 SEO。
+ERROR_SPACE_URL: URL 中含空格
+ERROR_SPACE_URL_DESC: 会导致链接失效，建议用短横线代替。
+ERROR_MULTIPLE_SLASHES: 路径中多个连续斜杠
+ERROR_MULTIPLE_SLASHES_DESC: 显得不专业，可能导致索引问题。
+ERROR_NOIMAGEINDEX: 使用 noimageindex 的页面
+ERROR_NOIMAGEINDEX_DESC: 会阻止图片被搜索引擎收录，请确认是否必要。
+ERROR_PICTURE_MISSONG_IMG: picture 标签缺少 img 元素
+ERROR_PICTURE_MISSONG_IMG_DESC: 会导致图片无法显示，也影响图片索引。
+ERROR_METAS_IN_BODY: meta 标签放在 body 中
+ERROR_METAS_IN_BODY_DESC: 必须放在 head 中，否则会被忽略。
+ERROR_NOSNIPPET: 使用 nosnippet 或 max-snippet:0
+ERROR_NOSNIPPET_DESC: 会阻止搜索结果显示文字/视频片段，请确认是否需要。
+ERROR_IMG_SIZE_ATTR: 图片缺少宽度高度属性
+ERROR_IMG_SIZE_ATTR_DESC: 会导致布局偏移（CLS），影响核心网页指标。
+ERROR_INCORRECT_MEDIA_TYPE: MIME 类型错误
+ERROR_INCORRECT_MEDIA_TYPE_DESC: 浏览器可能无法正确渲染，影响体验和索引。
+ERROR_DUPLICATED_ID: 重复的 ID 属性
+ERROR_DUPLICATED_ID_DESC: 会干扰 JavaScript 和辅助技术，影响可访问性。
+ERROR_MISSING_VIEWPORT: 缺少 viewport meta 标签
+ERROR_MISSING_VIEWPORT_DESC: 移动端显示异常，严重影响移动搜索排名。
+ERROR_DOM_SIZE: DOM 节点过多
+ERROR_DOM_SIZE_DESC: 会拖慢加载和渲染，建议精简结构。
+ERROR_PAGINATION_LINKS: rel="next/prev" 未在页面正文链接
+ERROR_PAGINATION_LINKS_DESC: 会让搜索引擎困惑分页关系。
+ERROR_LOCALHOST_LINKS: 链接指向 localhost 或 127.0.0.1
+ERROR_LOCALHOST_LINKS_DESC: 外部用户无法访问，会造成错误，建议替换为正式地址。
