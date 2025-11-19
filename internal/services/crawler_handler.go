@@ -84,14 +84,27 @@ func (s *CrawlerHandler) responseCallback(crawl *models.Crawl, p *models.Project
 		// the projects FollowNoFollow option. In case the URL is blocked by the robots.txt
 		// file a new blocked PageReport is saved. Both internal and external links
 		// are added as the crawler will discard the domains that are not allowed.
-		links := append(pageReport.Links, pageReport.ExternalLinks...)
-		for _, l := range links {
+		// 分别处理内部链接和外部链接
+		// 内部链接：如果被 robots.txt 阻止，需要记录到统计中
+		for _, l := range pageReport.Links {
 			if (!pageReport.Nofollow && !l.NoFollow) || p.FollowNofollow {
 				err := c.AddRequest(&crawler.RequestMessage{URL: l.ParsedURL, Data: requestData})
 				if errors.Is(err, crawler.ErrBlockedByRobotstxt) {
 					s.saveBlockedPageReport(l.ParsedURL, crawl)
 					crawl.BlockedByRobotstxt++
 				}
+			}
+		}
+
+		// 外部链接：添加到队列，但不处理 robots 阻止错误
+		// 因为外链的 robots.txt 属于外部域名，不应计入当前项目的统计
+		for _, l := range pageReport.ExternalLinks {
+			if (!pageReport.Nofollow && !l.NoFollow) || p.FollowNofollow {
+				// 外链会被 domainIsAllowed 检查拒绝（返回 ErrDomainNotAllowed），
+				// 或者如果通过域名检查（如 AllowSubdomains），其 robots.txt 检查结果
+				// 也不应计入当前项目的统计，因为这是外部域名的 robots.txt
+				_ = c.AddRequest(&crawler.RequestMessage{URL: l.ParsedURL, Data: requestData})
+				// 不处理 ErrBlockedByRobotstxt，因为这是外部域名的 robots.txt
 			}
 		}
 
