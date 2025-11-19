@@ -2,7 +2,7 @@ package services
 
 type (
 	ExternalLinkServiceRepository interface {
-		GetExternalLinkURLsByNofollow(crawlId int64, nofollow int) []string
+		GetExternalLinkURLsByNofollow(crawlId int64, nofollow int, deduplication bool) []string
 	}
 
 	ExternalLinkService struct {
@@ -14,6 +14,6 @@ func NewExternalLinkService(r ExternalLinkServiceRepository) *ExternalLinkServic
 	return &ExternalLinkService{repository: r}
 }
 
-func (s *ExternalLinkService) GetExternalLinkURLsByNofollow(crawlId int64, nofollow int) []string {
-	return s.repository.GetExternalLinkURLsByNofollow(crawlId, nofollow)
+func (s *ExternalLinkService) GetExternalLinkURLsByNofollow(crawlId int64, nofollow int, deduplication bool) []string {
+	return s.repository.GetExternalLinkURLsByNofollow(crawlId, nofollow, deduplication)
 }

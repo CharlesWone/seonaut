@@ -911,7 +911,7 @@ func (ds *DashboardRepository) GetDuplicateDescriptionURLsByDescription(crawlId 
 	return result
 }
 
-func (ds *DashboardRepository) GetURLsByMediaType(crawlId int64, mediaType string) []string {
+func (ds *DashboardRepository) GetURLsByMediaType(crawlId int64, mediaType string, deduplication bool) []string {
 	query := `
 		SELECT url
 		FROM pagereports
@@ -919,6 +919,10 @@ func (ds *DashboardRepository) GetURLsByMediaType(crawlId int64, mediaType strin
 		  AND crawled = 1
 		  AND media_type = ?
 	`
+	if deduplication {
+		query += "GROUP BY url"
+	}
+
 	var result []string
 
 	rows, err := ds.DB.Query(query, crawlId, mediaType)
