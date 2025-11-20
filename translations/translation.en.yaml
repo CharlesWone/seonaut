@@ -172,6 +172,7 @@ NEXT_ACTIONS: Next Actions
 EXPLORE_ISSUES: Explore Site Issues
 EXPLORE_ISSUES_MESSAGE: Uncover issues impacting your website's performance.
 SITE_ISSUES_LINK: Site Issues
+SITE_ISSUES_PUBLIC_LINK: Site Issues (Public)
 PAGE_DETAILS_LINK: Page Details
 ANALYZE_DATA: Analyze Raw Data
 ANALYZE_DATA_MESSAGE: Export your data for further analysis and reporting.
