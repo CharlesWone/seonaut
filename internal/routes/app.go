@@ -74,6 +74,11 @@ func NewServer(container *services.Container) {
 	http.HandleFunc("GET "+contextPath+"/issues", container.CookieSession.Auth(issueHandler.indexHandler))
 	http.HandleFunc("GET "+contextPath+"/issues/view", container.CookieSession.Auth(issueHandler.viewHandler))
 
+	// Issues Report routes
+	issuesReportHandler := issuesReportHandler{container}
+	http.HandleFunc("GET "+contextPath+"/issuesReport/", issuesReportHandler.indexHandler)
+	http.HandleFunc("GET "+contextPath+"/issuesReport/view/", issuesReportHandler.viewHandler)
+
 	// Project routes
 	projectHandler := projectHandler{container}
 	http.HandleFunc("GET "+contextPath+"/", container.CookieSession.Auth(projectHandler.indexHandler))
