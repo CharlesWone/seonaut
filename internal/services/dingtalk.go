@@ -94,7 +94,8 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 
 	// 报告链接
 	enc, _ := utils.EncryptParam(strconv.FormatInt(project.Id, 10))
-	crawlReportLink := fmt.Sprintf("%s/crawlReport/%s", strings.TrimRight(s.serverConfig.URL, "/"), enc)
+	//crawlReportLink := fmt.Sprintf("%s/crawlReport/%s", strings.TrimRight(s.serverConfig.URL, "/"), enc)
+	crawlReportLink := fmt.Sprintf("%s/issuesReport/%s", strings.TrimRight(s.serverConfig.URL, "/"), enc)
 
 	// Get additional statistics from dashboard service
 	imageAltCount := s.dashboardService.GetImageAltCount(crawl.Id)

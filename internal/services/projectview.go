@@ -57,6 +57,10 @@ func (s *ProjectViewService) GetProjectViewNoAuth(id int64) (*models.ProjectView
 		return nil, err
 	}
 
+	// 加密项目ID
+	token, _ := utils.EncryptParam(strconv.FormatInt(project.Id, 10))
+	project.EncryptedId = token
+
 	parsedURL, err := url.Parse(project.URL)
 	if err != nil {
 		return nil, err

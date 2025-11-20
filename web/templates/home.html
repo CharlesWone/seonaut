@@ -93,9 +93,10 @@
 				{{ if (and .Crawl.Id (not .Crawl.Crawling)) }}
 					<a href="{{url "/dashboard"}}?pid={{ .Project.Id }}">{{ trans "DASHBOARD" }}</a>
 					<a href="{{url "/issues"}}?pid={{ .Project.Id }}">{{ trans "SITE_ISSUES_LINK" }}</a>
+					<a href="{{url "/issuesReport/"}}{{ .Project.EncryptedId }}">Site Issues(公共)</a>
 					<a href="{{url "/explorer"}}?pid={{ .Project.Id }}">{{ trans "PAGE_DETAILS_LINK" }}</a>
 					<a href="{{url "/export"}}?pid={{ .Project.Id }}">{{ trans "ANALYZE_DATA_LINK" }}</a>
-					<a href="{{url "/crawlReport/"}}{{ .Project.EncryptedId }}">{{ trans "CRAWL_REPORT_LINK" }}</a>
+					<!--<a href="{{url "/crawlReport/"}}{{ .Project.EncryptedId }}">{{ trans "CRAWL_REPORT_LINK" }}</a>-->
 				{{ end }}
 			{{ end }}
 

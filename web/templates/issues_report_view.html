@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="{{ .Lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    {{ if .Refresh }}
+    <meta http-equiv="refresh" content="120"/>
+    {{ end }}
+    <title>
+        {{ trans .PageTitle }} - SEOnaut
+    </title>
+    <link rel="stylesheet" href="/resources/style.css">
+</head>
+<body class="dark">
+<div id="main">
+
+    {{ with .Data }}
+
+    <div class="panel">
+
+        <div class="box box-first">
+            <div class="col col-main">
+                <div class="content">
+                    <a href="{{url "/issuesReport/"}}{{ .ProjectView.Project.EncryptedId }}">{{ trans "SITE_ISSUES" }}</a>
+                </div>
+            </div>
+
+            <div class="col col-actions-l">
+                <div class="main-action">
+                    <div class="content">
+                        <a href="{{ .ProjectView.Project.URL }}" target="_blank">{{ .ProjectView.Project.Host }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="box">
+            <div class="col highlight col-main">
+                <div class="content">
+                    <div>
+                        <h2>{{ trans .Eid }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{ if .PaginatorView.PageReports }}
+
+        {{ $pid := .ProjectView.Project.Id }}
+        {{ $eid := .Eid }}
+        {{ range .PaginatorView.PageReports }}
+
+        <div class="box soft">
+            <div class="col col-main highlight">
+                <div class="content">
+                    <div class="url">
+                        {{ if .Title }}{{ .Title }}<br/>{{ end }}
+                        <a href="{{ .URL }}" target="_blank">{{ .URL }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{ end }}
+
+        {{ if gt .PaginatorView.Paginator.TotalPages 1 }}
+
+        <div class="box pagination">
+            <div class="col prev">
+                <div class="content">
+
+                    {{ if .PaginatorView.Paginator.PreviousPage }}
+
+                    <a href="{{url "/issuesReport/view/"}}{{ .ProjectView.Project.EncryptedId }}?eid={{ .Eid }}&p={{
+                    .PaginatorView.Paginator.PreviousPage }}">
+                    {{ trans "PREV" }}
+                    </a>
+
+                    {{ else }}
+
+                    {{ trans "PREV" }}
+
+                    {{ end }}
+
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="content aligned">
+                    {{ .PaginatorView.Paginator.CurrentPage }}/{{ .PaginatorView.Paginator.TotalPages }}
+                </div>
+            </div>
+
+            <div class="col next">
+                <div class="content">
+
+                    {{ if .PaginatorView.Paginator.NextPage }}
+
+                    <a href="{{url "/issuesReport/view/"}}{{ .ProjectView.Project.EncryptedId }}?eid={{ .Eid }}&p={{
+                    .PaginatorView.Paginator.NextPage }}">
+                    {{ trans "NEXT" }}
+                    </a>
+
+                    {{ else }}
+
+                    {{ trans "NEXT" }}
+
+                    {{ end }}
+
+                </div>
+            </div>
+        </div>
+
+        {{ end }}
+
+        {{ else }}
+
+        <p><b>{{ trans "NO_ISSUES" }}</b></p>
+
+        {{ end }}
+
+    </div>
+
+    {{ end }}
+
+    <div id="footer">
+
+    </div>
+
+</div>
+
+</body>
+</html>
