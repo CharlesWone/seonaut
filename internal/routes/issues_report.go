@@ -60,14 +60,14 @@ func (h *issuesReportHandler) indexHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	v := &PageView{
-		Lang:      "en",
+		Lang:      "zh",
 		Theme:     "dart",
 		Data:      ig,
 		User:      models.User{},
 		PageTitle: "ISSUES_VIEW_PAGE_TITLE",
 	}
 
-	h.Renderer.RenderTemplate(w, "issues_report", v, "en")
+	h.Renderer.RenderTemplate(w, "issues_report", v, "zh")
 }
 
 func (h *issuesReportHandler) viewHandler(w http.ResponseWriter, r *http.Request) {
@@ -122,12 +122,12 @@ func (h *issuesReportHandler) viewHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	v := &PageView{
-		Lang:      "en",
+		Lang:      "zh",
 		Theme:     "dart",
 		Data:      data,
 		User:      models.User{},
 		PageTitle: "ISSUES_DETAIL_PAGE_TITLE",
 	}
 
-	h.Renderer.RenderTemplate(w, "issues_report_view", v, "en")
+	h.Renderer.RenderTemplate(w, "issues_report_view", v, "zh")
 }
