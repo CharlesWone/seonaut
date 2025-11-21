@@ -49,7 +49,7 @@ func (h *crawlReportHandler) indexHandler(w http.ResponseWriter, r *http.Request
 		html = "<h2>爬取中...</h2>"
 		archiveExists = false
 	} else {
-		pv.Project.EncryptedId = pathParam
+		pv.Crawl.EncryptedId = pathParam
 		// 获取爬虫报告 markdown格式
 		markdown := h.CrawlReportService.GetCrawlReportMarkdown(&pv.Crawl, &pv.Project)
 		// 转换为HTML

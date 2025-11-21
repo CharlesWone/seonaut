@@ -37,7 +37,7 @@
             </div>
         </div>
 
-        {{ $encryptedId := .ProjectView.Project.EncryptedId }}
+        {{ $encryptedId := .ProjectView.Crawl.EncryptedId }}
 
         {{ if and (eq .ProjectView.Crawl.CriticalIssues 0) (and (eq .ProjectView.Crawl.WarningIssues 0) (eq
         .ProjectView.Crawl.AlertIssues 0)) }}

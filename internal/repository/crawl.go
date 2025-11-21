@@ -101,6 +101,71 @@ func (ds *CrawlRepository) GetLastCrawl(p *models.Project) models.Crawl {
 	return crawl
 }
 
+// GetLastFinishedCrawl returns a Crawl model with the last crawl stored for an specific project.
+func (ds *CrawlRepository) FindCrawlById(id int64) (models.Crawl, error) {
+	query := `
+		SELECT
+			id,
+			project_id,
+			start,
+			end,
+			total_urls,
+			total_issues,
+			critical_issues,
+			alert_issues,
+			warning_issues,
+			issues_end,
+			robotstxt_exists,
+			sitemap_exists,
+			sitemap_blocked,
+			links_internal_follow,
+			links_internal_nofollow,
+			links_external_follow,
+			links_external_nofollow,
+			links_sponsored,
+			links_ugc
+		FROM crawls
+		WHERE id = ?`
+
+	row := ds.DB.QueryRow(query, id)
+
+	var endTime, issuesEndTime sql.NullTime
+	crawl := models.Crawl{Crawling: true}
+	err := row.Scan(
+		&crawl.Id,
+		&crawl.ProjectId,
+		&crawl.Start,
+		&endTime, // &crawl.End,
+		&crawl.TotalURLs,
+		&crawl.TotalIssues,
+		&crawl.CriticalIssues,
+		&crawl.AlertIssues,
+		&crawl.WarningIssues,
+		&issuesEndTime, // &crawl.IssuesEnd,
+		&crawl.RobotstxtExists,
+		&crawl.SitemapExists,
+		&crawl.SitemapIsBlocked,
+		&crawl.InternalFollowLinks,
+		&crawl.InternalNoFollowLinks,
+		&crawl.ExternalFollowLinks,
+		&crawl.ExternalNoFollowLinks,
+		&crawl.SponsoredLinks,
+		&crawl.UGCLinks,
+	)
+	if err != nil {
+		log.Println(err)
+		return crawl, err
+	}
+
+	if endTime.Valid && issuesEndTime.Valid {
+		crawl.End = endTime.Time
+		crawl.IssuesEnd = issuesEndTime.Time
+		crawl.Crawling = false
+	}
+
+	return crawl, nil
+}
+
 // GetLastCrawls returns a slice with a number of crawls for the specific project. The number of crawls
 // to be returned is specified with the limit parameter.
 func (ds *CrawlRepository) GetLastCrawls(p models.Project, limit int) []models.Crawl {

@@ -22,7 +22,7 @@
         <div class="box box-first">
             <div class="col col-main">
                 <div class="content">
-                    <a href="{{url "/issuesReport/"}}{{ .ProjectView.Project.EncryptedId }}">{{ trans "SITE_ISSUES" }}</a>
+                    <a href="{{url "/issuesReport/"}}{{ .ProjectView.Crawl.EncryptedId }}">{{ trans "SITE_ISSUES" }}</a>
                 </div>
             </div>
 
@@ -73,7 +73,7 @@
 
                     {{ if .PaginatorView.Paginator.PreviousPage }}
 
-                    <a href="{{url "/issuesReport/view/"}}{{ .ProjectView.Project.EncryptedId }}?eid={{ .Eid }}&p={{
+                    <a href="{{url "/issuesReport/view/"}}{{ .ProjectView.Crawl.EncryptedId }}?eid={{ .Eid }}&p={{
                     .PaginatorView.Paginator.PreviousPage }}">
                     {{ trans "PREV" }}
                     </a>
@@ -98,7 +98,7 @@
 
                     {{ if .PaginatorView.Paginator.NextPage }}
 
-                    <a href="{{url "/issuesReport/view/"}}{{ .ProjectView.Project.EncryptedId }}?eid={{ .Eid }}&p={{
+                    <a href="{{url "/issuesReport/view/"}}{{ .ProjectView.Crawl.EncryptedId }}?eid={{ .Eid }}&p={{
                     .PaginatorView.Paginator.NextPage }}">
                     {{ trans "NEXT" }}
                     </a>

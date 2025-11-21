@@ -29,4 +29,5 @@ type Crawl struct {
 	ExternalNoFollowLinks int
 	SponsoredLinks        int
 	UGCLinks              int
+	EncryptedId           string // 加密后的id
 }

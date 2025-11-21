@@ -246,7 +246,7 @@ func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project 
 	}
 
 	// 报告链接
-	enc, _ := utils.EncryptParam(strconv.FormatInt(project.Id, 10))
+	enc, _ := utils.EncryptParam(strconv.FormatInt(crawl.Id, 10))
 	crawlReportLink := fmt.Sprintf("%s/issuesReport/%s", strings.TrimRight(s.serverConfig.URL, "/"), enc)
 
 	data := struct {

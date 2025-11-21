@@ -15,6 +15,7 @@ type (
 		FindProjectByIdNoAuth(id int64) (models.Project, error)
 
 		GetLastCrawl(*models.Project) models.Crawl
+		FindCrawlById(id int64) (models.Crawl, error)
 	}
 
 	ProjectViewService struct {
@@ -52,14 +53,19 @@ func (s *ProjectViewService) GetProjectView(id, uid int) (*models.ProjectView, e
 }
 
 func (s *ProjectViewService) GetProjectViewNoAuth(id int64) (*models.ProjectView, error) {
-	project, err := s.repository.FindProjectByIdNoAuth(id)
+	crawl, err := s.repository.FindCrawlById(id)
 	if err != nil {
 		return nil, err
 	}
 
-	// 加密项目ID
-	token, _ := utils.EncryptParam(strconv.FormatInt(project.Id, 10))
-	project.EncryptedId = token
+	project, err := s.repository.FindProjectByIdNoAuth(crawl.ProjectId)
+	if err != nil {
+		return nil, err
+	}
+
+	// 加密crawl ID
+	token, _ := utils.EncryptParam(strconv.FormatInt(crawl.Id, 10))
+	crawl.EncryptedId = token
 
 	parsedURL, err := url.Parse(project.URL)
 	if err != nil {
@@ -68,11 +74,9 @@ func (s *ProjectViewService) GetProjectViewNoAuth(id int64) (*models.ProjectView
 
 	project.Host = parsedURL.Host
 
-	c := s.repository.GetLastCrawl(&project)
-
 	v := &models.ProjectView{
 		Project: project,
-		Crawl:   c,
+		Crawl:   crawl,
 	}
 
 	return v, nil
@@ -85,12 +89,13 @@ func (s *ProjectViewService) GetProjectViews(uid int) []models.ProjectView {
 
 	projects := s.repository.FindProjectsByUser(uid)
 	for _, p := range projects {
-		// 加密项目ID
-		token, _ := utils.EncryptParam(strconv.FormatInt(p.Id, 10))
-		p.EncryptedId = token
+		crawl := s.repository.GetLastCrawl(&p)
+		// 加密crawl ID
+		token, _ := utils.EncryptParam(strconv.FormatInt(crawl.Id, 10))
+		crawl.EncryptedId = token
 		pv := models.ProjectView{
 			Project: p,
-			Crawl:   s.repository.GetLastCrawl(&p),
+			Crawl:   crawl,
 		}
 		views = append(views, pv)
 	}
