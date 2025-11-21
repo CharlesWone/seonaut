@@ -265,7 +265,10 @@ func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project 
 		StatusCodeByDepth: s.dashboardService.GetStatusCodeByDepth(crawl.Id),
 	}
 
-	totalLinks := crawl.InternalFollowLinks + crawl.InternalNoFollowLinks + crawl.ExternalFollowLinks + crawl.ExternalNoFollowLinks + crawl.SponsoredLinks + crawl.UGCLinks
+	totalInternalLinks := crawl.InternalFollowLinks + crawl.InternalNoFollowLinks
+	totalExternalLinks := crawl.ExternalFollowLinks + crawl.ExternalNoFollowLinks
+	totalLinks := totalInternalLinks + totalExternalLinks
+
 	// 占比
 	percent := func(a, b int) string {
 		if b == 0 {
@@ -293,13 +296,14 @@ func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project 
 	}
 
 	// 状态码 ### 📊 状态码统计
-	statusCodeStr := ``
-	if data.StatusChart != nil && len(*data.StatusChart) > 0 {
-		statusCodeStr += fmt.Sprintf("### 📊 状态码统计\n")
-		for _, i := range *data.StatusChart {
-			statusCodeStr += fmt.Sprintf("- **%s：** %d \n", i.Key, i.Value)
-		}
-	}
+	statusCodeStr := fmt.Sprintf("### 📊 状态码统计\n")
+	statusCodeStr += s.formatStatusCodeStats(data.StatusChart)
+	//if data.StatusChart != nil && len(*data.StatusChart) > 0 {
+	//	statusCodeStr += fmt.Sprintf("### 📊 状态码统计\n")
+	//	for _, i := range *data.StatusChart {
+	//		statusCodeStr += fmt.Sprintf("- **%s：** %d \n", i.Key, i.Value)
+	//	}
+	//}
 
 	//// ### 📈 页面深度分布（推荐最终版，彻底解决所有问题）
 	//depthStr := ""
@@ -423,7 +427,11 @@ func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project 
 		// 第三步：输出最终结果
 		for _, g := range groups {
 			if g.high > 0 {
-				depthStr += fmt.Sprintf("- **深度%d-%d：** %d页 (%s)\n", g.low, g.high, g.count, g.percentStr)
+				if g.low > 4 {
+					depthStr += fmt.Sprintf("- <font color=\"red\">**深度%d-%d：** %d页 (%s)</font>\n", g.low, g.high, g.count, g.percentStr)
+				} else {
+					depthStr += fmt.Sprintf("- **深度%d-%d：** %d页 (%s)\n", g.low, g.high, g.count, g.percentStr)
+				}
 			} else {
 				depthStr += fmt.Sprintf("- **深度%d：** %d页 (%s)\n", g.low, g.count, g.percentStr)
 			}
@@ -433,7 +441,7 @@ func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project 
 	text := fmt.Sprintf(`
 ### %s SEO审计报告完成
 - **网站：** %s
-- **报告链接：** %s
+- **详细报告：** %s
 - **审计时间：** %s
 - **审计耗时：** %s
 
@@ -446,23 +454,19 @@ func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project 
 
 ### 🔗 链接统计
 - **总链接数：** %d
-- **内部链接：** %d
+- **内部follow链接：** %d (%s)
 - **内部nofollow链接：** %d (%s)
-- **外部链接：** %d
 - **外部follow链接：** %d (%s)
+- **外部nofollow链接：** %d (%s)
 - **Sponsored链接：** %d
 - **UGC链接：** %d
 
-### 🔗 Canonical URLs统计
-- **Canonical页面：** %d
-- **Non-Canonical页面：** %d
-
 ### 🖼️ 图片Alt属性统计
 - **有Alt属性：** %d
-- **无Alt属性：** %d
+%s
 
 ### 🔒 HTTP/HTTPS统计
-- **HTTP页面：** %d
+%s
 - **HTTPS页面：** %d
 
 %s
@@ -472,15 +476,15 @@ func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project 
 %s
 
 ### 🤖 技术信息
-- **Robots.txt存在：** %s
-- **Sitemap存在：** %s
-- **Sitemap被阻止：** %s
+%s
+%s
+%s
 
 ---
 *报告生成时间：%s*`,
 		statusEmoji,
 		project.URL,
-		crawlReportLink,
+		fmt.Sprintf("[点击查看](%s)", crawlReportLink),
 		crawl.Start.Format("2006-01-02 15:04:05"),
 		formatDuration(duration),
 
@@ -491,21 +495,23 @@ func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project 
 
 		totalLinks,
 		crawl.InternalFollowLinks,
+		percent(crawl.InternalFollowLinks, totalInternalLinks),
 		crawl.InternalNoFollowLinks,
-		percent(crawl.InternalNoFollowLinks, totalLinks),
-		crawl.ExternalNoFollowLinks,
+		percent(crawl.InternalNoFollowLinks, totalInternalLinks),
 		crawl.ExternalFollowLinks,
-		percent(crawl.ExternalFollowLinks, totalLinks),
+		percent(crawl.ExternalFollowLinks, totalExternalLinks),
+		crawl.ExternalNoFollowLinks,
+		percent(crawl.ExternalNoFollowLinks, totalExternalLinks),
 		crawl.SponsoredLinks,
 		crawl.UGCLinks,
 
-		data.CanonicalCount.Canonical,
-		data.CanonicalCount.NonCanonical,
+		//data.CanonicalCount.Canonical,
+		//data.CanonicalCount.NonCanonical,
 
 		data.AltCount.Alt,
-		data.AltCount.NonAlt,
+		formatIntMetric("无Alt属性", data.AltCount.NonAlt, data.AltCount.NonAlt > 0),
 
-		data.SchemeCount.HTTP,
+		formatIntMetric("HTTP页面", data.SchemeCount.HTTP, data.SchemeCount.HTTP > 0),
 		data.SchemeCount.HTTPS,
 
 		mediaTypeStr,
@@ -514,9 +520,9 @@ func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project 
 
 		depthStr,
 
-		formatBool(crawl.RobotstxtExists),
-		formatBool(crawl.SitemapExists),
-		formatBool(crawl.SitemapIsBlocked),
+		formatStringMetric("Robots.txt存在", formatBool(crawl.RobotstxtExists), !crawl.RobotstxtExists),
+		formatStringMetric("Sitemap存在", formatBool(crawl.SitemapExists), !crawl.SitemapExists),
+		formatStringMetric("Sitemap被阻止", formatBool(crawl.SitemapIsBlocked), crawl.SitemapIsBlocked),
 		time.Now().Format("2006-01-02 15:04:05"),
 	)
 	return text
@@ -661,7 +667,7 @@ func (s *DingTalkService) formatStatusCodeStats(chart *models.Chart) string {
 		}
 
 		if isAbnormal {
-			result += fmt.Sprintf("\n- **%s：** <font color=\"red\">%d</font>", item.Key, item.Value)
+			result += fmt.Sprintf("\n- <font color=\"red\">**%s：** %d</font>", item.Key, item.Value)
 		} else {
 			result += fmt.Sprintf("\n- **%s：** %d", item.Key, item.Value)
 		}
