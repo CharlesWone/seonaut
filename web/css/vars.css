@@ -64,29 +64,29 @@
 }
 
 .dark {
-	/* Dark Mode Color Palette */
+	/* Dark Mode Color Palette - Improved Contrast */
 	--main-bg-color: #121212;
-	--light-bg-color: #1E1E1E;
+	--light-bg-color: #252525;
 	--primary-color: #E0E0E0;
 	--primary-light-color: #B0B0B0;
-	--secondary-color: #1E1E1E;
+	--secondary-color: #FFFFFF;
 	--highlight-color: #1E3A5F;
 	--alert-color: #EF5350;
 	--dark-opacity-color: rgba(255, 255, 255, 0.1);
 	
-	/* Section Colors - Dark Mode */
-	--main-section-color: #42A5F5;
-	--secondary-section-color: #42A5F5;
+	/* Section Colors - Dark Mode - Brighter for better contrast */
+	--main-section-color: #64B5F6;
+	--secondary-section-color: #90CAF9;
 	--tertiary-section-color: #EF5350;
-	--crawler-section-color: #66BB6A;
-	--crawler-section-secondary-color: #1B5E20;
+	--crawler-section-color: #81C784;
+	--crawler-section-secondary-color: #2E7D32;
 	--row-issue-color: #3E2723;
 
-	/* Issue Colors - Dark Mode */
+	/* Issue Colors - Dark Mode - Brighter for better contrast */
 	--issues-critical-highlight: #EF5350;
-	--issues-alert-highlight: #FFCA28;
-	--issues-warning-highlight: #42A5F5;
-	--issues-passed-highlight: #66BB6A;
+	--issues-alert-highlight: #FFD54F;
+	--issues-warning-highlight: #64B5F6;
+	--issues-passed-highlight: #81C784;
 
 	--issues-critical: #3E2723;
 	--issues-alert: #3E2723;

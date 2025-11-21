@@ -343,7 +343,7 @@ details[open].issue-details > summary {
 
 .dark input:focus {
 	border-color: var(--main-section-color);
-	box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.2);
+	box-shadow: 0 0 0 3px rgba(100, 181, 246, 0.3);
 }
 
 .dark select {
@@ -353,7 +353,7 @@ details[open].issue-details > summary {
 
 .dark select:focus {
 	border-color: var(--main-section-color);
-	box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.2);
+	box-shadow: 0 0 0 3px rgba(100, 181, 246, 0.3);
 }
 
 .dark summary {
@@ -363,4 +363,29 @@ details[open].issue-details > summary {
 .dark details ul {
 	border-color: rgba(255, 255, 255, 0.2);
 	background-color: var(--light-bg-color);
+}
+
+/* Enhanced button contrast in dark mode */
+.dark input[type="submit"],
+.dark .button,
+.dark button {
+	background-color: var(--main-section-color);
+	color: #FFFFFF;
+	font-weight: 600;
+	box-shadow: 0 2px 8px rgba(100, 181, 246, 0.3);
+}
+
+.dark input[type="submit"]:hover,
+.dark .button:hover,
+.dark button:hover {
+	background-color: var(--secondary-section-color);
+	color: #FFFFFF;
+	box-shadow: 0 4px 12px rgba(144, 202, 249, 0.4);
+}
+
+.dark input[type="submit"]:active,
+.dark .button:active,
+.dark button:active {
+	background-color: var(--main-section-color);
+	box-shadow: 0 2px 4px rgba(100, 181, 246, 0.3);
 }

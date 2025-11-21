@@ -228,6 +228,19 @@
 	text-decoration: none;
 }
 
+/* Enhanced contrast for dark mode buttons */
+.dark .col-actions a.project-crawl {
+	box-shadow: 0 2px 8px rgba(100, 181, 246, 0.3);
+}
+
+.dark .col-actions a.project-crawl:hover {
+	box-shadow: 0 4px 12px rgba(144, 202, 249, 0.4);
+}
+
+.dark .main-action {
+	box-shadow: 0 2px 8px rgba(100, 181, 246, 0.2);
+}
+
 .external_link {
 	display: flex;
 	align-items: center;
