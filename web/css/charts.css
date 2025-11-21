@@ -1,32 +1,56 @@
 .chart {
-	margin-top: var(--line-height);
-	width:100%;
+	margin-top: var(--spacing-md);
+	width: 100%;
 	height: calc(var(--line-height) * 13);
+	border-radius: var(--radius-sm);
+	background-color: var(--light-bg-color);
+	padding: var(--spacing-sm);
+	box-sizing: border-box;
 }
 
 .status-depth-chart {
-	margin-top: var(--line-height);
-	width:100%;
+	margin-top: var(--spacing-md);
+	width: 100%;
 	height: calc(var(--line-height) * 16);
+	border-radius: var(--radius-sm);
+	background-color: var(--light-bg-color);
+	padding: var(--spacing-sm);
+	box-sizing: border-box;
 }
 
 .links-chart,
 .follow-chart {
 	width: 100%;
 	height: calc(var(--line-height) * 16);
+	border-radius: var(--radius-sm);
+	background-color: var(--light-bg-color);
+	padding: var(--spacing-sm);
+	box-sizing: border-box;
 }
 
 .issues-chart {
 	width: 100%;
 	height: calc(var(--line-height) * 16);
+	border-radius: var(--radius-sm);
+	background-color: var(--light-bg-color);
+	padding: var(--spacing-sm);
+	box-sizing: border-box;
 }
 
 .crawl-chart {
 	width: 100%;
 	height: calc(var(--line-height) * 13);
+	border-radius: var(--radius-sm);
+	background-color: var(--light-bg-color);
+	padding: var(--spacing-sm);
+	box-sizing: border-box;
 }
 
 .issues-timeline-chart {
 	width: 100%;
 	height: calc(var(--line-height) * 13);
+	border-radius: var(--radius-sm);
+	background-color: var(--light-bg-color);
+	padding: var(--spacing-sm);
+	box-sizing: border-box;
 }

@@ -1,14 +1,21 @@
 .archive {
     background-color: var(--light-bg-color);
-    border: 1px solid var(--primary-color);
-    font-family: 'Nimbus Mono PS', 'Courier New', monospace;
-    font-size: .85rem;
-    margin-bottom: calc(var(--line-height) * 2);
-    overflow: scroll;
-    padding: var(--line-height) 1.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: var(--radius-md);
+    font-family: var(--mono-fontfamily);
+    font-size: 0.875rem;
+    margin-bottom: var(--spacing-xl);
+    overflow: auto;
+    padding: var(--spacing-lg);
     max-height: calc(var(--line-height) * 20);
+    box-shadow: var(--shadow-sm);
+    line-height: 1.6;
 }
 
 .archive:last-child {
     margin-bottom: 0;
+}
+
+.dark .archive {
+    border-color: rgba(255, 255, 255, 0.12);
 }

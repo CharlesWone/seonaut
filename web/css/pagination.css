@@ -3,9 +3,24 @@
 	color: var(--primary-light-color);
 	display: flex;
 	flex-direction: row;
-	font-weight: 300;
+	font-weight: 400;
+	gap: var(--spacing-sm);
+}
+
+.pagination a {
+	color: var(--main-section-color);
+	padding: var(--spacing-xs) var(--spacing-sm);
+	border-radius: var(--radius-sm);
+	transition: all var(--transition-fast);
+}
+
+.pagination a:hover {
+	background-color: var(--highlight-color);
+	color: var(--main-section-color);
+	text-decoration: none;
 }
 
 .pagination .next {
 	text-align: right;
+	margin-left: auto;
 }

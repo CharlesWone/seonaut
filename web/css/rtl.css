@@ -3,58 +3,77 @@
     text-align: right;
 }
 
-.rtl .box .col {
-    border-left: 1px dotted var(--primary-color);
-    border-right: none;
+.rtl .box .col:not(:last-child)::after {
+    left: 0;
+    right: auto;
 }
 
-.rtl .box .col:last-child {
-    border-left: none;
+.rtl .box .col:last-child::after {
+    display: none;
 }
 
 .rtl .menu {
     float: left;
 }
 
+.rtl .project-title {
+    flex-direction: row-reverse;
+}
+
 .rtl .project-title h2 {
-    margin-left: none;
-    margin-right: 1rem; 
+    margin-left: 0;
+    margin-right: 0; 
+}
+
+.rtl .crawler-item {
+    flex-direction: row-reverse;
 }
 
 .rtl .crawler-item span {
 	margin-left: 0;
-    margin-right: 1rem;
+    margin-right: var(--spacing-md);
 }
 
-.rtl .col.borderless {
-    border: none;
+.rtl .col.borderless::after {
+    display: none;
 }
 
 .rtl .label {
-    margin-right: 1rem;
-    margin-left: none;
+    margin-right: var(--spacing-md);
+    margin-left: 0;
 }
 
 .rtl .issues-critical-title {
-	border-right: 1rem solid var(--issues-critical-highlight);
+	border-right: 4px solid var(--issues-critical-highlight);
     border-left: none;
+    padding-right: var(--spacing-md);
+    padding-left: 0;
+    background: linear-gradient(270deg, var(--issues-critical) 0%, transparent 100%);
 }
 
 .rtl .issues-alert-title {
-	border-right: 1rem solid var(--issues-alert-highlight);
+	border-right: 4px solid var(--issues-alert-highlight);
     border-left: none;
+    padding-right: var(--spacing-md);
+    padding-left: 0;
+    background: linear-gradient(270deg, var(--issues-alert) 0%, transparent 100%);
 }
 
 .rtl .issues-warning-title {
-	border-right: 1rem solid var(--issues-warning-highlight);
+	border-right: 4px solid var(--issues-warning-highlight);
     border-left: none;
+    padding-right: var(--spacing-md);
+    padding-left: 0;
+    background: linear-gradient(270deg, var(--issues-warning) 0%, transparent 100%);
 }
 
 .rtl .issues-passed-title {
     border-left: none;
-    border-right: 1rem solid var(--issues-passed-highlight);
+    border-right: 4px solid var(--issues-passed-highlight);
+    padding-right: var(--spacing-md);
+    padding-left: 0;
+    background: linear-gradient(270deg, var(--issues-passed) 0%, transparent 100%);
 }
-
 
 .rtl .project-title svg {
     transform: scaleX(-1); 
@@ -64,8 +83,12 @@
     transform: scaleX(-1);
 }
 
+.rtl .external_link {
+    flex-direction: row-reverse;
+}
+
 .rtl .external_link a {
     margin-left: 0;
-    margin-right: .5rem;
+    margin-right: var(--spacing-sm);
     transform: scaleX(-1);
 }

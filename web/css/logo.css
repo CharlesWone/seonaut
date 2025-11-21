@@ -1,24 +1,34 @@
 .logo {
-	background-color: var(--primary-color);
+	background: linear-gradient(135deg, var(--main-section-color) 0%, var(--secondary-section-color) 100%);
 	font-family: var(--secondary-fontfamily);
-	font-size: 1rem;
-	font-weight: 600;
-	letter-spacing: .1rem;
-	display: inline;
-	line-height: 1rem;
-	margin-top: -.5rem;
-	padding: .5rem 6rem .5rem .5rem;
+	font-size: 1.25rem;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	display: inline-block;
+	line-height: 1;
+	margin-top: 0;
+	padding: var(--spacing-sm) var(--spacing-xl);
+	border-radius: var(--radius-md);
 	text-decoration: none;
+	box-shadow: var(--shadow-sm);
+	transition: all var(--transition-base);
+}
+
+.logo:hover {
+	box-shadow: var(--shadow-md);
+	transform: translateY(-1px);
 }
 
 .logo a {
-	color: var(--main-bg-color);
+	color: var(--secondary-color);
 	text-decoration: none;
-	font-size: 1rem;
-	font-weight: 600;
+	font-size: 1.25rem;
+	font-weight: 700;
 	border: none;
+	display: block;
 }
 
 .logo a:hover {
 	text-decoration: none;
+	color: var(--secondary-color);
 }

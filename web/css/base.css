@@ -10,9 +10,11 @@ body {
 	padding: 0;
 	background-color: var(--main-bg-color);
 	color: var(--primary-color);
-	margin:0;
+	margin: 0;
 	text-rendering: optimizeLegibility;
-	cursor: crosshair;
+	cursor: default;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 p {
@@ -43,28 +45,32 @@ ul li:last-child {
 }
 
 a {
-	border-bottom: 1px dotted var(--primary-color);
-	color: var(--primary-color);
+	color: var(--main-section-color);
 	text-decoration: none;
 	cursor: pointer;
+	transition: color var(--transition-fast);
 }
 
 a:hover {
-	border-bottom: 1px solid var(--primary-color);
+	color: var(--secondary-section-color);
+	text-decoration: underline;
 }
 
 a.icon-link {
-	display: inline-block;
-	padding: calc(calc(var(--line-height) / 2) - 2px);
-	border: 1px dotted var(--primary-color);
-	border-radius: 50px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--spacing-sm) var(--spacing-md);
+	border-radius: var(--radius-md);
 	margin-top: calc(0px - calc(var(--line-height) / 2));
+	background-color: transparent;
+	transition: all var(--transition-base);
 }
 
 a.icon-link:hover {
-	border: 1px solid var(--primary-color);
-	opacity: 1;
 	background-color: var(--highlight-color);
+	box-shadow: var(--shadow-sm);
+	transform: translateY(-1px);
 }
 
 a.icon-link svg {
@@ -83,47 +89,61 @@ a.borderless {
 input {
 	font-family: var(--main-fontfamily);
 	font-size: inherit;
-	font-weight: 300;
-	border: 1px solid var(--primary-color);
-	padding: calc(var(--line-height) / 2) .5rem;
+	font-weight: 400;
+	border: 1px solid rgba(0, 0, 0, 0.12);
+	padding: calc(var(--line-height) / 2) var(--spacing-md);
 	display: block;
 	margin-bottom: var(--line-height);
 	width: 25rem;
 	max-width: 100%;
 	box-sizing: border-box;
 	background-color: var(--light-bg-color);
-	border-radius: 0;
+	border-radius: var(--radius-sm);
 	line-height: calc(var(--line-height) - 2px);
-	color: inherit;
+	color: var(--primary-color);
+	transition: all var(--transition-base);
+}
+
+input:focus {
+	outline: none;
+	border-color: var(--main-section-color);
+	box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
 }
 
 input[type="submit"], .button {
-	background: var(--secondary-color);
-	border-top: 1px solid var(--primary-color);
-	border-left: 1px solid var(--primary-color);
-	border-bottom: 2px solid var(--primary-color);
-	border-right: 2px solid var(--primary-color);
-	border-radius: 0;
-	color: var(--primary-color);
+	background: var(--main-section-color);
+	border: none;
+	border-radius: var(--radius-md);
+	color: var(--secondary-color);
 	cursor: pointer;
-	font-weight: normal;
+	font-weight: 500;
 	margin-left: 0;
 	margin-top: var(--line-height);
 	width: auto;
-	padding: calc(var(--line-height) / 2) 1.5rem;
+	padding: calc(var(--line-height) / 2) var(--spacing-xl);
 	text-align: center;
 	min-width: 10rem;
 	line-height: calc(var(--line-height) - 3px);
+	box-shadow: var(--shadow-sm);
+	transition: all var(--transition-base);
 }
 
 input[type="submit"]:hover, .button:hover {
-	box-shadow: 2px 2px 0 black;
-	background-color: var(--highlight-color);
+	background-color: var(--secondary-section-color);
+	box-shadow: var(--shadow-md);
+	transform: translateY(-1px);
+}
+
+input[type="submit"]:active, .button:active {
+	transform: translateY(0);
+	box-shadow: var(--shadow-sm);
 }
 
 label {
 	display: block;
-	font-weight: 400;
+	font-weight: 500;
+	margin-bottom: var(--spacing-xs);
+	color: var(--primary-color);
 }
 
 label.checkbox {
@@ -132,10 +152,11 @@ label.checkbox {
 }
 
 h2 {
-	font-size: 1.2rem;
-	font-weight: normal;
-	line-height: var(--line-height);
-	margin: 0;
+	font-size: 1.25rem;
+	font-weight: 600;
+	line-height: 1.4;
+	margin: 0 0 var(--spacing-md) 0;
+	color: var(--primary-color);
 }
 
 h2 svg {
@@ -145,25 +166,44 @@ h2 svg {
 button {
 	cursor: pointer;
 	font-size: inherit;
-	padding: .5rem 1rem;
+	font-family: var(--main-fontfamily);
+	font-weight: 500;
+	padding: calc(var(--line-height) / 2) var(--spacing-md);
+	border: none;
+	border-radius: var(--radius-md);
+	background-color: var(--main-section-color);
+	color: var(--secondary-color);
+	transition: all var(--transition-base);
+	box-shadow: var(--shadow-sm);
+}
+
+button:hover {
+	background-color: var(--secondary-section-color);
+	box-shadow: var(--shadow-md);
+	transform: translateY(-1px);
+}
+
+button:active {
+	transform: translateY(0);
+	box-shadow: var(--shadow-sm);
 }
 
 summary {
-	background: var(--secondary-color);
-	border-top: 1px solid var(--primary-color);
-	border-left: 1px solid var(--primary-color);
-	border-bottom: 2px solid var(--primary-color);
-	border-right: 2px solid var(--primary-color);
+	background: var(--light-bg-color);
+	border: 1px solid rgba(0, 0, 0, 0.12);
+	border-radius: var(--radius-md);
 	cursor: pointer;
-	padding: calc(var(--line-height) / 2) 1.5rem;
+	padding: calc(var(--line-height) / 2) var(--spacing-lg);
 	width: 15rem;
 	line-height: calc(var(--line-height) - 2px);
+	transition: all var(--transition-base);
+	box-shadow: var(--shadow-sm);
 }
 
 summary:hover {
-    background-color: var(--highlight-color);
-	border-bottom-style: solid;
-	box-shadow: 2px 2px 0 black;
+	background-color: var(--highlight-color);
+	box-shadow: var(--shadow-md);
+	border-color: var(--main-section-color);
 }
 
 details[open] {
@@ -171,21 +211,27 @@ details[open] {
 }
 
 details[open] > summary {
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
 	border-bottom-color: transparent;
 }
 
 details {
-	position:relative;
+	position: relative;
 	width: 100%;
 }
 
 details ul {
-	background-color: var(--secondary-color);
-	border: 1px solid var(--primary-color);
+	background-color: var(--light-bg-color);
+	border: 1px solid rgba(0, 0, 0, 0.12);
+	border-top: none;
+	border-radius: 0 0 var(--radius-md) var(--radius-md);
 	width: 80%;
-	margin: 0 0 0 -1.5rem;
-	position:absolute;
-	padding: 1rem 0;
+	margin: 0 0 0 calc(-1 * var(--spacing-lg));
+	position: absolute;
+	padding: var(--spacing-sm) 0;
+	box-shadow: var(--shadow-md);
+	z-index: 10;
 }
 
 details ul li {
@@ -194,8 +240,9 @@ details ul li {
 
 details ul li a {
 	display: block;
-	padding: calc(var(--line-height) / 2) 1.5rem;
+	padding: calc(var(--line-height) / 2) var(--spacing-lg);
 	border: none;
+	transition: background-color var(--transition-fast);
 }
 
 details ul li a:hover {
@@ -204,9 +251,9 @@ details ul li a:hover {
 }
 
 select {
-    background-color: inherit;
-	color: inherit;
-    border: 1px solid var(--primary-color);
+    background-color: var(--light-bg-color);
+	color: var(--primary-color);
+    border: 1px solid rgba(0, 0, 0, 0.12);
     display: inline-block;
     font: inherit;
     line-height: 1.625em;
@@ -218,14 +265,14 @@ select {
     -webkit-appearance: none;
     -moz-appearance: none;
     width: 25rem;
-	border-radius: 0;
+	border-radius: var(--radius-sm);
 	cursor: pointer;
-    
+	transition: all var(--transition-base);
     
     background-image:
-      linear-gradient(45deg, transparent 50%, var(--primary-color) 50%),
-      linear-gradient(135deg, var(--primary-color) 50%, transparent 50%),
-      linear-gradient(to right, var(--primary-color), var(--primary-color));
+      linear-gradient(45deg, transparent 50%, var(--primary-light-color) 50%),
+      linear-gradient(135deg, var(--primary-light-color) 50%, transparent 50%),
+      linear-gradient(to right, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.12));
     background-position:
       calc(100% - 20px) calc(1em + 2px),
       calc(100% - 15px) calc(1em + 2px),
@@ -239,9 +286,9 @@ select {
 
 select:focus {
   background-image:
-    linear-gradient(45deg, green 50%, transparent 50%),
-    linear-gradient(135deg, transparent 50%, green 50%),
-    linear-gradient(to right, var(--primary-color), var(--primary-color));
+    linear-gradient(45deg, transparent 50%, var(--main-section-color) 50%),
+    linear-gradient(135deg, var(--main-section-color) 50%, transparent 50%),
+    linear-gradient(to right, var(--main-section-color), var(--main-section-color));
   background-position:
     calc(100% - 15px) 1em,
     calc(100% - 20px) 1em,
@@ -251,8 +298,9 @@ select:focus {
     5px 5px,
     1px 1.5em;
   background-repeat: no-repeat;
-  border-color: green;
+  border-color: var(--main-section-color);
   outline: 0;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
 }
 
 
@@ -262,20 +310,57 @@ select:-moz-focusring {
 }
 
 details.issue-details summary {
-	border: 0;
+	border: none;
 	width: 100%;
-	background:none;
+	background: none;
 	padding: 0;
 	font-size: 1.2rem;
-	font-weight: normal;
+	font-weight: 500;
 	line-height: var(--line-height);
+	cursor: pointer;
+	transition: color var(--transition-fast);
 }
 
 details.issue-details summary:hover {
-    background: none;
+	background: none;
 	box-shadow: none;
+	color: var(--main-section-color);
 }
 
 details[open].issue-details > summary {
 	margin-bottom: var(--line-height);
+}
+
+/* Dark mode specific adjustments */
+.dark svg {
+	stroke: var(--primary-color);
+}
+
+.dark input {
+	border-color: rgba(255, 255, 255, 0.2);
+	background-color: var(--light-bg-color);
+}
+
+.dark input:focus {
+	border-color: var(--main-section-color);
+	box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.2);
+}
+
+.dark select {
+	border-color: rgba(255, 255, 255, 0.2);
+	background-color: var(--light-bg-color);
+}
+
+.dark select:focus {
+	border-color: var(--main-section-color);
+	box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.2);
+}
+
+.dark summary {
+	border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark details ul {
+	border-color: rgba(255, 255, 255, 0.2);
+	background-color: var(--light-bg-color);
 }

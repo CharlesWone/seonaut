@@ -1,19 +1,33 @@
 #footer {
-	padding: calc(var(--line-height) * 2) 0;
+	padding: var(--spacing-xl) 0;
+	margin-top: var(--spacing-2xl);
+	border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.dark #footer {
+	border-top-color: rgba(255, 255, 255, 0.1);
 }
 
 #footer a {
 	border: 0;
-	margin-right: var(--line-height);
+	margin-right: var(--spacing-md);
+	color: var(--primary-light-color);
+	transition: color var(--transition-fast);
+}
+
+#footer a:hover {
+	color: var(--main-section-color);
+	text-decoration: underline;
 }
 
 @media only screen and (max-width: 820px) {
 	#footer {
 		text-align: center;
+		padding: var(--spacing-lg) var(--spacing-lg);
 	}
 
 	#footer a {
-		display: block;
-		margin: var(--line-height) 0;
+		display: inline-block;
+		margin: var(--spacing-xs) var(--spacing-sm);
 	}
 }

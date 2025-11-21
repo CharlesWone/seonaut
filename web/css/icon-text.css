@@ -7,18 +7,38 @@ a.icon-text {
 	justify-content: center;
 	font-size: 1rem;
 	line-height: var(--line-height);
+	color: var(--primary-color);
+	transition: all var(--transition-base);
+	padding: var(--spacing-sm);
+	border-radius: var(--radius-md);
+}
+
+a.icon-text:hover {
+	background-color: var(--highlight-color);
+	color: var(--main-section-color);
+	text-decoration: none;
+	transform: translateY(-1px);
 }
 
 p.icon {
 	margin-top: 0;
 	line-height: var(--line-height);
 	text-align: center;
-	margin-bottom: var(--line-height);
+	margin-bottom: var(--spacing-sm);
 	height: var(--line-height);
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
+
 p.icon svg {
 	width: 24px;
 	height: 24px;
 	display: block;
 	margin: 0 auto;
+	transition: transform var(--transition-base);
+}
+
+a.icon-text:hover p.icon svg {
+	transform: scale(1.1);
 }
