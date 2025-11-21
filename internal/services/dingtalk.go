@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/stjudewashere/seonaut/internal/utils"
 	"log"
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -61,7 +62,8 @@ func (s *DingTalkService) SendCrawlReport(crawl *models.Crawl, project *models.P
 		return nil
 	}
 
-	markdownText := s.formatCrawlReport(crawl, project)
+	//markdownText := s.formatCrawlReport(crawl, project)
+	markdownText := s.buildMarkdownCrawlReport(crawl, project)
 
 	message := DingTalkMessage{
 		MsgType: "markdown",
@@ -201,6 +203,322 @@ func (s *DingTalkService) formatCrawlReport(crawl *models.Crawl, project *models
 		text += "\n\n" + suggestions
 	}
 
+	return text
+}
+
+// 构建markdown格式的爬虫报告
+func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project *models.Project) string {
+	duration := crawl.End.Sub(crawl.Start)
+
+	var statusEmoji string
+	if crawl.CriticalIssues > 0 {
+		statusEmoji = "🔴"
+	} else if crawl.AlertIssues > 0 {
+		statusEmoji = "🟡"
+	} else if crawl.WarningIssues > 0 {
+		statusEmoji = "🟠"
+	} else {
+		statusEmoji = "🟢"
+	}
+
+	// 严重问题  - **严重问题：** %d
+	var criticalIssuesStr string
+	if crawl.CriticalIssues > 0 {
+		criticalIssuesStr = fmt.Sprintf("- <font color=\"red\">**严重问题：** %d</font> \n", crawl.CriticalIssues)
+	} else {
+		criticalIssuesStr = fmt.Sprintf("- **严重问题：** %d \n", crawl.CriticalIssues)
+	}
+
+	// 警告问题  - **警告问题：** %d
+	//var warningIssuesStr string
+	//if crawl.WarningIssues > 0 {
+	//	warningIssuesStr = fmt.Sprintf("- <font color=\"#f1d460\">**警告问题：** %d</font> \n", crawl.WarningIssues)
+	//} else {
+	//	warningIssuesStr = fmt.Sprintf("- **警告问题：** %d \n", crawl.WarningIssues)
+	//}
+
+	// 警告问题  - **警告问题：** %d
+	var alertIssuesStr string
+	if crawl.AlertIssues > 0 {
+		alertIssuesStr = fmt.Sprintf("- <font color=\"#f1d460\">**警告问题：** %d</font> \n", crawl.AlertIssues)
+	} else {
+		alertIssuesStr = fmt.Sprintf("- **警告问题：** %d \n", crawl.AlertIssues)
+	}
+
+	// 报告链接
+	enc, _ := utils.EncryptParam(strconv.FormatInt(project.Id, 10))
+	crawlReportLink := fmt.Sprintf("%s/issuesReport/%s", strings.TrimRight(s.serverConfig.URL, "/"), enc)
+
+	data := struct {
+		MediaChart        *models.Chart
+		StatusChart       *models.Chart
+		CanonicalCount    *models.CanonicalCount
+		AltCount          *models.AltCount
+		SchemeCount       *models.SchemeCount
+		StatusCodeByDepth []models.StatusCodeByDepth
+	}{
+		MediaChart:        s.dashboardService.GetMediaCount(crawl.Id),
+		StatusChart:       s.dashboardService.GetStatusCount(crawl.Id),
+		CanonicalCount:    s.dashboardService.GetCanonicalCount(crawl.Id),
+		AltCount:          s.dashboardService.GetImageAltCount(crawl.Id),
+		SchemeCount:       s.dashboardService.GetSchemeCount(crawl.Id),
+		StatusCodeByDepth: s.dashboardService.GetStatusCodeByDepth(crawl.Id),
+	}
+
+	totalLinks := crawl.InternalFollowLinks + crawl.InternalNoFollowLinks + crawl.ExternalFollowLinks + crawl.ExternalNoFollowLinks + crawl.SponsoredLinks + crawl.UGCLinks
+	// 占比
+	percent := func(a, b int) string {
+		if b == 0 {
+			return "0.0%"
+		}
+		p := float64(a) / float64(b) * 100
+		// 防止出现 -0.0% 的情况
+		if math.Signbit(p) && p > -0.0001 {
+			p = 0
+		}
+		return fmt.Sprintf("%.1f%%", p)
+	}
+
+	// 媒体类型 ### 📄 媒体类型统计
+	mediaTypeStr := ``
+	totalMediaTypeCount := 0
+	for _, item := range *data.MediaChart {
+		totalMediaTypeCount += item.Value
+	}
+	if totalMediaTypeCount > 0 {
+		mediaTypeStr += fmt.Sprintf("### 📄 媒体类型统计 \n")
+		for _, i := range *data.MediaChart {
+			mediaTypeStr += fmt.Sprintf("- **%s：** %d (%s) \n", i.Key, i.Value, percent(i.Value, totalMediaTypeCount))
+		}
+	}
+
+	// 状态码 ### 📊 状态码统计
+	statusCodeStr := ``
+	if data.StatusChart != nil && len(*data.StatusChart) > 0 {
+		statusCodeStr += fmt.Sprintf("### 📊 状态码统计\n")
+		for _, i := range *data.StatusChart {
+			statusCodeStr += fmt.Sprintf("- **%s：** %d \n", i.Key, i.Value)
+		}
+	}
+
+	//// ### 📈 页面深度分布（推荐最终版，彻底解决所有问题）
+	//depthStr := ""
+	//depthTotal := 0
+	//// 先计算总页面数
+	//for _, i := range data.StatusCodeByDepth {
+	//	depthTotal += i.StatusCode100 + i.StatusCode200 + i.StatusCode300 + i.StatusCode400 + i.StatusCode500
+	//}
+	//
+	//if depthTotal > 0 {
+	//	depthStr += "### 📈 页面深度分布\n"
+	//	depthStr += fmt.Sprintf("- **总页面数：** %d\n", depthTotal)
+	//
+	//	// 用 map 按 depth 存数量，便于后面分组
+	//	depthCount := make(map[int]int)
+	//	maxDepth := 0
+	//	for _, i := range data.StatusCodeByDepth {
+	//		count := i.StatusCode100 + i.StatusCode200 + i.StatusCode300 + i.StatusCode400 + i.StatusCode500
+	//		if count > 0 {
+	//			depthCount[i.Depth] = count
+	//			if i.Depth > maxDepth {
+	//				maxDepth = i.Depth
+	//			}
+	//		}
+	//	}
+	//
+	//	// 从 1 开始，每两层一组，直到盖过最大深度
+	//	for low := 1; low <= maxDepth+2; low += 2 { // +2 确保能盖到奇数层
+	//		high := low + 1
+	//
+	//		countLow := depthCount[low]
+	//		countHigh := depthCount[high]
+	//
+	//		totalInGroup := countLow + countHigh
+	//
+	//		// 只有当这一组有页面时才显示（关键！彻底杜绝 0 页行）
+	//		if totalInGroup == 0 {
+	//			continue
+	//		}
+	//
+	//		if countHigh > 0 {
+	//			depthStr += fmt.Sprintf("- **深度%d-%d：** %d页 (%s)\n", low, high, totalInGroup, percent(totalInGroup, depthTotal))
+	//		} else {
+	//			// 只有 low 有数据（奇数层结尾）
+	//			depthStr += fmt.Sprintf("- **深度%d：** %d页 (%s)\n", low, totalInGroup, percent(totalInGroup, depthTotal))
+	//		}
+	//	}
+	//}
+
+	// ### 📈 页面深度分布（百分比强制加起来 100.0% 版）
+	depthStr := ""
+	depthTotal := 0
+
+	for _, i := range data.StatusCodeByDepth {
+		depthTotal += i.StatusCode100 + i.StatusCode200 + i.StatusCode300 + i.StatusCode400 + i.StatusCode500
+	}
+
+	if depthTotal > 0 {
+		depthStr += "### 📈 页面深度分布\n"
+		depthStr += fmt.Sprintf("- **总页面数：** %d\n", depthTotal)
+
+		depthCount := make(map[int]int)
+		maxDepth := 0
+		for _, i := range data.StatusCodeByDepth {
+			count := i.StatusCode100 + i.StatusCode200 + i.StatusCode300 + i.StatusCode400 + i.StatusCode500
+			if count > 0 {
+				depthCount[i.Depth] = count
+				if i.Depth > maxDepth {
+					maxDepth = i.Depth
+				}
+			}
+		}
+
+		// 收集所有分组，用于最后补差
+		type group struct {
+			low, high  int
+			count      int
+			percentStr string // 先存原始百分比字符串
+		}
+		var groups []group
+
+		// 第一步：正常计算每一组的原始百分比（保留原始 float）
+		for low := 1; low <= maxDepth+2; low += 2 {
+			high := low + 1
+			countLow := depthCount[low]
+			countHigh := depthCount[high]
+			totalInGroup := countLow + countHigh
+			if totalInGroup == 0 {
+				continue
+			}
+
+			rawPercent := float64(totalInGroup) / float64(depthTotal) * 100
+			percentStr := fmt.Sprintf("%.1f%%", rawPercent)
+
+			if countHigh > 0 {
+				groups = append(groups, group{low: low, high: high, count: totalInGroup, percentStr: percentStr})
+			} else {
+				groups = append(groups, group{low: low, high: 0, count: totalInGroup, percentStr: percentStr})
+			}
+		}
+
+		// 第二步：如果有多行，把最后一个分组用来“兜底补差”
+		if len(groups) > 1 {
+			// 重新计算所有原始 float 值，求和
+			sumDisplayed := 0.0
+			for i := 0; i < len(groups)-1; i++ {
+				// 重新计算前几行的精确百分比并四舍五入
+				p := float64(groups[i].count) / float64(depthTotal) * 100
+				displayed := math.Round(p*10) / 10 // 强制保留一位小数
+				sumDisplayed += displayed
+			}
+
+			// 最后一个用 100 - 前面的和（完美 100.0%）
+			lastDisplayed := 100.0 - sumDisplayed
+			if lastDisplayed < 0 {
+				lastDisplayed = 0 // 防止极端浮点误差
+			}
+			groups[len(groups)-1].percentStr = fmt.Sprintf("%.1f%%", lastDisplayed)
+		}
+
+		// 第三步：输出最终结果
+		for _, g := range groups {
+			if g.high > 0 {
+				depthStr += fmt.Sprintf("- **深度%d-%d：** %d页 (%s)\n", g.low, g.high, g.count, g.percentStr)
+			} else {
+				depthStr += fmt.Sprintf("- **深度%d：** %d页 (%s)\n", g.low, g.count, g.percentStr)
+			}
+		}
+	}
+
+	text := fmt.Sprintf(`
+### %s SEO审计报告完成
+- **网站：** %s
+- **报告链接：** %s
+- **审计时间：** %s
+- **审计耗时：** %s
+
+### ⚠️ 网站问题统计
+%s
+%s
+
+### 📊 爬取统计
+- **总URL数：** %d
+
+### 🔗 链接统计
+- **总链接数：** %d
+- **内部链接：** %d
+- **内部nofollow链接：** %d (%s)
+- **外部链接：** %d
+- **外部follow链接：** %d (%s)
+- **Sponsored链接：** %d
+- **UGC链接：** %d
+
+### 🔗 Canonical URLs统计
+- **Canonical页面：** %d
+- **Non-Canonical页面：** %d
+
+### 🖼️ 图片Alt属性统计
+- **有Alt属性：** %d
+- **无Alt属性：** %d
+
+### 🔒 HTTP/HTTPS统计
+- **HTTP页面：** %d
+- **HTTPS页面：** %d
+
+%s
+
+%s
+
+%s
+
+### 🤖 技术信息
+- **Robots.txt存在：** %s
+- **Sitemap存在：** %s
+- **Sitemap被阻止：** %s
+
+---
+*报告生成时间：%s*`,
+		statusEmoji,
+		project.URL,
+		crawlReportLink,
+		crawl.Start.Format("2006-01-02 15:04:05"),
+		formatDuration(duration),
+
+		criticalIssuesStr,
+		alertIssuesStr, // warningIssuesStr,
+
+		crawl.TotalURLs,
+
+		totalLinks,
+		crawl.InternalFollowLinks,
+		crawl.InternalNoFollowLinks,
+		percent(crawl.InternalNoFollowLinks, totalLinks),
+		crawl.ExternalNoFollowLinks,
+		crawl.ExternalFollowLinks,
+		percent(crawl.ExternalFollowLinks, totalLinks),
+		crawl.SponsoredLinks,
+		crawl.UGCLinks,
+
+		data.CanonicalCount.Canonical,
+		data.CanonicalCount.NonCanonical,
+
+		data.AltCount.Alt,
+		data.AltCount.NonAlt,
+
+		data.SchemeCount.HTTP,
+		data.SchemeCount.HTTPS,
+
+		mediaTypeStr,
+
+		statusCodeStr,
+
+		depthStr,
+
+		formatBool(crawl.RobotstxtExists),
+		formatBool(crawl.SitemapExists),
+		formatBool(crawl.SitemapIsBlocked),
+		time.Now().Format("2006-01-02 15:04:05"),
+	)
 	return text
 }
 
