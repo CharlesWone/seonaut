@@ -11,6 +11,7 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -224,7 +225,7 @@ func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project 
 	// 严重问题  - **严重问题：** %d
 	var criticalIssuesStr string
 	if crawl.CriticalIssues > 0 {
-		criticalIssuesStr = fmt.Sprintf("- <font color=\"red\">**严重问题：** %d</font> \n", crawl.CriticalIssues)
+		criticalIssuesStr = fmt.Sprintf("- <font color=\"#ff0000\">**严重问题：** %d</font> \n", crawl.CriticalIssues)
 	} else {
 		criticalIssuesStr = fmt.Sprintf("- **严重问题：** %d \n", crawl.CriticalIssues)
 	}
@@ -428,13 +429,25 @@ func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project 
 		for _, g := range groups {
 			if g.high > 0 {
 				if g.low > 4 {
-					depthStr += fmt.Sprintf("- <font color=\"red\">**深度%d-%d：** %d页 (%s)</font>\n", g.low, g.high, g.count, g.percentStr)
+					depthStr += fmt.Sprintf("- <font color=\"#ff0000\">**深度%d-%d：** %d页 (%s)</font>\n", g.low, g.high, g.count, g.percentStr)
 				} else {
 					depthStr += fmt.Sprintf("- **深度%d-%d：** %d页 (%s)\n", g.low, g.high, g.count, g.percentStr)
 				}
 			} else {
 				depthStr += fmt.Sprintf("- **深度%d：** %d页 (%s)\n", g.low, g.count, g.percentStr)
 			}
+		}
+	}
+
+	robotsUrlStr := ""
+	sitemapUrlStr := ""
+	u, _ := url.Parse(project.URL)
+	if u != nil {
+		if crawl.RobotstxtExists {
+			robotsUrlStr = fmt.Sprintf(" | [链接>>](%s)", u.Scheme+"://"+u.Host+"/robots.txt")
+		}
+		if crawl.SitemapExists {
+			sitemapUrlStr = fmt.Sprintf(" | [链接>>](%s)", u.Scheme+"://"+u.Host+"/sitemap.xml")
 		}
 	}
 
@@ -484,7 +497,7 @@ func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project 
 *报告生成时间：%s*`,
 		statusEmoji,
 		project.URL,
-		fmt.Sprintf("[点击查看](%s)", crawlReportLink),
+		fmt.Sprintf("[点击查看>>](%s)", crawlReportLink),
 		crawl.Start.Format("2006-01-02 15:04:05"),
 		formatDuration(duration),
 
@@ -520,8 +533,8 @@ func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project 
 
 		depthStr,
 
-		formatStringMetric("Robots.txt存在", formatBool(crawl.RobotstxtExists), !crawl.RobotstxtExists),
-		formatStringMetric("Sitemap存在", formatBool(crawl.SitemapExists), !crawl.SitemapExists),
+		formatStringMetric("Robots.txt存在", formatBool(crawl.RobotstxtExists), !crawl.RobotstxtExists)+robotsUrlStr,
+		formatStringMetric("Sitemap存在", formatBool(crawl.SitemapExists), !crawl.SitemapExists)+sitemapUrlStr,
 		formatStringMetric("Sitemap被阻止", formatBool(crawl.SitemapIsBlocked), crawl.SitemapIsBlocked),
 		time.Now().Format("2006-01-02 15:04:05"),
 	)
@@ -625,7 +638,7 @@ func (s *DingTalkService) formatMediaTypeStats(chart *models.Chart, allMediaType
 		}
 
 		if isAbnormal {
-			result += fmt.Sprintf("\n- <font color=\"red\">**%s：** %d (%.1f%%)</font>", item.Key, item.Value, percentage)
+			result += fmt.Sprintf("\n- <font color=\"#ff0000\">**%s：** %d (%.1f%%)</font>", item.Key, item.Value, percentage)
 		} else {
 			result += fmt.Sprintf("\n- **%s：** %d (%.1f%%)", item.Key, item.Value, percentage)
 		}
@@ -667,7 +680,7 @@ func (s *DingTalkService) formatStatusCodeStats(chart *models.Chart) string {
 		}
 
 		if isAbnormal {
-			result += fmt.Sprintf("\n- <font color=\"red\">**%s：** %d</font>", item.Key, item.Value)
+			result += fmt.Sprintf("\n- <font color=\"#ff0000\">**%s：** %d</font>", item.Key, item.Value)
 		} else {
 			result += fmt.Sprintf("\n- **%s：** %d", item.Key, item.Value)
 		}
@@ -730,14 +743,14 @@ func (s *DingTalkService) formatStatusCodeByDepthStats(statusCodes []models.Stat
 
 	// Format depth 5-6 with red if abnormal
 	if depth5_8Abnormal {
-		result += fmt.Sprintf("\n- **深度5-6：** <font color=\"red\">%d页 (%.1f%%)</font>", depth5_6, depth5_6Percent)
+		result += fmt.Sprintf("\n- <font color=\"#ff0000\">**深度5-6：** %d页 (%.1f%%)</font>", depth5_6, depth5_6Percent)
 	} else {
 		result += fmt.Sprintf("\n- **深度5-6：** %d页 (%.1f%%)", depth5_6, depth5_6Percent)
 	}
 
 	// Format depth 7-8 with red if abnormal
 	if depth7_8Abnormal {
-		result += fmt.Sprintf("\n- **深度7-8：** <font color=\"red\">%d页 (%.1f%%)</font>", depth7_8, depth7_8Percent)
+		result += fmt.Sprintf("\n- <font color=\"#ff0000\">**深度7-8：** %d页 (%.1f%%)</font>", depth7_8, depth7_8Percent)
 	} else {
 		result += fmt.Sprintf("\n- **深度7-8：** %d页 (%.1f%%)", depth7_8, depth7_8Percent)
 	}
@@ -757,7 +770,7 @@ func formatBool(b bool) string {
 func formatMetric(name string, value interface{}, isAbnormal bool) string {
 	valueStr := fmt.Sprintf("%v", value)
 	if isAbnormal {
-		return fmt.Sprintf("- <font color=\"red\">**%s：** %s</font>", name, valueStr)
+		return fmt.Sprintf("- <font color=\"#ff0000\">**%s：** %s</font>", name, valueStr)
 	}
 	return fmt.Sprintf("- **%s：** %s", name, valueStr)
 }
@@ -783,7 +796,7 @@ func (s *DingTalkService) formatLinkStats(crawl *models.Crawl) string {
 	if internalTotal > 0 {
 		internalNoFollowRatio := float64(crawl.InternalNoFollowLinks) / float64(internalTotal)
 		if internalNoFollowRatio > 0.3 {
-			result += fmt.Sprintf("\n- <font color=\"red\">**内部nofollow链接：** %d (%.1f%%)</font>", crawl.InternalNoFollowLinks, internalNoFollowRatio*100)
+			result += fmt.Sprintf("\n- <font color=\"#ff0000\">**内部nofollow链接：** %d (%.1f%%)</font>", crawl.InternalNoFollowLinks, internalNoFollowRatio*100)
 		} else {
 			result += fmt.Sprintf("\n- **内部nofollow链接：** %d (%.1f%%)", crawl.InternalNoFollowLinks, internalNoFollowRatio*100)
 		}
@@ -795,7 +808,7 @@ func (s *DingTalkService) formatLinkStats(crawl *models.Crawl) string {
 	if externalTotal > 0 {
 		externalFollowRatio := float64(crawl.ExternalFollowLinks) / float64(externalTotal)
 		if externalFollowRatio > 0.5 {
-			result += fmt.Sprintf("\n- <font color=\"red\">**外部follow链接：** %d (%.1f%%)</font>", crawl.ExternalFollowLinks, externalFollowRatio*100)
+			result += fmt.Sprintf("\n- <font color=\"#ff0000\">**外部follow链接：** %d (%.1f%%)</font>", crawl.ExternalFollowLinks, externalFollowRatio*100)
 		} else {
 			result += fmt.Sprintf("\n- **外部follow链接：** %d (%.1f%%)", crawl.ExternalFollowLinks, externalFollowRatio*100)
 		}
@@ -819,18 +832,18 @@ func (s *DingTalkService) formatInlinkStats(stats *models.InlinkStats) string {
 
 	// Zero inlinks (isolated pages)
 	if zeroInlinksPercent > 10 {
-		result += fmt.Sprintf("\n- <font color=\"red\">**孤岛页面（入链数=0）：** %d (%.1f%%)</font>", stats.ZeroInlinks, zeroInlinksPercent)
+		result += fmt.Sprintf("\n- <font color=\"#ff0000\">**孤岛页面（入链数=0）：** %d (%.1f%%)</font>", stats.ZeroInlinks, zeroInlinksPercent)
 	} else if zeroInlinksPercent > 5 {
-		result += fmt.Sprintf("\n- <font color=\"red\">**孤岛页面（入链数=0）：** %d (%.1f%%)</font>", stats.ZeroInlinks, zeroInlinksPercent)
+		result += fmt.Sprintf("\n- <font color=\"#ff0000\">**孤岛页面（入链数=0）：** %d (%.1f%%)</font>", stats.ZeroInlinks, zeroInlinksPercent)
 	} else {
 		result += fmt.Sprintf("\n- **孤岛页面（入链数=0）：** %d (%.1f%%)", stats.ZeroInlinks, zeroInlinksPercent)
 	}
 
 	// Low value inlinks (<= 1)
 	if lowValueInlinksPercent > 30 {
-		result += fmt.Sprintf("\n- <font color=\"red\">**低价值入口页面（入链数<=1）：** %d (%.1f%%)</font>", stats.LowValueInlinks, lowValueInlinksPercent)
+		result += fmt.Sprintf("\n- <font color=\"#ff0000\">**低价值入口页面（入链数<=1）：** %d (%.1f%%)</font>", stats.LowValueInlinks, lowValueInlinksPercent)
 	} else if lowValueInlinksPercent > 15 {
-		result += fmt.Sprintf("\n- <font color=\"red\">**低价值入口页面（入链数<=1）：** %d (%.1f%%)</font>", stats.LowValueInlinks, lowValueInlinksPercent)
+		result += fmt.Sprintf("\n- <font color=\"#ff0000\">**低价值入口页面（入链数<=1）：** %d (%.1f%%)</font>", stats.LowValueInlinks, lowValueInlinksPercent)
 	} else {
 		result += fmt.Sprintf("\n- **低价值入口页面（入链数<=1）：** %d (%.1f%%)", stats.LowValueInlinks, lowValueInlinksPercent)
 	}
