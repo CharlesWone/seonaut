@@ -42,7 +42,8 @@ func (ds *CrawlRepository) SaveCrawl(p models.Project) (*models.Crawl, error) {
 func (ds *CrawlRepository) GetLastCrawl(p *models.Project) models.Crawl {
 	query := `
 		SELECT
-			id,
+			crawls.id,
+			projects.url,
 			start,
 			end,
 			total_urls,
@@ -60,7 +61,7 @@ func (ds *CrawlRepository) GetLastCrawl(p *models.Project) models.Crawl {
 			links_external_nofollow,
 			links_sponsored,
 			links_ugc
-		FROM crawls
+		FROM crawls LEFT  JOIN projects ON crawls.project_id = projects.id
 		WHERE project_id = ?
 		ORDER BY start DESC LIMIT 1`
 
@@ -70,6 +71,7 @@ func (ds *CrawlRepository) GetLastCrawl(p *models.Project) models.Crawl {
 	crawl := models.Crawl{Crawling: true}
 	err := row.Scan(
 		&crawl.Id,
+		&crawl.ProjectId,
 		&crawl.Start,
 		&endTime, // &crawl.End,
 		&crawl.TotalURLs,
