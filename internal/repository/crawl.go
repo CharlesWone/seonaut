@@ -71,7 +71,7 @@ func (ds *CrawlRepository) GetLastCrawl(p *models.Project) models.Crawl {
 	crawl := models.Crawl{Crawling: true}
 	err := row.Scan(
 		&crawl.Id,
-		&crawl.ProjectId,
+		&crawl.URL,
 		&crawl.Start,
 		&endTime, // &crawl.End,
 		&crawl.TotalURLs,
