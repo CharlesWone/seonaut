@@ -49,7 +49,8 @@ func NewShortTitleReporter() *models.PageIssueReporter {
 			return false
 		}
 
-		return len(pageReport.Title) > 0 && len(pageReport.Title) < 20
+		length := len([]rune(pageReport.Title))
+		return length > 0 && length < 20
 	}
 
 	return &models.PageIssueReporter{
@@ -71,7 +72,7 @@ func NewLongTitleReporter() *models.PageIssueReporter {
 			return false
 		}
 
-		return len(pageReport.Title) > 60
+		return len([]rune(pageReport.Title)) > 60
 	}
 
 	return &models.PageIssueReporter{

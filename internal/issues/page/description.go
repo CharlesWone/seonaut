@@ -53,7 +53,8 @@ func NewShortDescriptionReporter() *models.PageIssueReporter {
 			return false
 		}
 
-		return len(pageReport.Description) > 0 && len(pageReport.Description) < 80
+		length := len([]rune(pageReport.Description))
+		return length > 0 && length < 80
 	}
 
 	return &models.PageIssueReporter{
@@ -79,7 +80,8 @@ func NewLongDescriptionReporter() *models.PageIssueReporter {
 			return false
 		}
 
-		return len(pageReport.Description) > 160
+		length := len([]rune(pageReport.Description))
+		return length > 160
 	}
 
 	return &models.PageIssueReporter{
