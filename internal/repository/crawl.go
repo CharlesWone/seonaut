@@ -308,7 +308,7 @@ func (ds *CrawlRepository) DeleteProjectCrawls(p *models.Project) {
 			log.Printf("DeleteProjectCrawls: %v\n", err)
 		}
 
-		ds.DeleteCrawlData(c)
+		go ds.DeleteCrawlData(c)
 	}
 
 	query = `DELETE FROM crawls WHERE project_id = ?`
@@ -347,7 +347,7 @@ func (ds *CrawlRepository) DeleteUnfinishedCrawls() {
 		}
 
 		count++
-		ds.DeleteCrawlData(c)
+		go ds.DeleteCrawlData(c)
 		ids = append(ids, c.Id)
 		placeholders = append(placeholders, "?")
 	}
