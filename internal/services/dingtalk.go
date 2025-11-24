@@ -230,13 +230,8 @@ func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project 
 		criticalIssuesStr = fmt.Sprintf("- **严重问题：** %d \n", crawl.CriticalIssues)
 	}
 
-	// 警告问题  - **警告问题：** %d
-	//var warningIssuesStr string
-	//if crawl.WarningIssues > 0 {
-	//	warningIssuesStr = fmt.Sprintf("- <font color=\"#f1d460\">**警告问题：** %d</font> \n", crawl.WarningIssues)
-	//} else {
-	//	warningIssuesStr = fmt.Sprintf("- **警告问题：** %d \n", crawl.WarningIssues)
-	//}
+	// 提示问题  - **提示问题：** %d
+	warningIssuesStr := fmt.Sprintf("- **提示问题：** %d \n", crawl.WarningIssues)
 
 	// 警告问题  - **警告问题：** %d
 	var alertIssuesStr string
@@ -461,6 +456,7 @@ func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project 
 ### ⚠️ 网站问题统计
 %s
 %s
+%s
 
 ### 📊 爬取统计
 - **总URL数：** %d
@@ -503,6 +499,7 @@ func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project 
 
 		criticalIssuesStr,
 		alertIssuesStr, // warningIssuesStr,
+		warningIssuesStr,
 
 		crawl.TotalURLs,
 
