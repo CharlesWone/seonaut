@@ -230,8 +230,8 @@ func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project 
 		criticalIssuesStr = fmt.Sprintf("- **严重问题：** %d \n", crawl.CriticalIssues)
 	}
 
-	// 提示问题  - **提示问题：** %d
-	warningIssuesStr := fmt.Sprintf("- **提示问题：** %d \n", crawl.WarningIssues)
+	// 注意问题  - **注意问题：** %d
+	warningIssuesStr := fmt.Sprintf("- **注意问题：** %d \n", crawl.WarningIssues)
 
 	// 警告问题  - **警告问题：** %d
 	var alertIssuesStr string
