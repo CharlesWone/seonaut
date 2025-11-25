@@ -442,7 +442,10 @@ func (s *DingTalkService) buildMarkdownCrawlReport(crawl *models.Crawl, project 
 			robotsUrlStr = fmt.Sprintf(" | [链接>>](%s)", u.Scheme+"://"+u.Host+"/robots.txt")
 		}
 		if crawl.SitemapExists {
-			sitemapUrlStr = fmt.Sprintf(" | [链接>>](%s)", u.Scheme+"://"+u.Host+"/sitemap.xml")
+			sitemapUrlStr = " |"
+			for i, sitemap := range crawl.Sitemaps {
+				sitemapUrlStr += fmt.Sprintf(" [链接%d>>](%s)", i+1, sitemap)
+			}
 		}
 	}
 

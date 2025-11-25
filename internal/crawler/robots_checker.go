@@ -71,7 +71,10 @@ func (r *RobotsChecker) getRobotsMap(u *url.URL) (*robotstxt.RobotsData, error) 
 		return robot, nil
 	}
 
-	resp, err := r.client.Get(u.Scheme + "://" + u.Host + "/robots.txt")
+	robotsURL := u.Scheme + "://" + u.Host + "/robots.txt"
+
+	// Follow redirects to get the final response
+	_, resp, err := r.followRedirect(robotsURL, 0, make(map[string]bool))
 	if err != nil {
 		r.robotsMap[u.Host] = nil
 		return nil, err
@@ -92,4 +95,60 @@ func (r *RobotsChecker) getRobotsMap(u *url.URL) (*robotstxt.RobotsData, error) 
 	r.robotsMap[u.Host] = robot
 
 	return robot, nil
+}
+
+// followRedirect follows redirects and returns the final URL and response
+func (r *RobotsChecker) followRedirect(URL string, redirectCount int, visited map[string]bool) (string, *ClientResponse, error) {
+	// Prevent infinite redirect loops
+	if redirectCount >= 10 {
+		return "", nil, errors.New("redirect limit exceeded")
+	}
+
+	// Check if we've already visited this URL (prevent redirect loops)
+	if visited[URL] {
+		return "", nil, errors.New("redirect loop detected")
+	}
+	visited[URL] = true
+
+	resp, err := r.client.Get(URL)
+	if err != nil {
+		return "", nil, err
+	}
+
+	statusCode := resp.Response.StatusCode
+
+	// Check if it's a redirect status code (301, 302, 307, 308)
+	if statusCode == 301 || statusCode == 302 || statusCode == 307 || statusCode == 308 {
+		location := resp.Response.Header.Get("Location")
+		if location == "" {
+			// No Location header, return current response
+			return URL, resp, nil
+		}
+
+		// Close the redirect response body
+		resp.Response.Body.Close()
+
+		// Parse the redirect target URL
+		redirectURL, err := url.Parse(location)
+		if err != nil {
+			return "", nil, err
+		}
+
+		// Resolve relative URLs against the original request URL
+		baseURL, err := url.Parse(URL)
+		if err != nil {
+			return "", nil, err
+		}
+
+		// If the redirect URL is relative, resolve it against the base URL
+		if !redirectURL.IsAbs() {
+			redirectURL = baseURL.ResolveReference(redirectURL)
+		}
+
+		// Recursively follow the redirect
+		return r.followRedirect(redirectURL.String(), redirectCount+1, visited)
+	}
+
+	// Not a redirect, return the response
+	return URL, resp, nil
 }

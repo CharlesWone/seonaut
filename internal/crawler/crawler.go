@@ -213,6 +213,11 @@ func (c *Crawler) SitemapExists() bool {
 	return c.sitemapExists
 }
 
+// Returns the sitemap.xml file lists.
+func (c *Crawler) Sitemaps() []string {
+	return c.sitemaps
+}
+
 // Returns true if the robots.txt file exists.
 func (c *Crawler) RobotstxtExists() bool {
 	return c.robotsChecker.Exists(c.url)

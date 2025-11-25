@@ -486,7 +486,7 @@ ERROR_HREFLANG_RELATIVE_URL_DESC: hreflang 必须使用绝对路径。
 ERROR_CANONICAL_MISMATCH: HTML 与 HTTP 头中的 canonical 不一致
 ERROR_CANONICAL_MISMATCH_DESC: 不一致会导致搜索引擎困惑，影响排名。
 ERROR_MISSING_HSTS: 缺少 HSTS 头
-ERROR_MISSING_HSTS_DESC: 缺少 HSTS 会降低安全性，可能影响 SEO。
+ERROR_MISSING_HSTS_DESC: 缺少 HSTS 会降低安全性，可能影响 SEO，强制浏览器只通过HTTPS与网站通信，防止SSL剥离攻击。
 ERROR_MISSING_CSP: 缺少内容安全策略
 ERROR_MISSING_CSP_DESC: 缺少 CSP 增加安全风险，搜索引擎可能降权。
 ERROR_CONTENT_TYPE_OPTIONS: 缺少 X-Content-Type-Options 头

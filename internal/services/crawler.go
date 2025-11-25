@@ -118,6 +118,7 @@ func (s *CrawlerService) StartCrawler(p models.Project, b models.BasicAuth) erro
 
 		crawl.RobotstxtExists = c.RobotstxtExists()
 		crawl.SitemapExists = c.SitemapExists()
+		crawl.Sitemaps = c.Sitemaps()
 		crawl.SitemapIsBlocked = c.SitemapIsBlocked()
 		crawl.End = time.Now()
 
