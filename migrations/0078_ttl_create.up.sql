@@ -11,6 +11,18 @@ ALTER TABLE `audios` ADD COLUMN `create_time` datetime NOT NULL DEFAULT CURRENT_
 ALTER TABLE `videos` ADD COLUMN `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE `pagereports` ADD COLUMN `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
+ALTER TABLE `crawls` ADD INDEX `idx_createTime`(`create_time`) USING BTREE;
+ALTER TABLE `links` ADD INDEX `idx_createTime`(`create_time`) USING BTREE;
+ALTER TABLE `external_links` ADD INDEX `idx_createTime`(`create_time`) USING BTREE;
+ALTER TABLE `hreflangs` ADD INDEX `idx_createTime`(`create_time`) USING BTREE;
+ALTER TABLE `issues` ADD INDEX `idx_createTime`(`create_time`) USING BTREE;
+ALTER TABLE `images` ADD INDEX `idx_createTime`(`create_time`) USING BTREE;
+ALTER TABLE `scripts` ADD INDEX `idx_createTime`(`create_time`) USING BTREE;
+ALTER TABLE `styles` ADD INDEX `idx_createTime`(`create_time`) USING BTREE;
+ALTER TABLE `iframes` ADD INDEX `idx_createTime`(`create_time`) USING BTREE;
+ALTER TABLE `audios` ADD INDEX `idx_createTime`(`create_time`) USING BTREE;
+ALTER TABLE `videos` ADD INDEX `idx_createTime`(`create_time`) USING BTREE;
+ALTER TABLE `pagereports` ADD INDEX `idx_createTime`(`create_time`) USING BTREE;
 
 ALTER TABLE `crawls` TTL = `create_time` + INTERVAL 7 DAY;
 ALTER TABLE `links` TTL = `create_time` + INTERVAL 7 DAY;
