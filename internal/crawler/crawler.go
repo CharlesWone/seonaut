@@ -241,7 +241,9 @@ func (c *Crawler) setupSitemaps() {
 	sitemaps := c.robotsChecker.GetSitemaps(c.url)
 	nonBlockedSitemaps := []string{}
 	if len(sitemaps) == 0 {
-		sitemaps = []string{c.url.Scheme + "://" + c.url.Host + "/sitemap.xml"}
+		//sitemaps = []string{c.url.Scheme + "://" + c.url.Host + "/sitemap.xml"}
+		//不使用默认地址，只取robots中解析的
+		return
 	}
 
 	for _, sm := range sitemaps {
