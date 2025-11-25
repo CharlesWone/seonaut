@@ -137,7 +137,7 @@ func (sc *SitemapChecker) ParseSitemaps(URLs []string, callback func(u string)) 
 // followRedirect follows redirects and returns the final URL and response
 func (sc *SitemapChecker) followRedirect(URL string, redirectCount int, visited map[string]bool) (string, *ClientResponse, error) {
 	// Prevent infinite redirect loops
-	if redirectCount >= 10 {
+	if redirectCount >= 5 {
 		return "", nil, errors.New("redirect limit exceeded")
 	}
 

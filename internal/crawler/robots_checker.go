@@ -100,7 +100,7 @@ func (r *RobotsChecker) getRobotsMap(u *url.URL) (*robotstxt.RobotsData, error) 
 // followRedirect follows redirects and returns the final URL and response
 func (r *RobotsChecker) followRedirect(URL string, redirectCount int, visited map[string]bool) (string, *ClientResponse, error) {
 	// Prevent infinite redirect loops
-	if redirectCount >= 10 {
+	if redirectCount >= 5 {
 		return "", nil, errors.New("redirect limit exceeded")
 	}
 
