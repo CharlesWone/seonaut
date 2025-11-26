@@ -2,6 +2,6 @@ insert into issue_types
 values (80, 'ERROR_MISSING_XFRAME_OPTIONS', 3),
        (81, 'ERROR_MISSING_REFERRER_POLICY', 3),
        (82, 'ERROR_SERVER_VERSION_LEAK', 3),
-       (83, 'ERROR_SERVER_VERSION_LEAK', 3),
-       (84, 'ERROR_SERVER_VERSION_LEAK', 3)
+       (83, 'ERROR_XPOWERED_BY_LEAK', 3),
+       (84, 'ERROR_ASPNET_VERSION_LEAK', 3)
 ;
