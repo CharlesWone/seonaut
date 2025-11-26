@@ -2,16 +2,25 @@ package crawler
 
 import (
 	"errors"
+	"github.com/temoto/robotstxt"
 	"net/url"
 	"sync"
-
-	"github.com/temoto/robotstxt"
+	"unsafe"
 )
 
 type RobotsChecker struct {
 	robotsMap map[string]*robotstxt.RobotsData
 	rlock     *sync.RWMutex
 	client    Client
+}
+
+type RobotsData struct {
+	// private
+	groups      map[string]*robotstxt.Group
+	allowAll    bool
+	disallowAll bool
+	Host        string
+	Sitemaps    []string
 }
 
 func NewRobotsChecker(client Client) *RobotsChecker {
@@ -90,6 +99,12 @@ func (r *RobotsChecker) getRobotsMap(u *url.URL) (*robotstxt.RobotsData, error) 
 	if err != nil {
 		r.robotsMap[u.Host] = nil
 		return nil, err
+	}
+
+	// 用指针映射访问未公开字段
+	shadow := (*RobotsData)(unsafe.Pointer(robot))
+	if len(shadow.groups) <= 0 {
+		return nil, errors.New("robots.txt file does not exist")
 	}
 
 	r.robotsMap[u.Host] = robot
