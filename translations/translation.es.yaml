@@ -496,6 +496,22 @@ ERROR_CANONICAL_MISMATCH: Desajuste canónico
 ERROR_CANONICAL_MISMATCH_DESC: Páginas con diferentes URLs canónicas en el código HTML y los encabezados HTTP. Establecer diferentes URLs canónicas en el código HTML y los encabezados HTTP crea inconsistencias y puede confundir a los motores de búsqueda, lo que puede resultar en una reducción de los rankings y la visibilidad en los motores de búsqueda.
 ERROR_MISSING_HSTS: Falta el encabezado HSTS
 ERROR_MISSING_HSTS_DESC: Páginas sin encabezado HSTS. La falta del encabezado HTTP Strict Transport Security hace que los sitios sean más vulnerables a amenazas de seguridad, lo que puede impactar en el SEO en términos de seguridad del usuario y confiabilidad.
+
+ERROR_MISSING_XFRAME_OPTIONS: Falta protección contra Clickjacking
+ERROR_MISSING_XFRAME_OPTIONS_DESC: Sin X-Frame-Options ni frame-ancestors en CSP. La página puede ser incrustada en iframe por cualquier sitio, con riesgo de clickjacking.
+
+ERROR_MISSING_REFERRER_POLICY: Falta cabecera Referrer-Policy
+ERROR_MISSING_REFERRER_POLICY_DESC: Sin Referrer-Policy, parámetros sensibles (token, session) en la URL de origen pueden filtrarse a sitios terceros.
+
+ERROR_SERVER_VERSION_LEAK: Cabecera Server expone versión
+ERROR_SERVER_VERSION_LEAK_DESC: La cabecera Server incluye número de versión. En entornos sin Cloudflare se expone la versión exacta.
+
+ERROR_XPOWERED_BY_LEAK: Fuga de información X-Powered-By
+ERROR_XPOWERED_BY_LEAK_DESC: La cabecera expone la pila tecnológica del backend. Permite explotación de vulnerabilidades conocidas.
+
+ERROR_ASPNET_VERSION_LEAK: Fuga grave de versión ASP.NET
+ERROR_ASPNET_VERSION_LEAK_DESC: Existen cabeceras X-AspNet-Version o X-AspNetMvc-Version. Información crítica expuesta por defecto en versiones antiguas de ASP.NET.
+
 ERROR_MISSING_CSP: Falta la política de seguridad de contenido
 ERROR_MISSING_CSP_DESC: Páginas a las que les falta la metaetiqueta o encabezado HTTP de CSP (Content Security Policy) aumentan la vulnerabilidad a amenazas de seguridad, lo que potencialmente puede llevar a contenido malicioso o experiencias de usuario comprometidas, que los motores de búsqueda pueden penalizar.
 ERROR_CONTENT_TYPE_OPTIONS: Falta las opciones de tipo de contenido

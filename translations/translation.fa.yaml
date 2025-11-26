@@ -497,6 +497,22 @@ ERROR_CANONICAL_MISMATCH: عدم تطابق متعارف
 ERROR_CANONICAL_MISMATCH_DESC: صفحات با URLهای متعارف مختلف در کد HTML و سرصفحه‌های HTTP. تنظیم URLهای متعارف مختلف در کد HTML و سرصفحه‌های HTTP ناهماهنگی ایجاد می‌کند و می‌تواند موتورهای جستجو را گیج کند، که ممکن است منجر به کاهش رتبه‌بندی موتور جستجو و دید شود.
 ERROR_MISSING_HSTS: سرصفحه HSTS گم شده
 ERROR_MISSING_HSTS_DESC: صفحات بدون سرصفحه HSTS. عدم وجود سرصفحه امنیت حمل و نقل سخت‌گیرانه HTTP سایت‌ها را در برابر تهدیدات امنیتی آسیب‌پذیرتر می‌کند که ممکن است بر سئو از نظر امنیت کاربر و قابل اعتماد بودن تأثیر بگذارد.
+
+ERROR_MISSING_XFRAME_OPTIONS: عدم وجود محافظت در برابر Clickjacking
+ERROR_MISSING_XFRAME_OPTIONS_DESC: هدر X-Frame-Options یا frame-ancestors تنظیم نشده. صفحه می‌تواند در iframe هر سایتی قرار گیرد و خطر کلیک‌جکینگ وجود دارد.
+
+ERROR_MISSING_REFERRER_POLICY: هدر Referrer-Policy وجود ندارد
+ERROR_MISSING_REFERRER_POLICY_DESC: بدون Referrer-Policy، پارامترهای حساس (مثل token و session) در URL منبع ممکن است به سایت‌های ثالث نشت کند.
+
+ERROR_SERVER_VERSION_LEAK: هدر Server نسخه را فاش می‌کند
+ERROR_SERVER_VERSION_LEAK_DESC: هدر Server شامل شماره نسخه است. در محیط‌های بدون Cloudflare نسخه دقیق افشا می‌شود.
+
+ERROR_XPOWERED_BY_LEAK: افشای اطلاعات X-Powered-By
+ERROR_XPOWERED_BY_LEAK_DESC: این هدر تکنولوژی بک‌اند را نشان می‌دهد. مهاجمان می‌توانند از آسیب‌پذیری‌های شناخته‌شده سوءاستفاده کنند.
+
+ERROR_ASPNET_VERSION_LEAK: نشت شدید نسخه ASP.NET
+ERROR_ASPNET_VERSION_LEAK_DESC: هدرهای X-AspNet-Version یا X-AspNetMvc-Version وجود دارند. افشای اطلاعات خطرناک که در نسخه‌های قدیمی ASP.NET به‌صورت پیش‌فرض فعال است.
+
 ERROR_MISSING_CSP: سیاست امنیت محتوا گم شده
 ERROR_MISSING_CSP_DESC: صفحات بدون تگ متا HTML یا سرصفحه HTTP سیاست امنیت محتوا (CSP) آسیب‌پذیری را در برابر تهدیدات امنیتی افزایش می‌دهند، که ممکن است منجر به محتواهای مخرب یا تجربیات کاربر به خطر افتاده شود، که موتورهای جستجو ممکن است آن‌ها را جریمه کنند.
 ERROR_CONTENT_TYPE_OPTIONS: گزینه‌های نوع محتوا گم شده
