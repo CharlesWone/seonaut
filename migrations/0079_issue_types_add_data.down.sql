@@ -1,0 +1,1 @@
+DELETE  FROM issue_types WHERE id IN (80, 81, 82, 83, 84);

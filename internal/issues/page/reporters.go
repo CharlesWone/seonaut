@@ -76,9 +76,15 @@ func GetAllReporters() []*models.PageIssueReporter {
 		NewHTTPSchemeReporter(),
 
 		// Add security issue reporters
-		NewMissingHSTSHeaderReporter(),
-		NewMissingCSPReporter(),
-		NewMissingContentTypeOptionsReporter(),
+		NewMissingHSTSHeaderReporter(),         // Strict-Transport-Security
+		NewMissingCSPReporter(),                // Content-Security-Policy
+		NewMissingContentTypeOptionsReporter(), // X-Content-Type-Options
+		// 新增的
+		NewMissingXFrameOptionsReporter(),  // X-Frame-Options
+		NewMissingReferrerPolicyReporter(), // Referrer-Policy
+		NewServerVersionLeakReporter(),     // Server
+		NewXPoweredByLeakReporter(),        // X-Powered-By
+		NewAspNetVersionLeakReporter(),     // X-AspNet-Version 和 X-AspNetMvc-Version
 
 		// Add timeout issue reporter
 		NewTimeoutReporter(),
