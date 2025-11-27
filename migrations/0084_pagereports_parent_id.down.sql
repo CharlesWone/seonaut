@@ -1,0 +1,1 @@
+alter table pagereports drop column parent_id;

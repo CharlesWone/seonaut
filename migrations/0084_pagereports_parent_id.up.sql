@@ -1,0 +1,1 @@
+alter table pagereports add parent_id int unsigned default 0 not null;

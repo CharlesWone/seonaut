@@ -49,9 +49,10 @@ func (ds *PageReportRepository) SavePageReport(r *models.PageReport, cid int64) 
 			in_sitemap,
 			depth,
 			body_hash,
-			ttfb
+			ttfb,
+		    parent_id
 		)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
 	stmt, err := ds.DB.Prepare(query)
 	if err != nil {
@@ -86,6 +87,7 @@ func (ds *PageReportRepository) SavePageReport(r *models.PageReport, cid int64) 
 		r.Depth,
 		r.BodyHash,
 		r.TTFB,
+		r.ParentId,
 	)
 	if err != nil {
 		return r, err

@@ -47,21 +47,21 @@ func NewCrawlerHandler(r CrawlerHandlerRepository, b *Broker, m *ReportManager) 
 	}
 }
 
-func (s *CrawlerHandler) archiveWrapper(callback crawler.ResponseCallback, a Archiver) crawler.ResponseCallback {
-	return func(r *crawler.ResponseMessage) {
+func (s *CrawlerHandler) archiveWrapper(callback crawler.ResponseCallback, a Archiver, pageReportIds []int64) crawler.ResponseCallback {
+	return func(r *crawler.ResponseMessage, pageReportIds []int64) (dept int, pageReportId int64) {
 		if r.Error == nil && a != nil {
 			a.AddRecord(r.Response)
 		}
-		callback(r)
+		return callback(r, pageReportIds)
 	}
 }
 
 func (s *CrawlerHandler) responseCallback(crawl *models.Crawl, p *models.Project, c *crawler.Crawler) crawler.ResponseCallback {
-	return func(r *crawler.ResponseMessage) {
+	return func(r *crawler.ResponseMessage, pageReportIds []int64) (int, int64) {
 		pageReport, htmlNode, err := s.buildPageReport(r)
 		if err != nil {
 			log.Printf("callback function error: %v", err)
-			return
+			return -1, 0
 		}
 
 		// Create a requestData object and increase the Depth value
@@ -282,6 +282,14 @@ func (s *CrawlerHandler) responseCallback(crawl *models.Crawl, p *models.Project
 		// If the pageReport is saved correctly create the page issues, otherwise
 		// log the error.
 		if !pageReport.Noindex || p.IncludeNoindex {
+			// 处理 parent_id
+			var parentId int64
+			if pageReport.Depth != 0 {
+				parentId = pageReportIds[pageReport.Depth-1]
+			} else {
+				parentId = 0
+			}
+			pageReport.ParentId = parentId
 			pageReport, err = s.repository.SavePageReport(pageReport, crawl.Id)
 			if err == nil {
 				headers := make(http.Header)
@@ -304,6 +312,8 @@ func (s *CrawlerHandler) responseCallback(crawl *models.Crawl, p *models.Project
 			Crawling:   status.Crawling,
 			Discovered: status.Discovered,
 		}})
+		// 返回出去
+		return pageReport.Depth, pageReport.Id
 	}
 }
 

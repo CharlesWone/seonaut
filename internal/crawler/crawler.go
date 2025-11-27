@@ -39,7 +39,7 @@ type Client interface {
 	GetUAName() string
 }
 
-type ResponseCallback func(r *ResponseMessage)
+type ResponseCallback func(r *ResponseMessage, pageReportIds []int64) (dept int, pageReportId int64)
 
 type Options struct {
 	CrawlLimit      int
@@ -74,6 +74,7 @@ type Crawler struct {
 	cancel           context.CancelFunc
 	context          context.Context
 	callback         ResponseCallback
+	PageReportIds    []int64 // 存 page_reports 的id 索引对应深度（dept）
 }
 
 type ClientResponse struct {
@@ -162,7 +163,16 @@ func (c *Crawler) Start() {
 		c.status.Crawled++
 
 		if c.callback != nil {
-			c.callback(rm)
+			dept, pageReportId := c.callback(rm, c.PageReportIds)
+			if dept != -1 && pageReportId > 0 {
+				// 确保切片长度足够
+				if dept >= len(c.PageReportIds) {
+					// 扩容到 dept+1，用 0 填充
+					c.PageReportIds = append(c.PageReportIds, make([]int64, dept-len(c.PageReportIds)+1)...)
+				}
+				// 写入对应深度
+				c.PageReportIds[dept] = pageReportId
+			}
 		}
 
 		if !c.queue.Active() && c.options.CrawlSitemap && !sitemapLoaded {
@@ -174,6 +184,8 @@ func (c *Crawler) Start() {
 			break
 		}
 	}
+	// 爬完设置为 nil
+	c.PageReportIds = nil
 }
 
 // AddRequest processes a request message for the crawler.
