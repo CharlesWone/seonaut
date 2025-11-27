@@ -20,13 +20,13 @@ const (
 
 	// Random delay in milliseconds.
 	// A random delay up to this value is introduced before new HTTP requests.
-	randomDelay = 1500
+	randomDelay = 1000
 
 	// Number of threads a queue will use to crawl a project.
-	consumerThreads = 2
+	consumerThreads = 10
 
 	// Crawler timeout in hours.
-	crawlerTimeout = 2
+	crawlerTimeout = 5
 )
 
 var ErrBlockedByRobotstxt = errors.New("blocked by robots.txt")
