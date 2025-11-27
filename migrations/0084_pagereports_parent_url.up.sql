@@ -1,0 +1,1 @@
+alter table pagereports add parent_url varchar(1000) default '' not null;

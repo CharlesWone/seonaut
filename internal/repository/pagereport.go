@@ -50,7 +50,7 @@ func (ds *PageReportRepository) SavePageReport(r *models.PageReport, cid int64) 
 			depth,
 			body_hash,
 			ttfb,
-		    parent_id
+		    parent_url
 		)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
@@ -87,7 +87,7 @@ func (ds *PageReportRepository) SavePageReport(r *models.PageReport, cid int64) 
 		r.Depth,
 		r.BodyHash,
 		r.TTFB,
-		r.ParentId,
+		r.ParentURL,
 	)
 	if err != nil {
 		return r, err

@@ -103,7 +103,7 @@ func (s *CrawlerService) StartCrawler(p models.Project, b models.BasicAuth) erro
 				log.Printf("Failed to create archive: %v", err)
 			} else {
 				defer archiver.Close()
-				callback = s.crawlerHandler.archiveWrapper(callback, archiver, c.PageReportIds)
+				callback = s.crawlerHandler.archiveWrapper(callback, archiver)
 			}
 		}
 

@@ -41,5 +41,5 @@ type PageReport struct {
 	BodyHash           string
 	Timeout            bool
 	TTFB               int
-	ParentId           int64
+	ParentURL          string
 }
