@@ -240,8 +240,7 @@ URL_AFFECTED: 1 URL afectada          # Singular
 URLS_AFFECTED: "%1% URLs afectadas"   # Plural. %1% will be replaced with a number greater than 1
 DOWNLOAD_URLS: Descargar URLs
 NO_ISSUES: Todo está bien
-PARENT_URL: "URL padre:"
-ISSUE_URL:  "URL del problema:"
+PARENT_URL: "Origen:"
 
 # =============================================
 # CONTEXT: Data export page

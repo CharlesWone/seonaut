@@ -49,8 +49,8 @@
 				<div class="content">
 					<div class="url">
 						{{ if .Title }}{{ .Title }}<br />{{ end }}
-						{{ if .ParentURL }}{{ trans "PARENT_URL"}}<a href="{{ .ParentURL }}" target="_blank">{{ .ParentURL }}</a><br/>{{ end }}
-						{{ trans "ISSUE_URL" }}<a href="{{url "/resources"}}?pid={{ $pid }}&rid={{ .Id }}&eid={{ $eid }}">{{ .URL }}</a>
+						<a href="{{url "/resources"}}?pid={{ $pid }}&rid={{ .Id }}&eid={{ $eid }}">{{ .URL }}</a><br/>
+						{{ if .ParentURL }}{{ trans "PARENT_URL"}}<a href="{{ .ParentURL }}" target="_blank">{{ .ParentURL }}</a>{{ end }}
 					</div>
 				</div>
 			</div>

@@ -235,8 +235,7 @@ URL_AFFECTED: 1 个 URL 受影响        # 单数
 URLS_AFFECTED: "%1% 个 URL 受影响"  # 复数，%1% 将被替换为大于1的数字
 DOWNLOAD_URLS: 下载 URL 列表
 NO_ISSUES: 一切正常
-PARENT_URL: 上级URL：
-ISSUE_URL: 问题URL：
+PARENT_URL: 来源：
 
 # =============================================
 # CONTEXT: Data export page
