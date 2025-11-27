@@ -57,7 +57,8 @@
                 <div class="content">
                     <div class="url">
                         {{ if .Title }}{{ .Title }}<br/>{{ end }}
-                        <a href="{{ .URL }}" target="_blank">{{ .URL }}</a>
+                        {{ if .ParentURL }}{{ trans "PARENT_URL"}}<a href="{{ .ParentURL }}" target="_blank">{{ .ParentURL }}</a><br/>{{ end }}
+                        {{ trans "ISSUE_URL" }}<a href="{{ .URL }}" target="_blank">{{ .URL }}</a>
                     </div>
                 </div>
             </div>

@@ -240,6 +240,8 @@ URLS_AFFECTED: "%1% لینک تحت تأثیر"
 ISSUES_MESSAGE: "%1% مشکل بحرانی و %2% هشدار در این سایت شناسایی شده است."
 DOWNLOAD_URLS: دانلود لینک‌ها
 NO_ISSUES: همه چیز خوب است
+PARENT_URL: "نشانی والد:"
+ISSUE_URL:  "نشانی مشکل:"
 
 # =============================================
 # CONTEXT: Data export page

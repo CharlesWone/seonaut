@@ -163,7 +163,8 @@ func (ds *IssueRepository) FindPageReportIssues(cid int64, p int, errorType stri
 		SELECT
 			id,
 			url,
-			title
+			title,
+			parent_url
 		FROM pagereports
 		WHERE id IN (
 			SELECT DISTINCT pagereport_id
@@ -180,7 +181,7 @@ func (ds *IssueRepository) FindPageReportIssues(cid int64, p int, errorType stri
 
 	for rows.Next() {
 		p := models.PageReport{}
-		err := rows.Scan(&p.Id, &p.URL, &p.Title)
+		err := rows.Scan(&p.Id, &p.URL, &p.Title, &p.ParentURL)
 		if err != nil {
 			log.Println(err)
 			continue
