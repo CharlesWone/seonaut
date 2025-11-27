@@ -311,7 +311,7 @@ func (s *CrawlerHandler) responseCallback(crawl *models.Crawl, p *models.Project
 func (s *CrawlerHandler) buildPageReport(r *crawler.ResponseMessage) (*models.PageReport, *html.Node, error) {
 	// Check if the response caused an error and save a pageReport.
 	if r.Error != nil {
-		log.Printf("responseMessage error: %v", r.Error)
+		//log.Printf("responseMessage error: %v", r.Error)
 
 		return &models.PageReport{
 			Timeout:   true,
