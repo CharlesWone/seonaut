@@ -16,9 +16,9 @@ import (
 )
 
 const (
-	CrawlLimit      = 20000 // Max number of page reports that will be created
-	LastCrawlsLimit = 5     // Max number returned by GetLastCrawls
-	ClientTimeout   = 10    // HTTP client timeout in seconds.
+	CrawlLimit      = 100000 // Max number of page reports that will be created
+	LastCrawlsLimit = 5      // Max number returned by GetLastCrawls
+	ClientTimeout   = 10     // HTTP client timeout in seconds.
 )
 
 type CrawlerServiceRepository interface {
