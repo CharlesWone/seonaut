@@ -23,7 +23,7 @@ const (
 	randomDelay = 1000
 
 	// Number of threads a queue will use to crawl a project.
-	consumerThreads = 10
+	consumerThreads = 5
 
 	// Crawler timeout in hours.
 	crawlerTimeout = 5
