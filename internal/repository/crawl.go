@@ -228,6 +228,10 @@ func (ds *CrawlRepository) GetLastCrawls(p models.Project, limit int) []models.C
 // DeleteCrawlData deletes all the crawl's data in a batch process. It removes the crawl's associated
 // links, external_links, hreflangs, issues, images and any other data associated to it.
 func (ds *CrawlRepository) DeleteCrawlData(crawl *models.Crawl) {
+	if true {
+		// 不删除，靠ttl自动清理
+		return
+	}
 	log.Printf("DeleteCrawlData start, crawl_id: %d, url: %s", crawl.Id, crawl.URL)
 
 	tables := []string{
