@@ -36,16 +36,16 @@ func (sr *SqlReporter) NoFollowIndexableReporter(c *models.Crawl) *models.Multip
 // that are internally linked with and without the nofollow attribute.
 func (sr *SqlReporter) FollowNoFollowReporter(c *models.Crawl) *models.MultipageIssueReporter {
 	query := `
-		SELECT
-			pagereports.id
-		FROM pagereports WHERE crawl_id = ? and url_hash in (
-			SELECT
-				url_hash
+		SELECT pr.id
+		FROM pagereports pr
+		INNER JOIN (
+			SELECT url_hash
 			FROM links
 			WHERE crawl_id = ?
 			GROUP BY url_hash
-			HAVING COUNT(DISTINCT nofollow) > 1
-			)`
+			HAVING MIN(nofollow) <> MAX(nofollow) 
+		) l ON pr.url_hash = l.url_hash
+		WHERE pr.crawl_id = ?;`
 
 	return &models.MultipageIssueReporter{
 		Pstream:   sr.pageReportsQuery(query, c.Id, c.Id),
