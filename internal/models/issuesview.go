@@ -4,6 +4,7 @@ type (
 	IssuesGroupView struct {
 		ProjectView *ProjectView
 		IssueCount  *IssueCount
+		Crawls      []Crawl
 	}
 
 	IssuesView struct {

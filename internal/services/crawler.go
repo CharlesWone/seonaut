@@ -158,6 +158,11 @@ func (s *CrawlerService) GetLastCrawls(p models.Project) []models.Crawl {
 	return crawls
 }
 
+// GetLastNCrawls returns a slice with the specified number of crawls for the project
+func (s *CrawlerService) GetLastNCrawls(p models.Project, limit int) []models.Crawl {
+	return s.repository.GetLastCrawls(p, limit)
+}
+
 // StopCrawler stops a crawler. If the crawler does not exsit it will just return.
 func (s *CrawlerService) StopCrawler(p models.Project) {
 	s.lock.Lock()

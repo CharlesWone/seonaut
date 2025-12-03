@@ -54,9 +54,13 @@ func (h *issuesReportHandler) indexHandler(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	// 获取最近30次爬取数据
+	crawls := h.CrawlerService.GetLastNCrawls(pv.Project, 7)
+
 	ig := models.IssuesGroupView{
 		ProjectView: pv,
 		IssueCount:  h.IssueService.GetIssuesCount(pv.Crawl.Id),
+		Crawls:      crawls,
 	}
 
 	v := &PageView{
