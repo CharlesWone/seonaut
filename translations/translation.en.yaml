@@ -546,6 +546,21 @@ ERROR_CANONICAL_MISMATCH_DESC: Pages with different canonical URLs in the HTML c
 ERROR_MISSING_HSTS: Missing HSTS header
 ERROR_MISSING_HSTS_DESC: Pages without HSTS header. Missing HTTP Strict Transport Security header makes sites more vulnerable to security threats which may impact SEO in terms of user security and trustworthiness.
 
+ERROR_MISSING_XFRAME_OPTIONS: Missing Clickjacking Protection
+ERROR_MISSING_XFRAME_OPTIONS_DESC: No X-Frame-Options or CSP frame-ancestors header. Page can be embedded in iframe by any site, risking clickjacking attacks.
+
+ERROR_MISSING_REFERRER_POLICY: Missing Referrer-Policy Header
+ERROR_MISSING_REFERRER_POLICY_DESC: Without Referrer-Policy, sensitive parameters (e.g. token, session) in referrer URL may leak to third-party sites.
+
+ERROR_SERVER_VERSION_LEAK: Server Header Exposes Version
+ERROR_SERVER_VERSION_LEAK_DESC: Server header contains version number. In non-Cloudflare environments, exact version is exposed.
+
+ERROR_XPOWERED_BY_LEAK: X-Powered-By Information Disclosure
+ERROR_XPOWERED_BY_LEAK_DESC: Header exposes backend technology stack. Attackers can exploit known vulnerabilities.
+
+ERROR_ASPNET_VERSION_LEAK: Severe ASP.NET Version Leak
+ERROR_ASPNET_VERSION_LEAK_DESC: Headers X-AspNet-Version or X-AspNetMvc-Version present. High-risk fingerprinting issue enabled by default in old ASP.NET versions.
+
 ERROR_MISSING_CSP: Missing content security policy
 ERROR_MISSING_CSP_DESC: Pages missing the CSP (Content Security Policy) HTML meta tag or HTTP header increase vulnerability to security threats, potentially leading to malicious content or compromised user experiences, which search engines may penalize.
 

@@ -487,6 +487,22 @@ ERROR_CANONICAL_MISMATCH: HTML 与 HTTP 头中的 canonical 不一致
 ERROR_CANONICAL_MISMATCH_DESC: 不一致会导致搜索引擎困惑，影响排名。
 ERROR_MISSING_HSTS: 缺少 HSTS 头
 ERROR_MISSING_HSTS_DESC: 缺少 HSTS 会降低安全性，可能影响 SEO，强制浏览器只通过HTTPS与网站通信，防止SSL剥离攻击。
+
+ERROR_MISSING_XFRAME_OPTIONS: 缺少防点击劫持保护
+ERROR_MISSING_XFRAME_OPTIONS_DESC: 未设置 X-Frame-Options 或 CSP frame-ancestors，页面可被任意站点 iframe 嵌入，可能导致点击劫持攻击。
+
+ERROR_MISSING_REFERRER_POLICY: 缺少 Referrer-Policy 响应头
+ERROR_MISSING_REFERRER_POLICY_DESC: 未设置 Referrer-Policy，可能导致来源 URL 中的敏感参数（如 token、session）泄露给第三方站点。
+
+ERROR_SERVER_VERSION_LEAK: Server 头泄露服务器版本
+ERROR_SERVER_VERSION_LEAK_DESC: Server 头包含版本号，非 Cloudflare 环境会暴露具体版本信息。
+
+ERROR_XPOWERED_BY_LEAK: X-Powered-By 信息泄露
+ERROR_XPOWERED_BY_LEAK_DESC: 响应头暴露后端技术栈，攻击者可针对性利用已知漏洞。
+
+ERROR_ASPNET_VERSION_LEAK: ASP.NET 版本信息严重泄露
+ERROR_ASPNET_VERSION_LEAK_DESC: 存在 X-AspNet-Version 或 X-AspNetMvc-Version 头，属于高危指纹信息，老版本 ASP.NET 默认开启。
+
 ERROR_MISSING_CSP: 缺少内容安全策略
 ERROR_MISSING_CSP_DESC: 缺少 CSP 增加安全风险，搜索引擎可能降权。
 ERROR_CONTENT_TYPE_OPTIONS: 缺少 X-Content-Type-Options 头
