@@ -31,7 +31,8 @@ type CrawlerHandler struct {
 }
 
 type crawlerData struct {
-	Depth int
+	Depth     int
+	ParentURL string
 }
 
 type Archiver interface {
@@ -72,6 +73,7 @@ func (s *CrawlerHandler) responseCallback(crawl *models.Crawl, p *models.Project
 		d, ok := r.Data.(crawlerData)
 		if ok {
 			requestData.Depth = d.Depth + 1
+			requestData.ParentURL = pageReport.URL
 		}
 
 		pageReport.TTFB = r.TTFB
@@ -282,6 +284,8 @@ func (s *CrawlerHandler) responseCallback(crawl *models.Crawl, p *models.Project
 		// If the pageReport is saved correctly create the page issues, otherwise
 		// log the error.
 		if !pageReport.Noindex || p.IncludeNoindex {
+			// 从响应中拿
+			pageReport.ParentURL = d.ParentURL
 			pageReport, err = s.repository.SavePageReport(pageReport, crawl.Id)
 			if err == nil {
 				headers := make(http.Header)
@@ -304,6 +308,7 @@ func (s *CrawlerHandler) responseCallback(crawl *models.Crawl, p *models.Project
 			Crawling:   status.Crawling,
 			Discovered: status.Discovered,
 		}})
+		return
 	}
 }
 
